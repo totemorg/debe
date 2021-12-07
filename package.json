@@ -10,7 +10,7 @@
     "config": "source ./maint.sh config",
     "relink": "cd node_modules; for f in doc atomic enums totem blog skin dogs randpr pipe geohack reader jsdb man; do ln -s ../../$f $f; done",
     "redoc": "jsdoc2md --template README.hbs --files debe.js >README.md; git commit -am 'redoc'; git  push agent master",
-    "genhome": "node debe.js blog http://localhost:8080/totemblog.view ./stash/index.html; cd stash; git commit -am 'reblog'; git push agent master",
+    "genio": "node debe.js blog http://localhost:8080/totemblog.view ./stash/index.html; cd stash; git commit -am 'reblog'; git push agent master",
     "gen": "node debe.js blog ${npm_config_in} ${npm_config_out}"
   },
   "repository": {

@@ -107,7 +107,9 @@ Simply install and start its federated docker image (
 	npm run startdb						# Start the database servers
 	npm run debug						# Start debe in debug mode
 	npm run oper						# Start debe in operational mode
-	npm run reblog						# Generate totemstan splash pages
+	npm run genio						# Generate totemstan.github.io page
+	npm run gen --in=src --out=tar		# Generate target file from source url
+
 
 ## Usage
 
