@@ -1,0 +1,241 @@
+//- UNCLASSIFIED
+extends base
+append base_help
+	:markdown
+		# site options:
+
+			- etc = side bar links (!{etc})
+			- name = site name (!{query.name})
+			- dock = folder docking style left || right || top || bottom (!{dock})
+			- dims = width,height maximum widget dimensions (!{dims})
+			- view = site style Home | Kiss | Engr | Min | Basic | Simple, ... (!{view})
+			- page = maximum grid rows (!{page})
+			- pulse = grid refresh rate [seconds] (!{pulse})
+			- secureLink = enable the secureLink (!{secureLink})
+
+append base_parms
+	block site_parms
+		- etc = "links || status || pocs"
+		- dock = "top" // folder docking style left | right | top | bottom
+		- dims = "100%,100%" // width,height maximum widget dimensions 
+		- view = "tabbed" // site style Home | Kiss | Engr | Min | Basic | Simple, ..
+		- page = 50 // maximum grid rows
+		- pulse = 120 // refresh rate [seconds]
+		- secureLink = true
+
+	case view
+		when "draw"
+			- tech = "d3"
+		when "brief"
+			- tech = "reveal"
+		when "browse"
+			- tech = "elFinder"
+		default
+			- tech = "layout"
+
+append base_head
+	block site_head
+
+append base_body
+
+	- rand = Math.floor( Math.random() * 20 )
+	- logo = `/stash/${domain}/header${rand}.jpg`
+	- mode = view.toLowerCase()
+	- name = query.name
+	- tools = [ nick.link("/totem.brief"), ((profile.Credit*1e-3).toFixed(0)+"$ "+profile.QoS+"qos"), "artifacts".link(`/${query.name}.browse`), "brief".link(`/${query.name}.brief`), "stores".link(`${query.name}.stores`), "ToU".link(`${query.name}.tou`)]
+	- toolbar = tools.join(" || ").tag("span")
+
+	if secureLink
+		script(type="text/javascript",src="/clients/openpgp.min.js")
+		script(type="text/javascript",src="/uis/uilink.js")
+		link(rel='stylesheet',href='/uis/uilink.css')
+
+		- users = "".tag("select").tag("span",{id:"users"})
+		//- rooms = "".tag("select").tag("span",{id:"rooms"})
+		- tips = {save:"!!passphrase saves history",load:"!!passphrase loads history",delete:"clear history",lock:"privacy status",login:"!!reset||temp||logoff||account/password|| login"}
+		- scroll = "".tag("input",{id:"scroll",type:"number",value:1,min:0,max:0,onclick:"notice_scroll()"})
+		- upload = "".tag("input", {id:"upload",class:"inputfile",type:"file",size:10,value:"/myfiles"})+"upload".tag("label",{for:"upload"})
+		- but = name => "".tag("img",{src:`/clients/icons/actions/${name}.png`,width:15,height:15}).tag("button",{id:name,text:name,value:"on",class:"btn",onclick:`notice_${name}()`})
+		- ctrl = name => (but(name)+tips[name].tag("span",{class:"w3-text"})).tag("span",{class:"w3-tooltip"})
+		- ctrls = ctrl("save")+ctrl("load")+ctrl("login")+scroll
+		- notice = "".tag("input", {id:"notice",type:"text",autocomplete:"on",size:75,value:"hello",onchange:"notice_signal()"})
+		- tick = "".tag("input", {id:"tick",type:"text",size:1, class:"infoBox", value:timeout,	disabled: 1, style:"display:none"}),
+		- tries = "".tag("input", {id:"tries",	type:"text",size:1, class:"infoBox", value:retries,	disabled: 1, style:"display:none" }),
+		- toolbar += [users, tick + tries, users, notice, ctrls, upload].join(" || ")
+
+	p.ui-banner= banner
+	case mode
+		when "test"
+			folder#Fold
+				tab.One
+					p tab1 content
+					grid#test1(path="/demo.db",cols="ID...hide,Name,Counter.n.careful,Source,Description.x,Start")
+
+				tab.Two
+					p tab2 content
+
+		when "min"
+			border#xSite(
+				crush, splash=true,
+				head="Prefs(Locales,Themes),Files(Manage,Uploads,$uploads,Stores,$stores),Options,LikeUs,Help",
+				LikeUs="/likeus.db",
+				Manage="/files.view" )
+
+				block site_help
+				tab#center
+					block site_body
+
+				tab#north(class=toolbar)
+					img(src=logo,width="100%",height="80px")
+
+				tab#west(class=etc)
+					:markdown
+						!{$brief}  
+						[scripts](/scripts.view)  
+						[survey](/survey.view)  
+						[notebooks](/notebooks.html)  					
+						!{$rtp}  
+						!{$jira}  
+						!{$ras}
+
+		when "basic"
+			folder#xSite(dock=dock)
+				block site_body
+
+		when "insert"
+			border#xSite(head="Options,Help",crush)
+
+				block site_help
+
+				#folder(class=query.name,center,dock=dock)
+					block site_body
+
+		when "tabbed"
+			border#xSite(
+				crush, splash=true,
+				head="Prefs(Locales,Themes),Files(Manage,Uploads,$uploads,Stores,$stores),Options,LikeUs,Help",
+				LikeUs="/likeus.db",
+				Manage="/files.view" )
+
+				block site_help
+				tab#center
+					folder#xFolder(dock=dock)
+						block site_body
+
+				tab#north(class=toolbar)
+					img(src=logo,width="100%",height="80px")
+
+				tab#south
+					p!= map
+					//
+						:markdown
+
+						By: #{byline}  
+
+				tab#west(class=etc)
+					:markdown
+						!{$brief}  
+						[scripts](/scripts.view)  
+						[survey](/survey.view)  
+						[notebooks](/notebooks.html)  					
+						!{$rtp}  
+						!{$jira}  
+						!{$ras}
+
+		when "home"
+			border#xSite(
+				title=toolbar,crush,dims=dims,
+				head="Health,Users,Themes,Capture,Links,Options,Likeus,Help",
+				LikeUs="/likeus.db" )
+
+				block site_help
+				// #post.xBrief(path="/briefs.view?notebook=#{query.name}",dims="600,300")
+
+				tab#center(class=query.name)
+					block site_body
+
+		when "monster"
+			border#xSite(
+				title=toolbar,crush,
+				head="More(Health,Users,Links,Themes),Uploads,$uploads,Stores,$stores,Views,Options,LikeUs,Help",
+				LikeUs="/likeus.db")
+
+				block site_help
+				// #post.xBrief(path="/briefs.view?notebook=#{query.name}",dims="600,300")
+
+				//
+					#pivot.Helpful.Links(
+					west,crush,dims="200,600",
+					path="/sidebars.db",
+					cols="Pivot(NodeID,Topic),Special")
+
+				tab#center(class=query.name)
+					block site_body
+
+		when "kiss"
+		when "simple"
+		when "brief"
+			block site_help
+			block site_body
+
+		when "search"
+			border#xSite(
+				crush,
+				head="Comfort,Prefs(Locales,Themes),Files(Manage,Uploads,$uploads,Stores,$stores),Options,Likeus,Help",
+				LikeUs="/likeus.db",
+				Manage="/files.view",
+				title=toolbar)
+
+				grid#Search(
+					path="/catalog.db",center,crush,
+					head="Search,Execute,Print,Refresh",
+					page=100,
+					cols="Ref,Name,Link.h,Dated.d,Quality")
+
+				tab#center(class=query.name)
+					block site_body
+
+		default
+			border#xSite(
+				title=toolbar,
+				crush,
+				head="System(Health,Users,Links,Notebooks,Tasks),Prefs(Locales,Themes),Files(Manage,Uploads,$uploads,Stores,$stores),Options,LikeUs,Capture,Help",
+				LikeUs="/likeus.db",
+				Manage="/files.view")
+
+				block site_help
+				// #post.xBrief(path="/briefs.view?notebook=#{query.name}",dims="600,300")
+
+				tab#center(class=query.name)
+					block site_body
+
+	//-
+		p.ui-banner= banner
+		case mode
+		when "monster"
+			#fit(class=etc,south,crush)
+				ishtml
+					each brow in ["supported","Chrome","Firefox","Opera","Safari"]
+						img(src=icons+"/browsers/"+brow+".ico",width=16,height=16)
+					each brow in ["unsupported","IE","Netscape","Traveler","TheWorld","Maxthon"]
+						img(src=icons+"/browsers/"+brow+".ico",width=16,height=16)
+
+		when "basic"
+		when "tabbed"
+		when "jome"
+		when "min"
+			#fit(class=etc,west,crush)
+				:markdown
+					[browse Totem](/briefs.view?nb=browse)  
+					[API guide](/api.view)  
+					[skinning guide](/skinguide.view)  
+					[restart Totem](/restart)  
+					[email history](/email.view)  
+					[issues](/issues.view)  
+					[scripts](/scripts.view)  
+					[survey](/survey.view)  
+					[status](/status.view)  
+					[notebooks](/notebooks.html)  					
+					!{RTP}  
+					!{JIRA}  
+					!{RAS}

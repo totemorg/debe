@@ -1,0 +1,754 @@
+{
+  "settings": {
+    "languages": [
+      "en"
+    ]
+  },
+  "nluManager": {
+    "settings": {},
+    "languages": [
+      "en"
+    ],
+    "intentDomains": {},
+    "domainManagers": {
+      "en": {
+        "settings": {
+          "language": "en",
+          "useNoneFeature": true,
+          "config": {
+            "activation": "leaky-relu",
+            "hiddenLayers": [],
+            "iterations": 20000,
+            "learningRate": 0.7,
+            "errorThresh": 0.00005,
+            "momentum": 0.5,
+            "deltaErrorThresh": 0.000001,
+            "maxDecimals": 9,
+            "leakyReluAlpha": 0.08,
+            "timeout": 120000
+          }
+        },
+        "language": "en",
+        "nluClassName": "BrainNLU",
+        "useMasterDomain": true,
+        "trainByDomain": false,
+        "keepStopwords": true,
+        "stemDict": {
+          "a,horribl,is,oper,system,window": {
+            "domain": "default",
+            "intent": "os"
+          },
+          "best,is,oper,system,the,unix": {
+            "domain": "default",
+            "intent": "os"
+          },
+          "and,fast,incud,linux,os,sometim,window": {
+            "domain": "default",
+            "intent": "os"
+          },
+          "a,area,coher,complex,involv,is,of,optic,subject,the,theori": {
+            "domain": "default",
+            "intent": "photons"
+          },
+          "can,cross,due,fring,issu,puriti,shift,some,spectral,to": {
+            "domain": "default",
+            "intent": "photons"
+          },
+          "a,count,doubli,is,photon,process,stochast": {
+            "domain": "default",
+            "intent": "photons"
+          },
+          "a,fundement,is,optic,polarizarion,properti": {
+            "domain": "default",
+            "intent": "photons"
+          },
+          "a,beam,coher,degre,in,is,measur,of,of,optic,polar,the": {
+            "domain": "default",
+            "intent": "photons"
+          },
+          "cartel,kill,own,sometim,their": {
+            "domain": "default",
+            "intent": "terror"
+          },
+          "by,farc,helpless,peasant,threaten,were": {
+            "domain": "default",
+            "intent": "terror"
+          },
+          "the": {
+            "domain": "default",
+            "intent": "terror"
+          }
+        },
+        "intentDict": {
+          "os": "default",
+          "photons": "default",
+          "terror": "default"
+        },
+        "useStemDict": true,
+        "domains": {
+          "master_domain": {
+            "settings": {
+              "language": "en",
+              "useNoneFeature": true,
+              "config": {
+                "activation": "leaky-relu",
+                "hiddenLayers": [],
+                "iterations": 20000,
+                "learningRate": 0.7,
+                "errorThresh": 0.00005,
+                "momentum": 0.5,
+                "deltaErrorThresh": 0.000001,
+                "maxDecimals": 9,
+                "leakyReluAlpha": 0.08,
+                "timeout": 120000
+              }
+            },
+            "language": "en",
+            "keepStopwords": true,
+            "docs": [
+              {
+                "intent": "os",
+                "tokens": [
+                  "window",
+                  "is",
+                  "a",
+                  "horribl",
+                  "oper",
+                  "system"
+                ]
+              },
+              {
+                "intent": "os",
+                "tokens": [
+                  "the",
+                  "best",
+                  "oper",
+                  "system",
+                  "is",
+                  "unix"
+                ]
+              },
+              {
+                "intent": "os",
+                "tokens": [
+                  "fast",
+                  "os",
+                  "incud",
+                  "linux",
+                  "and",
+                  "sometim",
+                  "window"
+                ]
+              },
+              {
+                "intent": "photons",
+                "tokens": [
+                  "optic",
+                  "is",
+                  "a",
+                  "complex",
+                  "subject",
+                  "area",
+                  "involv",
+                  "the",
+                  "theori",
+                  "of",
+                  "coher"
+                ]
+              },
+              {
+                "intent": "photons",
+                "tokens": [
+                  "some",
+                  "fring",
+                  "can",
+                  "shift",
+                  "due",
+                  "to",
+                  "cross",
+                  "spectral",
+                  "puriti",
+                  "issu"
+                ]
+              },
+              {
+                "intent": "photons",
+                "tokens": [
+                  "photon",
+                  "count",
+                  "is",
+                  "a",
+                  "doubli",
+                  "stochast",
+                  "process"
+                ]
+              },
+              {
+                "intent": "photons",
+                "tokens": [
+                  "polarizarion",
+                  "is",
+                  "a",
+                  "fundement",
+                  "optic",
+                  "properti"
+                ]
+              },
+              {
+                "intent": "photons",
+                "tokens": [
+                  "the",
+                  "degre",
+                  "of",
+                  "polar",
+                  "is",
+                  "a",
+                  "measur",
+                  "of",
+                  "coher",
+                  "in",
+                  "optic",
+                  "beam"
+                ]
+              },
+              {
+                "intent": "terror",
+                "tokens": [
+                  "sometim",
+                  "cartel",
+                  "kill",
+                  "their",
+                  "own"
+                ]
+              },
+              {
+                "intent": "terror",
+                "tokens": [
+                  "helpless",
+                  "peasant",
+                  "were",
+                  "threaten",
+                  "by",
+                  "farc"
+                ]
+              },
+              {
+                "intent": "terror",
+                "tokens": [
+                  "the"
+                ]
+              }
+            ],
+            "features": {
+              "window": 2,
+              "is": 6,
+              "a": 5,
+              "horribl": 1,
+              "oper": 2,
+              "system": 2,
+              "the": 4,
+              "best": 1,
+              "unix": 1,
+              "fast": 1,
+              "os": 1,
+              "incud": 1,
+              "linux": 1,
+              "and": 1,
+              "sometim": 2,
+              "optic": 3,
+              "complex": 1,
+              "subject": 1,
+              "area": 1,
+              "involv": 1,
+              "theori": 1,
+              "of": 3,
+              "coher": 2,
+              "some": 1,
+              "fring": 1,
+              "can": 1,
+              "shift": 1,
+              "due": 1,
+              "to": 1,
+              "cross": 1,
+              "spectral": 1,
+              "puriti": 1,
+              "issu": 1,
+              "photon": 1,
+              "count": 1,
+              "doubli": 1,
+              "stochast": 1,
+              "process": 1,
+              "polarizarion": 1,
+              "fundement": 1,
+              "properti": 1,
+              "degre": 1,
+              "polar": 1,
+              "measur": 1,
+              "in": 1,
+              "beam": 1,
+              "cartel": 1,
+              "kill": 1,
+              "their": 1,
+              "own": 1,
+              "helpless": 1,
+              "peasant": 1,
+              "were": 1,
+              "threaten": 1,
+              "by": 1,
+              "farc": 1
+            },
+            "isEditing": false,
+            "className": "BrainNLU",
+            "classifier": {
+              "className": "BrainClassifier",
+              "settings": {
+                "language": "en",
+                "useNoneFeature": true,
+                "config": {
+                  "activation": "leaky-relu",
+                  "hiddenLayers": [],
+                  "iterations": 20000,
+                  "learningRate": 0.7,
+                  "errorThresh": 0.00005,
+                  "momentum": 0.5,
+                  "deltaErrorThresh": 0.000001,
+                  "maxDecimals": 9,
+                  "leakyReluAlpha": 0.08,
+                  "timeout": 120000
+                }
+              },
+              "labels": [],
+              "network": {
+                "sizes": [
+                  57,
+                  4
+                ],
+                "layers": [
+                  {
+                    "window": {},
+                    "is": {},
+                    "a": {},
+                    "horribl": {},
+                    "oper": {},
+                    "system": {},
+                    "the": {},
+                    "best": {},
+                    "unix": {},
+                    "fast": {},
+                    "os": {},
+                    "incud": {},
+                    "linux": {},
+                    "and": {},
+                    "sometim": {},
+                    "optic": {},
+                    "complex": {},
+                    "subject": {},
+                    "area": {},
+                    "involv": {},
+                    "theori": {},
+                    "of": {},
+                    "coher": {},
+                    "some": {},
+                    "fring": {},
+                    "can": {},
+                    "shift": {},
+                    "due": {},
+                    "to": {},
+                    "cross": {},
+                    "spectral": {},
+                    "puriti": {},
+                    "issu": {},
+                    "photon": {},
+                    "count": {},
+                    "doubli": {},
+                    "stochast": {},
+                    "process": {},
+                    "polarizarion": {},
+                    "fundement": {},
+                    "properti": {},
+                    "degre": {},
+                    "polar": {},
+                    "measur": {},
+                    "in": {},
+                    "beam": {},
+                    "cartel": {},
+                    "kill": {},
+                    "their": {},
+                    "own": {},
+                    "helpless": {},
+                    "peasant": {},
+                    "were": {},
+                    "threaten": {},
+                    "by": {},
+                    "farc": {},
+                    "nonefeature": {}
+                  },
+                  {
+                    "os": {
+                      "bias": 0.305935785,
+                      "weights": {
+                        "window": 2.856062174,
+                        "is": 1.811701179,
+                        "a": -0.237812057,
+                        "horribl": 1.223580241,
+                        "oper": 3.273092747,
+                        "system": 3.273092747,
+                        "the": -0.273596078,
+                        "best": 2.049512863,
+                        "unix": 2.049512863,
+                        "fast": 1.632482409,
+                        "os": 1.632482409,
+                        "incud": 1.632482409,
+                        "linux": 1.632482409,
+                        "and": 1.632482409,
+                        "sometim": 1.172577739,
+                        "optic": -1.021048784,
+                        "complex": -0.415023267,
+                        "subject": -0.415023267,
+                        "area": -0.415023267,
+                        "involv": -0.415023267,
+                        "theori": -0.415023267,
+                        "of": -0.644761026,
+                        "coher": -0.644761026,
+                        "some": -0.133312091,
+                        "fring": -0.133312091,
+                        "can": -0.133312091,
+                        "shift": -0.133312091,
+                        "due": -0.133312091,
+                        "to": -0.133312091,
+                        "cross": -0.133312091,
+                        "spectral": -0.133312091,
+                        "puriti": -0.133312091,
+                        "issu": -0.133312091,
+                        "photon": -0.44034341,
+                        "count": -0.44034341,
+                        "doubli": -0.44034341,
+                        "stochast": -0.44034341,
+                        "process": -0.44034341,
+                        "polarizarion": -0.376287788,
+                        "fundement": -0.376287788,
+                        "properti": -0.376287788,
+                        "degre": -0.229737788,
+                        "polar": -0.229737788,
+                        "measur": -0.229737788,
+                        "in": -0.229737788,
+                        "beam": -0.229737788,
+                        "cartel": -0.459904581,
+                        "kill": -0.459904581,
+                        "their": -0.459904581,
+                        "own": -0.459904581,
+                        "helpless": -0.145192742,
+                        "peasant": -0.145192742,
+                        "were": -0.145192742,
+                        "threaten": -0.145192742,
+                        "by": -0.145192742,
+                        "farc": -0.145192742,
+                        "nonefeature": -0.414628744
+                      }
+                    },
+                    "photons": {
+                      "bias": 0.572165267,
+                      "weights": {
+                        "window": -1.215845227,
+                        "is": 2.312795401,
+                        "a": 2.724854231,
+                        "horribl": -1.193926573,
+                        "oper": -1.605985522,
+                        "system": -1.605985522,
+                        "the": -0.561647058,
+                        "best": -0.412059128,
+                        "unix": -0.412059128,
+                        "fast": -0.021918653,
+                        "os": -0.021918653,
+                        "incud": -0.021918653,
+                        "linux": -0.021918653,
+                        "and": -0.021918653,
+                        "sometim": -0.278142035,
+                        "optic": 2.540834427,
+                        "complex": 0.545588255,
+                        "subject": 0.545588255,
+                        "area": 0.545588255,
+                        "involv": 0.545588255,
+                        "theori": 0.545588255,
+                        "of": 1.091055632,
+                        "coher": 1.091055632,
+                        "some": 1.192730427,
+                        "fring": 1.192730427,
+                        "can": 1.192730427,
+                        "shift": 1.192730427,
+                        "due": 1.192730427,
+                        "to": 1.192730427,
+                        "cross": 1.192730427,
+                        "spectral": 1.192730427,
+                        "puriti": 1.192730427,
+                        "issu": 1.192730427,
+                        "photon": 1.377946496,
+                        "count": 1.377946496,
+                        "doubli": 1.377946496,
+                        "stochast": 1.377946496,
+                        "process": 1.377946496,
+                        "polarizarion": 1.449778676,
+                        "fundement": 1.449778676,
+                        "properti": 1.449778676,
+                        "degre": 0.545468032,
+                        "polar": 0.545468032,
+                        "measur": 0.545468032,
+                        "in": 0.545468032,
+                        "beam": 0.545468032,
+                        "cartel": -0.256223381,
+                        "kill": -0.256223381,
+                        "their": -0.256223381,
+                        "own": -0.256223381,
+                        "helpless": -0.241889238,
+                        "peasant": -0.241889238,
+                        "were": -0.241889238,
+                        "threaten": -0.241889238,
+                        "by": -0.241889238,
+                        "farc": -0.241889238,
+                        "nonefeature": -0.600204885
+                      }
+                    },
+                    "terror": {
+                      "bias": 3.591436216,
+                      "weights": {
+                        "window": -0.916106641,
+                        "is": -3.537629604,
+                        "a": -1.490113974,
+                        "horribl": -0.148718029,
+                        "oper": -2.196233749,
+                        "system": -2.196233749,
+                        "the": 8.507923126,
+                        "best": -2.047515392,
+                        "unix": -2.047515392,
+                        "fast": -0.767388701,
+                        "os": -0.767388701,
+                        "incud": -0.767388701,
+                        "linux": -0.767388701,
+                        "and": -0.767388701,
+                        "sometim": 1.171454787,
+                        "optic": -1.282492042,
+                        "complex": -0.640903711,
+                        "subject": -0.640903711,
+                        "area": -0.640903711,
+                        "involv": -0.640903711,
+                        "theori": -0.640903711,
+                        "of": -1.278989792,
+                        "coher": -1.278989792,
+                        "some": -0.358083695,
+                        "fring": -0.358083695,
+                        "can": -0.358083695,
+                        "shift": -0.358083695,
+                        "due": -0.358083695,
+                        "to": -0.358083695,
+                        "cross": -0.358083695,
+                        "spectral": -0.358083695,
+                        "puriti": -0.358083695,
+                        "issu": -0.358083695,
+                        "photon": -0.058903906,
+                        "count": -0.058903906,
+                        "doubli": -0.058903906,
+                        "stochast": -0.058903906,
+                        "process": -0.058903906,
+                        "polarizarion": -0.003502204,
+                        "fundement": -0.003502204,
+                        "properti": -0.003502204,
+                        "degre": -0.638085961,
+                        "polar": -0.638085961,
+                        "measur": -0.638085961,
+                        "in": -0.638085961,
+                        "beam": -0.638085961,
+                        "cartel": 1.938844204,
+                        "kill": 1.938844204,
+                        "their": 1.938844204,
+                        "own": 1.938844204,
+                        "helpless": 1.487724185,
+                        "peasant": 1.487724185,
+                        "were": 1.487724185,
+                        "threaten": 1.487724185,
+                        "by": 1.487724185,
+                        "farc": 1.487724185,
+                        "nonefeature": -3.416238308
+                      }
+                    },
+                    "None": {
+                      "bias": 2.605309814,
+                      "weights": {
+                        "window": -0.428413808,
+                        "is": -0.809588969,
+                        "a": -0.68099761,
+                        "horribl": -0.142959565,
+                        "oper": -0.271550894,
+                        "system": -0.271550894,
+                        "the": -2.45007062,
+                        "best": -0.128591314,
+                        "unix": -0.128591314,
+                        "fast": -0.285454303,
+                        "os": -0.285454303,
+                        "incud": -0.285454303,
+                        "linux": -0.285454303,
+                        "and": -0.285454303,
+                        "sometim": -0.749129534,
+                        "optic": -0.315201014,
+                        "complex": -0.044943966,
+                        "subject": -0.044943966,
+                        "area": -0.044943966,
+                        "involv": -0.044943966,
+                        "theori": -0.044943966,
+                        "of": -0.048998367,
+                        "coher": -0.048998367,
+                        "some": -0.260478854,
+                        "fring": -0.260478854,
+                        "can": -0.260478854,
+                        "shift": -0.260478854,
+                        "due": -0.260478854,
+                        "to": -0.260478854,
+                        "cross": -0.260478854,
+                        "spectral": -0.260478854,
+                        "puriti": -0.260478854,
+                        "issu": -0.260478854,
+                        "photon": -0.222837076,
+                        "count": -0.222837076,
+                        "doubli": -0.222837076,
+                        "stochast": -0.222837076,
+                        "process": -0.222837076,
+                        "polarizarion": -0.266202629,
+                        "fundement": -0.266202629,
+                        "properti": -0.266202629,
+                        "degre": -0.004054401,
+                        "polar": -0.004054401,
+                        "measur": -0.004054401,
+                        "in": -0.004054401,
+                        "beam": -0.004054401,
+                        "cartel": -0.463675112,
+                        "kill": -0.463675112,
+                        "their": -0.463675112,
+                        "own": -0.463675112,
+                        "helpless": -0.433990121,
+                        "peasant": -0.433990121,
+                        "were": -0.433990121,
+                        "threaten": -0.433990121,
+                        "by": -0.433990121,
+                        "farc": -0.433990121,
+                        "nonefeature": 9.730897903
+                      }
+                    }
+                  }
+                ],
+                "trainOpts": {
+                  "iterations": 20000,
+                  "errorThresh": 0.00005,
+                  "fixedError": false,
+                  "deltaErrorThresh": 0.000001,
+                  "learningRate": 0.7,
+                  "momentum": 0.5,
+                  "leakyReluAlpha": 0.08,
+                  "maxDecimals": 9,
+                  "log": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "extraSentences": [
+      [
+        "en",
+        "windows is a horrible operating system"
+      ],
+      [
+        "en",
+        "the best operating system is unix"
+      ],
+      [
+        "en",
+        "fast os incude linux and sometimes windows"
+      ],
+      [
+        "en",
+        "optics is a complex subject area involving the theory of coherence"
+      ],
+      [
+        "en",
+        "some fringes can shift due to cross spectral purity issues"
+      ],
+      [
+        "en",
+        "photon counting is a doubly stochastic process"
+      ],
+      [
+        "en",
+        "polarizarion is a fundemental optical property"
+      ],
+      [
+        "en",
+        "the degree of polarization is a measure of coherence in optical beams"
+      ],
+      [
+        "en",
+        "sometimes cartels kill their own"
+      ],
+      [
+        "en",
+        "helpless peasants were threatened by FARC"
+      ],
+      [
+        "en",
+        "the "
+      ]
+    ]
+  },
+  "nerManager": {
+    "settings": {},
+    "threshold": 0.8,
+    "builtins": [
+      "Number",
+      "Ordinal",
+      "Percentage",
+      "Age",
+      "Currency",
+      "Dimension",
+      "Temperature",
+      "DateTime",
+      "PhoneNumber",
+      "IpAddress",
+      "Boolean",
+      "Email",
+      "Hashtag",
+      "URL"
+    ],
+    "namedEntities": {
+      "DTO,CTO,hawk,lieutenant,police officer,politician,officer,suspect,windows,OS": {
+        "type": "enum",
+        "name": [
+          "DTO",
+          "CTO",
+          "hawk",
+          "lieutenant",
+          "police officer",
+          "politician",
+          "officer",
+          "suspect",
+          "windows",
+          "OS"
+        ],
+        "localeFallback": {
+          "*": "en"
+        },
+        "locales": {
+          "undefined": {
+            "undefined": [
+              null
+            ]
+          }
+        }
+      }
+    }
+  },
+  "slotManager": {},
+  "responses": {},
+  "actions": {},
+  "utteranceDict": {
+    "?": "help"
+  }
+}

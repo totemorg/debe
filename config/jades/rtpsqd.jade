@@ -1,0 +1,33 @@
+extends base
+append base_help
+	:markdown
+		# Render project RTP:
+
+			- src = path to notebook (!{query.src})
+			- mode = viewing mode run||exam||view||etc (!{query.mode})
+			- name = notebook name (!{query.name})
+			- cols = dataset columns "key.type.label, ..." (!{query.cols})
+			- client = client viewing this notebook (!{client})
+
+		[sample](/run.help?src=/nets.run&name=gtdcsv)  
+		[example](/nets.run?name=gtdcsv)
+
+extends site
+append site_parms
+	- view = "kiss"
+
+append site_body
+	- title = `${query.name} Research Technology Plan`
+	- folder = `/shares/${query.name}`
+
+	h1= title
+	img(src="#{folder}/logo.jpg")
+	iframe(src='/barplot.view',width=600,height=200)
+
+	:markdown
+		This is a RTP doc
+
+	each i in [1,2,3]
+		:markdown
+			# [edit](/faqs.view) Section #{i} 
+			#embed{/faqs.html?Num:=Seq&Question:=Q&Answer:=A&Seq=#{i}.*&_sort=Seq}

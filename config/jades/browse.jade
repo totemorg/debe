@@ -1,0 +1,49 @@
+extends base
+append base_help
+	:markdown
+		# Browse files/json stores with options:
+
+			- name = notebook (!{query.name})
+			- src = path to json source (!{query.src})
+			- json = name of json store (!{query.json})
+
+		[sample](/browse.help?json=Save_baseline$&src=/nets.json?name=gtdcsv)  
+		[example](/browse.view?json=Save_baseline$&src=/nets.json?name=gtdcsv)
+		
+append base_parms
+	- tech = "elFinder"
+
+append base_head
+	script.
+		const
+			opts = {
+				src: "#{query.src}"
+						? "#{query.json}"
+							? "/#{query.json}/".tag("?",{ src: "#{query.src}"})
+							: "/root/artifacts/#{query.name}/"
+						: "/root/"
+			};
+
+append base_body
+	script.
+		$().ready( () => {			
+			const { src } = opts;
+			$('#content').elfinder({
+				url : src,
+				
+				lang: "en",
+				//debug: ["error", "warning"],
+				rememberLastDir: false,
+				requestType: "get",
+				defaultView: "icons",  // list||icons
+				resizable: true,
+				/*commands: [
+					"getfile","help","rename","open"
+				],*/
+				handlers: {
+					//select: ev => alert("select"),
+					//open: ev => alert("open"),
+					//back: ev => alert("back"),
+				},
+			}).elfinder('instance');
+		});
