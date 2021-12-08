@@ -6711,7 +6711,7 @@ switch ( process.argv[2] ) { // unit tests
 	case "?":
 		Log("unit test with 'node debe [D1 || D2 || ...]'");
 		break;
-			
+	
 	/**
 	See [Installation and Usage](https://sc.appdev.proj.coe/acmesds/debe)
 	@var D1

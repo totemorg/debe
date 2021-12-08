@@ -109,7 +109,7 @@ Simply install and start its federated docker image (
 	npm run oper						# Start debe in operational mode
 	npm run genio						# Generate totemstan.github.io page
 	npm run gen --in=src --out=tar		# Generate target file from source url
-
+	npm run lab							# Start the matrix workshop
 
 ## Usage
 
