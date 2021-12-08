@@ -107,7 +107,7 @@ Simply install and start its federated docker image (
 	npm run startdb						# Start the database servers
 	npm run debug						# Start debe in debug mode
 	npm run oper						# Start debe in operational mode
-	npm run genio						# Generate totemstan.github.io page
+	npm run updateio					# Update totemstan.github.io from jades/totemblog
 	npm run gen --in=src --out=tar		# Generate target file from source url
 	npm run lab							# Start the matrix workshop
 
