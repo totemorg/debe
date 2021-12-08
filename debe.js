@@ -13,6 +13,7 @@ const
 	FS = require("fs"), 				//< filesystem and uploads
 	VM = require("vm"),					//< virtual machines
 	OS = require("os"),					//< os utilities
+	REPL = require("repl"),
 			
 	// 3rd party modules
 	  
@@ -604,6 +605,7 @@ in accordance with [jsdoc]{@link https://jsdoc.app/}.
 @requires fs
 @requires stream
 @requires cluster
+@requires repl
 
 @requires i18n-abide
 @requires optimist
@@ -6888,18 +6890,27 @@ clients, users, system health, etc).`
 			if ( tar.endsWith(".html") ) 
 				Fetch( src, html => {
 					FS.writeFile(tar, html, err => {
-						Log(err || "ok");
+						Log(err || "blogged");
 						DEBE.stop( () => process.exit() );
 					});
 				});
 
 			else
 				CP.exec(`phantomjs rasterize.js ${src} ${tar}`, (err,log) => {
-					console.log(err || "ok");
+					Log(err || "blogged");
 					DEBE.stop( () => process.exit() );
 				});
 		});
 		break;
+		
+	case "lab":
+		DEBE.config({}, sql=> {
+			Log("$lab is up");
+			const 
+				{$} = DEBE.pluginLibs; 
+
+			REPL.start({prompt: "$> "}).context.$ = $;
+		});
 }
 
 // UNCLASSIFIED

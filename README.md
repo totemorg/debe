@@ -290,7 +290,7 @@ Provides UI interfaces to the [barebone TOTEM web service](https://github.com/to
 to support notebooks and other entities.  This module documented 
 in accordance with [jsdoc](https://jsdoc.app/).
 
-**Requires**: <code>module:crypto</code>, <code>module:child\_process</code>, <code>module:fs</code>, <code>module:stream</code>, <code>module:cluster</code>, <code>module:i18n-abide</code>, <code>module:optimist</code>, <code>module:tokml</code>, <code>module:mathjax-node</code>, <code>module:totem</code>, <code>module:atomic</code>, <code>module:geohack</code>, <code>module:man</code>, <code>module:randpr</code>, <code>module:enums</code>, <code>module:reader</code>, <code>module:skin</code>, <code>module:blog</code>, <code>module:dogs</code>  
+**Requires**: <code>module:crypto</code>, <code>module:child\_process</code>, <code>module:fs</code>, <code>module:stream</code>, <code>module:cluster</code>, <code>module:repl</code>, <code>module:i18n-abide</code>, <code>module:optimist</code>, <code>module:tokml</code>, <code>module:mathjax-node</code>, <code>module:totem</code>, <code>module:atomic</code>, <code>module:geohack</code>, <code>module:man</code>, <code>module:randpr</code>, <code>module:enums</code>, <code>module:reader</code>, <code>module:skin</code>, <code>module:blog</code>, <code>module:dogs</code>  
 **Author**: [ACMESDS](https://totemstan.github.io)  
 **Example**  
 ```js
