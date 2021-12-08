@@ -6711,7 +6711,7 @@ To connect to ${site.Nick} from Windows:
 
 switch ( process.argv[2] ) { // unit tests
 	case "?":
-		Log("unit test with 'node debe [D1 || D2 || ...]'");
+		Log("unit test with 'node debe MODE'");
 		break;
 	
 	/**
@@ -6720,7 +6720,10 @@ switch ( process.argv[2] ) { // unit tests
 	@memberof UnitTest
 	*/
 
-	case "D1": 
+	case "debug": 
+	case "oper":
+	case "prod":
+	case "prot":
 		DEBE.config({
 			riddles: 10,
 			onFile: {
