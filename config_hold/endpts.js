@@ -36,7 +36,7 @@ module.exports = {
 	@param {Object} req Totem request
 	@param {Function} res Totem response
 	*/
-	ping: (req,res) => {
+	U1: (req,res) => {
 		const 
 			{ client, site, type } = req,
 			{ nick } = site;
@@ -53,7 +53,7 @@ module.exports = {
 	@param {Object} req Totem request
 	@param {Function} res Totem response
 	*/
-	task: (req,res) => {  //< task sharding
+	U2: (req,res) => {  //< task sharding
 		const {query,body,sql,type,table,url} = req;
 		const {task,domains,cb,client,credit,name,qos} = body;
 
@@ -107,7 +107,7 @@ module.exports = {
 	@param {Object} req Totem session request
 	@param {Function} res Totem response callback
 	*/
-	riddle: (req,res) => {
+	U3: (req,res) => {
 		const 
 			{ query, sql, type, body, action } = req,
 			{ client , guess } = (action=="select") ? query : body;

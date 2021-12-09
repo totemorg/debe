@@ -1013,7 +1013,8 @@ append site_body
 
 					tab.js
 						:markdown
-							# Example1					
+							# Example1
+
 							This [js-engine](/jsdemo1.run):
 
 								function jsdemo1(ctx, res, {$log} ) {
@@ -1052,6 +1053,7 @@ append site_body
 							exit, its context `B` context variable is exported by its `Exit` queries.   
 
 							# Example2
+
 							This [js-engine](/jsdemo2.exe?name=test):
 
 								function jsdemo2(ctx,res,{$log}) {
@@ -1082,20 +1084,21 @@ append site_body
 							matrix `X` and measurement vector `y`.  Regression results `a` are then saved into 
 							a `b` vector (which, for example, may be saved with a Context.entry sql).
 
-							# Passed context methods:
-							The following methods are available to a js-**engine**:  
-							+ $trace(msg)  
-							+ $log(...)  
-							+ $pipe( batch => {...} )  
-							+ $ran(opts)  
-							+ [$geo](https://sc.appdev.proj.coe.ic.gov://acmesds/geohack)  
-							+ [$task](https://sc.appdev.proj.coe.ic.gov://acmesds/totem)( { keys ... } , $ => {}, msg => {} )  
+							# Passed context
+
+							In addition to global *Array* and *String* prototypes, the following are 
+							automatically added to the context of any *js-engine*:  
+							+ [$trace](https://www.github.com/totemstan/enums)(logMessage)  
+							+ [$log](https://www.github.com/totemstan/enums)(...)  
+							+ [$pipe](https://www.github.com/totemstan/pipe)( batch => { if (batch) { do whatever } else { stream ended } )  
+							+ [$ran](https://www.github.com/totemstan/randpr)(opts)  
+							+ [$geo](https://www.github.com/totemstan/geohack)  
+							+ [$task](https://www.github.com/totemstan/totem)( { keys ... } , $ => {}, msg => {} )  
 							+ [$jimp](https://www.npmjs.com/package/jimp)  
-							+ $read(...)  
-							+ $copy(src,tar,deep)  
-							+ $each(obj, (key,val) => {...} )  
-							+ [$](https://mathjs.org/)("script", ctx)  
-							+ [$](https://mathjs.org/).FUNCTION(args)			
+							+ [$copy](https://www.github.com/totemstan/enums)(src,tar,deep)  
+							+ [$each](https://www.github.com/totemstan/enums)(obj, (key,val) => {...} )  
+							+ [$](https://www.github.com/totemstan/man)("[mathjs script](https://mathjs.org/)", ctx)  
+							+ [$](https://www.github.com/totemstan/man).FUNCTION(args)  
 
 	tab.Machines
 		:markdown

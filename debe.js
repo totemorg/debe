@@ -4684,7 +4684,7 @@ Usage: ${uses.join(", ")}  `);
 		},
 		
 		tou: "/config/jades/tou.txt",
-		notebooks: "./notebooks",
+		//notebooks: "./notebooks",
 		
 		skin: {
 			org1: "./public/jade/Org1",
@@ -5523,7 +5523,7 @@ function getPlugin(req,res) {
 						sql.query( "SELECT Code,Minified FROM openv.engines WHERE ? LIMIT 1", { Name: name }, (err,engs) => {
 							//Log(">>eng", engs[0]);
 							if ( eng = engs[0] )
-								FS.readFile( `${paths.notebooks}/${name}.d/source`, "utf8", (err, srcCode) => {
+								FS.readFile( `./notebooks/${name}.d/source`, "utf8", (err, srcCode) => {
 									if (!err) eng.Code = srcCode;
 
 									if ( pub = pubs[0] )	// already licensed so simply distribute
@@ -5676,7 +5676,7 @@ function exportPlugin(req,res) {
 
 	res( "exporting" );
 	CP.exec(
-		`mysqldump -u$MYSQL_USER -p$MYSQL_PASS -h$MYSQL_HOST --add-drop-table app ${name} >${paths.notebooks}/${name}.nb`,
+		`mysqldump -u$MYSQL_USER -p$MYSQL_PASS -h$MYSQL_HOST --add-drop-table app ${name} >./notebooks/${name}.nb`,
 		(err,out) => Trace( `EXPORTED ${name} `, err||"ok" ) );	
 }
 
@@ -5696,7 +5696,7 @@ function importPlugin(req,res) {
 
 	res( "importing" );
 	CP.exec(
-		`mysql -u$MYSQL_USER -p$MYSQL_PASS -h$MYSQL_HOST --force app < ${paths.notebooks}/${name}.nb`,
+		`mysql -u$MYSQL_USER -p$MYSQL_PASS -h$MYSQL_HOST --force app < ./notebooks/${name}.nb`,
 		(err,out) => Trace( `IMPORTED ${name} `, err||"ok" ) );							
 }
 
@@ -5871,7 +5871,7 @@ function publishPlugin(req,res) {
 
 			function getResource( file ) {	
 				try {
-					return FS.readFileSync( `${paths.notebooks}/resource/${file}`, "utf8").replace( /\r\n/g, "\n");
+					return FS.readFileSync( `./notebooks/resource/${file}`, "utf8").replace( /\r\n/g, "\n");
 				}
 				catch (err) {
 					return null;
@@ -5889,7 +5889,7 @@ function publishPlugin(req,res) {
 			}
 
 			const
-				path = `${paths.notebooks}/${name}`,
+				path = `./notebooks/${name}`,
 				type = ("js" in mod) ? "js" : ("py" in mod) ? "py" : ("R" in mod) ? "R" : ("cv" in mod) ? "cv" : ("m" in mod) ? "m" : ("mj" in mod) ? "mj" : "js",
 				code = ((mod[type] || mod.code || mod.engine)+"") || getResource( `${name}.${type}` ),
 				tou = mod.tou || mod.doc || getResource( `${name}.tou` ) || getResource( `${name}.doc` ) || getResource( "default.tou" ),
@@ -6172,7 +6172,7 @@ IDList=
 		}
 
 		try {	// prime and process the plugin's script
-			procScript( sql, name, require(`${paths.notebooks}/${book}`) );	
+			procScript( sql, name, require(`./notebooks/${book}`) );	
 			genReadme( name );
 			cb(null);
 		}
@@ -6180,7 +6180,7 @@ IDList=
 		catch (err) {	// module at path does not yet exists so prime
 			Log(">>>>>>>>>>>>>>>>>>>>>>prime !!!", err);
 			if ( false )  { // careful!!
-				CP.exec( `cp ${paths.notebooks}/temp.js ${paths.notebooks}/${name}.js --no-clobber`, err => {
+				CP.exec( `cp ./notebooks/temp.js ./notebooks/${name}.js --no-clobber`, err => {
 					if (err) 
 						cb(err);
 
