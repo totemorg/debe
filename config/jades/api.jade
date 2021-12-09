@@ -1016,13 +1016,13 @@ append site_body
 							# Example1					
 							This [js-engine](/jsdemo1.run):
 
-								function jsdemo1(ctx, res) {
-									Log("jsdemo1 ctx", ctx);
+								function jsdemo1(ctx, res, {$log} ) {
+									$log("jsdemo1 ctx", ctx);
 									var debug = false;
 
 									if (debug) {
-										Log("A="+ctx.A.length+" by "+ctx.A[0].length);
-										Log("B="+ctx.B.length+" by "+ctx.B[0].length);
+										$log("A="+ctx.A.length+" by "+ctx.A[0].length);
+										$log("B="+ctx.B.length+" by "+ctx.B[0].length);
 									}
 
 									ctx.Save = [ {u: ctx.M}, {u:ctx.M+1}, {u:ctx.M+2} ];
@@ -1030,7 +1030,7 @@ append site_body
 
 									if (debug)
 										$( "D=A`A'; E=D+D`3; disp(entry); ", ctx, ctx => {
-											Log( "D=", ctx.D, "E=", ctx.E);
+											$log( "D=", ctx.D, "E=", ctx.E);
 										});
 
 							with initial context: 
@@ -1054,9 +1054,9 @@ append site_body
 							# Example2
 							This [js-engine](/jsdemo2.exe?name=test):
 
-								function jsdemo2(ctx,res) {
+								function jsdemo2(ctx,res,{$log}) {
 									$("a = inv(X' * X) * X' * y", ctx, ctx => {
-										Log(ctx);
+										$log(ctx);
 
 										var 
 											a = ctx.a,
@@ -1082,21 +1082,18 @@ append site_body
 							matrix `X` and measurement vector `y`.  Regression results `a` are then saved into 
 							a `b` vector (which, for example, may be saved with a Context.entry sql).
 
-							# Available methods:
+							# Passed context methods:
 							The following methods are available to a js-**engine**:  
 							+ $trace(msg)  
-							+ $pipe( (res,ctx,res) => {...} )  
-							+ $ran(opts)  
 							+ $log(...)  
+							+ $pipe( batch => {...} )  
+							+ $ran(opts)  
 							+ [$geo](https://sc.appdev.proj.coe.ic.gov://acmesds/geohack)  
 							+ [$task](https://sc.appdev.proj.coe.ic.gov://acmesds/totem)( { keys ... } , $ => {}, msg => {} )  
 							+ [$jimp](https://www.npmjs.com/package/jimp)  
 							+ $read(...)  
 							+ $copy(src,tar,deep)  
 							+ $each(obj, (key,val) => {...} )  
-							+ $tag(arg,el,at)  
-							+ $eval(arg,ctx)  
-							+ $index(list,"[from || regexp || (JS) || !SPEC] => [to || !SPEC] || INDEX, ..."  )  
 							+ [$](https://mathjs.org/)("script", ctx)  
 							+ [$](https://mathjs.org/).FUNCTION(args)			
 

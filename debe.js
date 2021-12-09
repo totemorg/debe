@@ -72,6 +72,11 @@ const
 @module DEBE.String
 */
 Copy({
+	get: function (cb) {
+		Log("pipe", this+"");
+		PIPE(this+"", cb);
+	},
+	
 	/**
 	Returns a ref-joined list of links
 	@extends Array
@@ -818,7 +823,7 @@ const
 		$neo: neoThread,
 		//$file: FS,	// make safe versions of this
 		$copy: Copy,
-		$each: Each,
+		$each: Each
 		/*
 		$fetch: (url,opts,cb) => {
 			if ( url.startsWith("http") || url.startsWith("/") )
@@ -836,7 +841,6 @@ const
 					sql.query(url, opts, (err,recs) => cb( err ? null : recs ) );
 				});
 		},
-		*/
 		$tag: (arg,el,at) => arg.tag(el,at),
 		$eval: (arg,ctx) => arg.parse$(ctx),
 		//$stream: Stream,
@@ -847,7 +851,7 @@ const
 			catch (err) {
 				return null;
 			}
-		}
+		}  */
 	},
 	
 	/**
@@ -6565,24 +6569,18 @@ function runPlugin(req, res) {  //< callback res(ctx) with resulting ctx or cb(n
 
 			const { Pipe } = ctx;
 
-			Log("pipe", Pipe);
-			
 			if (Pipe)
 				switch ( Pipe.constructor ) {
 					case String: // source pipe
 						
 						ATOM.$libs.$trace = tracePipe;
-						ATOM.$libs.$pipe = cb => {
-							Trace("pipe starting");
-							PIPE(Pipe,cb); 
-						}; //(Pipe.startsWith("/") || Pipe.startsWith("?")) ? regulatePipe : bufferPipe;
+						ATOM.$libs.$pipe = cb => PIPE(Pipe,cb); 
 
 						req.query = ctx;
 
 						ATOM.select(req, ctx => {
 							//Log("pipe run ctx", ctx);
-							
-							Log("save ctx?", ctx?ctx._net?"net":ctx:false);
+							// Log("save ctx?", ctx?ctx._net?"net":ctx:false);
 							if ( ctx )
 								Trace( sql.saveContext( ctx ) );
 						});
@@ -6910,9 +6908,10 @@ clients, users, system health, etc).`
 		DEBE.config({}, sql=> {
 			Log("$lab is up");
 			const 
-				{$} = DEBE.pluginLibs; 
+				{$} = DEBE.pluginLibs,
+				ctx = REPL.start({prompt: "$> ", useGlobal: true}).context;
 
-			REPL.start({prompt: "$> "}).context.$ = $;
+				ctx.$ = $;
 		});
 }
 
