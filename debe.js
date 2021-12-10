@@ -776,7 +776,7 @@ DEBE.config({
 */
 
 const
-	{ sendMail, Log, Trace, routeTable, publishPlugins, 
+	{ sendMail, Log, Trace, routeTable, pluginLibs,
 	 	licenseOnDownload, defaultDocs } = DEBE = module.exports = Copy({
 	
 	Log: (...args) => console.log(">>>debe", args),
@@ -1124,7 +1124,7 @@ as described in the [Notebooks api](/api.view). `,
 
 		function startMail(cb) {
 			
-			var
+			const
 				[rxHost,rxPort] = (ENV.RXMAIL_HOST || "").split(":"),
 				[rxUser,rxPass] = (ENV.RXMAIL_USER || "").split(":"),
 				[txHost,txPort] = (ENV.TXMAIL_HOST || "").split(":"),
@@ -1314,6 +1314,17 @@ as described in the [Notebooks api](/api.view). `,
 			if (cb) cb();
 		}
 
+		function initNIF(cb) {
+			sql.getTables( "app", books => {	// config notebook i/f
+				books.forEach( book => {
+					pluginLibs["$"+book] = function (query, cb) {
+						`${book}.nb?${query}`.get( cb );
+					};
+				});
+				cb();
+			});			
+		}
+		
 		/*
 		function initIFS(cb) {	// init interfaces
 			["select", "delete", "insert", "update", "execute"].forEach( crud => {
@@ -1322,7 +1333,9 @@ as described in the [Notebooks api](/api.view). `,
 
 			if (cb) cb();	
 		} */
-		const {lookups} = SKIN;
+		const 
+			{lookups} = SKIN,
+			{pocs,host} = site;
 		
 		sql.query("SELECT Ref AS `Key`,group_concat(DISTINCT Path SEPARATOR '|') AS `Select` FROM openv.lookups GROUP BY Ref", [], (err,recs) => {
 			recs.forEach( rec => {
@@ -1330,10 +1343,10 @@ as described in the [Notebooks api](/api.view). `,
 			});
 		});
 		
+		initNIF( () => {  // init nootbook i/f
 		initENV( () => {  // init environment
 		initSES( () => {  // init sessions
-
-			const {pocs,host} = site;
+			
 			if ( CLUSTER.isMaster ) {
 				if ( false ) startNews(sql);
 
@@ -1410,7 +1423,7 @@ as described in the [Notebooks api](/api.view). `,
 				sqlThread: sqlThread,
 				//emitter: DEBE.IO ? DEBE.IO.sockets.emit : null,
 				//skinner: JADE,
-				// $libs: DEBE.pluginLibs,
+				// $libs: pluginLibs,
 				sendMail: sendMail,
 				createCert: TOTEM.createCert,
 				//diag: TOTEM.diag,
@@ -1432,8 +1445,9 @@ as described in the [Notebooks api](/api.view). `,
 				//fetch: fetch
 			}, $ => {
 				
-				$.sqlThread( sql => {
-					const {saveKeys,scripts} = $;
+				sqlThread( sql => {
+					const 
+						{saveKeys,scripts} = $;
 
 					sql.getFields("openv._stats", null, [], keys => {		//  init shared file stats
 						keys.forEach( key => saveKeys[key] = true );
@@ -1468,7 +1482,7 @@ as described in the [Notebooks api](/api.view). `,
 				sqlThread: sqlThread,
 				cores: 0,
 				node: ENV.HOSTNAME,
-				"$libs.": DEBE.pluginLibs
+				"$libs.": pluginLibs
 			});
 
 			READ.config({
@@ -1477,11 +1491,10 @@ as described in the [Notebooks api](/api.view). `,
 			});
 			
 			init(sql);
-			
 			//site.repos.forEach( x => site[x+"$"] = lab => (lab||x).tag(site.repo+"/"+x) );
 			//site.views.forEach( x => site[x+"$"] = lab => (lab||x).tag(site.view+"/"+x+".view") );
 
-		}); }); 
+		}); }); }); 
 	},
 		
 	dogs: DOGS,
@@ -6869,13 +6882,12 @@ clients, users, system health, etc).`
 		break;
 		
 	case "lab":
-		DEBE.config({}, sql=> {
+		DEBE.config({}, sql => {
 			Log("$lab is up");
 			const 
-				{$} = DEBE.pluginLibs,
 				ctx = REPL.start({prompt: "$> ", useGlobal: true}).context;
 
-				ctx.$ = $;
+			Each( pluginLibs, (key,lib) => ctx[key] = lib );
 		});
 }
 

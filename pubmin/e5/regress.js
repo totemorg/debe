@@ -12,25 +12,19 @@ function regress(ctx, res, _ref) {
       Name = ctx.Name,
       Hyper = ctx.Hyper,
       Cycle = ctx.Cycle,
-      _Boost = ctx._Boost;
-  $log("REGRESS", Method, Host, Name, Hyper);
+      _Boost = ctx._Boost; //$log(Method,Host,Name);
+
   var save = ctx.Save = [],
       use = Method.toLowerCase(),
-      hyper = Hyper || {
-    qda: {
-      mixes: 2
-    }
-  },
-      solve = hyper[use] || {},
-      mixes = solve.mixes,
-      samples = solve.samples;
+      hyper = Hyper || {},
+      solve = hyper[use] || {};
   $pipe(function (batch) {
     if (batch) {
       var jpgSave, chans, done;
       var chan;
 
       (function () {
-        var _ref2 = batch.forEach ? batch.get("x&y&x0&y0") : batch,
+        var _ref2 = batch.forEach ? batch.get("x&y") : batch,
             multi = _ref2.multi,
             x = _ref2.x,
             y = _ref2.y,
@@ -106,10 +100,11 @@ function regress(ctx, res, _ref) {
               var alpha = boost.alpha,
                   h = boost.h,
                   xroc = boost.xroc,
-                  weis = boost.weis;
-              var nsigma = solve.nsigma,
-                  mixes = solve.mixes;
-              var sign = Math.sign;
+                  weis = boost.weis,
+                  mixes = solve.mixes,
+                  nsigma = solve.nsigma,
+                  samples = solve.samples,
+                  sign = Math.sign;
               if (mixes) $.boost(Cycle, sql, boost, $trace, function (x, keys) {
                 // boost with provided hypo manager
 
@@ -119,7 +114,7 @@ function regress(ctx, res, _ref) {
                 	save hypo keys to boost stash if neither specified
                 */
                 function hypo(x, keys) {
-                  // return hypo[k] = +/-1 if x inside/outside nsigma sphere on mapping x with keys[k]
+                  // return hypo[k] = +/-1 if x inside/outside nsigma sphere with keys[k]
                   return $(keys.length, function (k, H) {
                     // enumerate thru all keys
                     H[k] = 0; // default if invalid key
@@ -156,64 +151,60 @@ function regress(ctx, res, _ref) {
                 if (keys) // test hypo using keys
                   return hypo(x, keys);else if (x) {
                   // learn hypo keys
-                  var _keys = h[Cycle] = []; // reserve key stash
-
+                  var keys = h[Cycle] = []; // reserve key stash
 
                   $.train(use, x, null, solve, function (info) {
-                    // retrain hypo keys
                     var em = info.cls.em;
                     em.forEach(function (mix) {
-                      // enumerate thru each EM mix
                       //$log("mix", mix.key);
                       if (key = mix.key) // valid key provided
-                        _keys.push({
+                        keys.push({
                           B: $.clone(key.B),
                           b: $.clone(key.b)
                         });else // invalid key
-                        _keys.push(null);
+                        keys.push(null);
                     });
 
                     if (weis && y) {
                       // stash weishart matrix for this boost
                       var Y = y._data || y,
-                          _ctx = weis[Cycle] = {
+                          ctx = weis[Cycle] = {
                         w: $([mixes, mixes], function (i, j, w) {
                           return w[i][j] = 0;
                         }),
                         n: 0
                       };
-
                       Y.forEach(function (y, n) {
                         if (mix = em[y]) {
                           // have labelled x so update weishart
-                          _ctx.x = x[n];
-                          _ctx.mu = mix.mu;
-                          $("w = w + (x-mu)*(x-mu)'; n=n+1; ", _ctx);
+                          ctx.x = x[n];
+                          ctx.mu = mix.mu;
+                          $("w = w + (x-mu)*(x-mu)'; n=n+1; ", ctx);
                         }
                       });
                       /*
                       at some cylce, instead of running $.traun, regress the w[i] 
                       against the n[i], i=1:cycle to get an improved sigma covar.  
                       Use this improved sigma in the pca to get new keys and 
-                      store in current cycle slot.
+                      store in current cycle slot
                       */
                     }
                   });
-                  return _keys;
+                  return keys;
                 } else {
                   // save boosted roc
                   if (xroc) {
-                    // generate ROC
-                    var hits = 0,
-                        cols = 0;
+                    // generate effective roc
                     var F = $(mixes, function (k, F) {
                       return F[k] = 0;
                     }),
                         // reserve for boosted hypo
                     t = Cycle,
-                        _N = xroc.length,
-                        maxHits = _N,
-                        maxCols = _N * mixes;
+                        hits = 0,
+                        cols = 0,
+                        N = xroc.length,
+                        maxHits = N,
+                        maxCols = N * mixes;
                     xroc.forEach(function (x, m) {
                       // enumerate x samples to build roc
                       for (var n = 1; n <= t; n++) {
@@ -242,8 +233,7 @@ function regress(ctx, res, _ref) {
                     $log(">>>>>rates", boost.hitRate, boost.colRate, [hits, cols], [maxHits, maxCols]);
                   }
 
-                  sql.query( // save boosting parameters
-                  "UPDATE app.regress SET ? WHERE ?", [{
+                  sql.query("UPDATE app.regress SET ? WHERE ?", [{
                     _Boost: JSON.stringify(boost),
                     Cycle: Cycle + 1 //Pipe: JSON.stringify( ( Cycle == 1 ) ? "#" + ctx.Pipe : ctx.Pipe )
 
@@ -262,7 +252,7 @@ function regress(ctx, res, _ref) {
               var N = x.length,
                   D = 1 / N,
                   added = 0; // "/genpr_test4D4M.export?[x,y]=$.get(['x','n'])"
-              // "/genpr_test4D4M.export?[x,y]=$.get(['x','n'])&x0=$.draw(Samples).get('x')"
+              // "/genpr_test4D4M.export?[x,y]=$.get(['x','n'])&x0=$.draw(Channels).get('x')"
 
               sql.query("DELETE FROM app.points");
               sql.beginBulk();
@@ -286,7 +276,7 @@ function regress(ctx, res, _ref) {
                       // points: N,	// number of x0 points
                       samples: samples,
                       // number of samples in points db
-                      mixes: mixes || 0,
+                      mixes: solve.mixes || 0,
                       // numer of mixes to boost
                       //labels: labels,
                       thresh: D * 0.9,
@@ -333,8 +323,11 @@ function regress(ctx, res, _ref) {
                 });
               }
             });
-          });else // bad params 
-          res("Missing parameters");
+          });else {
+          // in adhoc supervised learning mode
+          $trace("invalid pipe parameters");
+          res(null);
+        }
       })();
     } else {//done
     }

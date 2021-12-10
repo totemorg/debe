@@ -3,19 +3,18 @@ function regress(ctx,res,{$log,$trace,$pipe,$sql}) {  // define notebook engine
 		// extact context keys and setup regressors and optional boosting 
 		const {Method,Host,Name,Hyper,Cycle,_Boost} = ctx;
 
-		$log("REGRESS", Method,Host,Name,Hyper);
+		//$log(Method,Host,Name);
 
 		var
 			save = ctx.Save = [],
 			use = Method.toLowerCase(),
-			hyper = Hyper || {qda: {mixes: 2}},
-			solve = hyper[use] || {},
-			{mixes,samples} = solve;
+			hyper = Hyper || {},
+			solve = hyper[use] || {};
 		
 		$pipe( batch => {
 			if ( batch ) {
 				const 
-					{multi,x,y,x0,y0} = batch.forEach ? batch.get("x&y&x0&y0") : batch,
+					{multi,x,y,x0,y0} = batch.forEach ? batch.get("x&y") : batch,
 					sum = {
 						boosting: Cycle ? _Boost : false,
 						solve: solve,
@@ -76,9 +75,10 @@ function regress(ctx,res,{$log,$trace,$pipe,$sql}) {  // define notebook engine
 
 					$sql( sql => {	// get a sql thread
 						function booster( sql, boost ) {	// boost the hypo
-							const { alpha, h, xroc, weis } = boost;
-							const { nsigma, mixes } = solve;
-							const { sign } = Math;
+							const 
+								{ alpha, h, xroc, weis } = boost,
+								{ mixes, nsigma, samples } = solve,
+								{ sign } = Math;
 
 							if (mixes)
 								$.boost( Cycle, sql, boost, $trace, (x,keys) => {  // boost with provided hypo manager
@@ -89,7 +89,7 @@ function regress(ctx,res,{$log,$trace,$pipe,$sql}) {  // define notebook engine
 									*/
 
 									function hypo(x,keys) {	
-										// return hypo[k] = +/-1 if x inside/outside nsigma sphere on mapping x with keys[k]
+										// return hypo[k] = +/-1 if x inside/outside nsigma sphere with keys[k]
 
 										return $( keys.length, (k, H) => {		// enumerate thru all keys
 											H[ k ] = 0;		// default if invalid key
@@ -121,12 +121,12 @@ function regress(ctx,res,{$log,$trace,$pipe,$sql}) {  // define notebook engine
 
 									else
 									if ( x ) { 	// learn hypo keys
-										const keys = h[Cycle] = [];	// reserve key stash
+										var keys = h[Cycle] = [];	// reserve key stash
 
-										$.train( use, x, null, solve, info => {		// retrain hypo keys
+										$.train( use, x, null, solve, info => {
 											const {em} = info.cls;
 
-											em.forEach( mix => {	// enumerate thru each EM mix
+											em.forEach( mix => {
 												//$log("mix", mix.key);
 
 												if ( key = mix.key )	// valid key provided
@@ -140,7 +140,7 @@ function regress(ctx,res,{$log,$trace,$pipe,$sql}) {  // define notebook engine
 											});
 
 											if ( weis && y ) { // stash weishart matrix for this boost
-												const 
+												var 
 													Y = y._data || y,
 													ctx = weis[Cycle] = {
 														w: $( [mixes,mixes], (i,j,w) => w[i][j] = 0 ),
@@ -159,7 +159,7 @@ function regress(ctx,res,{$log,$trace,$pipe,$sql}) {  // define notebook engine
 												at some cylce, instead of running $.traun, regress the w[i] 
 												against the n[i], i=1:cycle to get an improved sigma covar.  
 												Use this improved sigma in the pca to get new keys and 
-												store in current cycle slot.
+												store in current cycle slot
 												*/
 
 											}
@@ -169,13 +169,12 @@ function regress(ctx,res,{$log,$trace,$pipe,$sql}) {  // define notebook engine
 									}
 
 									else { // save boosted roc
-										if ( xroc ) { // generate ROC
-											var
-												hits = 0,
-												cols = 0;
-											const 
+										if ( xroc ) { // generate effective roc
+											var 
 												F = $( mixes, (k,F) => F[k] = 0 ),		// reserve for boosted hypo
 												t = Cycle,
+												hits = 0,
+												cols = 0,
 												N = xroc.length,
 												maxHits = N,
 												maxCols = N * mixes;
@@ -214,7 +213,7 @@ function regress(ctx,res,{$log,$trace,$pipe,$sql}) {  // define notebook engine
 											$log(">>>>>rates", boost.hitRate, boost.colRate, [hits, cols], [maxHits, maxCols] );
 										}
 
-										sql.query(		// save boosting parameters
+										sql.query(
 											"UPDATE app.regress SET ? WHERE ?", 
 											[{
 												_Boost: JSON.stringify(boost), 
@@ -228,9 +227,12 @@ function regress(ctx,res,{$log,$trace,$pipe,$sql}) {  // define notebook engine
 						}
 
 						if ( x && y ) {	// prime the boost dataset then boost at Cycle=1
-							var N = x.length, D = 1/N, added = 0;
+							var 
+								N = x.length, 
+								D = 1/N, 
+								added = 0;
 							// "/genpr_test4D4M.export?[x,y]=$.get(['x','n'])"
-							// "/genpr_test4D4M.export?[x,y]=$.get(['x','n'])&x0=$.draw(Samples).get('x')"
+							// "/genpr_test4D4M.export?[x,y]=$.get(['x','n'])&x0=$.draw(Channels).get('x')"
 
 							sql.query( "DELETE FROM app.points" );
 							sql.beginBulk();
@@ -249,7 +251,7 @@ function regress(ctx,res,{$log,$trace,$pipe,$sql}) {  // define notebook engine
 											xroc: x0,	// points to gen roc
 											// points: N,	// number of x0 points
 											samples: samples,	// number of samples in points db
-											mixes: mixes || 0,	// numer of mixes to boost
+											mixes: solve.mixes || 0,	// numer of mixes to boost
 											//labels: labels,
 											thresh: D * 0.9,	// boosting threshold
 											weis: [null],	// weishart stash for covar boost
@@ -302,11 +304,14 @@ function regress(ctx,res,{$log,$trace,$pipe,$sql}) {  // define notebook engine
 						});
 					});
 
-				else 		// bad params 
-					res("Missing parameters");
+				else {	// in adhoc supervised learning mode
+					$trace("invalid pipe parameters");
+					res(null);
+				}
 			}
 			
 			else { //done
 			}
 		});
+			
 	}
