@@ -72,11 +72,6 @@ const
 @module DEBE.String
 */
 Copy({
-	get: function (cb) {
-		Log("pipe", this+"");
-		PIPE(this+"", cb);
-	},
-	
 	/**
 	Returns a ref-joined list of links
 	@extends Array
@@ -815,43 +810,12 @@ const
 		$: $,
 		$ran: opts => new RAN(opts),
 		$log: console.log,
-		//read: READ,
-		$geo: GEO,
 		$task: runTask,
 		$jimp: JIMP,
 		$sql: sqlThread,
 		$neo: neoThread,
-		//$file: FS,	// make safe versions of this
 		$copy: Copy,
 		$each: Each
-		/*
-		$fetch: (url,opts,cb) => {
-			if ( url.startsWith("http") || url.startsWith("/") )
-				Fetch( url.tag("?",opts), [], txt => {
-					try {
-						cb( JSON.parse(txt) );
-					}
-					catch (err) {
-						cb( txt );
-					}
-				});
-
-			else
-				sqlThread( sql => {
-					sql.query(url, opts, (err,recs) => cb( err ? null : recs ) );
-				});
-		},
-		$tag: (arg,el,at) => arg.tag(el,at),
-		$eval: (arg,ctx) => arg.parse$(ctx),
-		//$stream: Stream,
-		$get: (arg,idx,cb) => {
-			try {
-				return arg.get(idx,cb);
-			}
-			catch (err) {
-				return null;
-			}
-		}  */
 	},
 	
 	/**
