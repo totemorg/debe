@@ -818,9 +818,97 @@ append site_body
 
 			tab.Examples
 				folder#Examples(dock="right")
+					tab.js
+						:markdown
+							# Example1
+							This [js-engine](/jsdemo1.run):
+
+								function jsdemo1(ctx, res, {$log} ) {
+									$log("jsdemo1 ctx", ctx);
+									var debug = false;
+
+									if (debug) {
+										$log("A="+ctx.A.length+" by "+ctx.A[0].length);
+										$log("B="+ctx.B.length+" by "+ctx.B[0].length);
+									}
+
+									ctx.Save = [ {u: ctx.M}, {u:ctx.M+1}, {u:ctx.M+2} ];
+									res(ctx);
+
+									if (debug)
+										$( "D=A`A'; E=D+D`3; disp(entry); ", ctx, ctx => {
+											$log( "D=", ctx.D, "E=", ctx.E);
+										});
+
+							with initial context: 
+
+								"M": 3, 
+								"query": {  // default sql-entry query parms if none supplied on url
+									"Name": "DefaultTestName"
+								},
+								"Entry": {
+									"A": "SELECT a2,a3,a6 FROM MATtest WHERE least(?,1)",
+									"B": "SELECT a1,a6 FROM MATtest WHERE least(?,1)"
+								},
+								"Exit": {
+									"A": "INSERT INTO ?? SET ?"
+								}
+
+							will, on entry, prime its `A` and `B` context keys using its `Entry` queries: the "?" therein
+							references its context `query` hash (as overridden by url query parameters).  On
+							exit, its context `B` context variable is exported by its `Exit` queries.   
+
+							# Example2
+							This [js-engine](/jsdemo2.exe?name=test):
+
+								function jsdemo2(ctx,res,{$log}) {
+									$("a = inv(X' * X) * X' * y", ctx, ctx => {
+										$log(ctx);
+
+										var 
+											a = ctx.a,
+											N = ctx.N = a.length,
+											b = $(N, (n,B) => B[n] = a[n]);
+
+										res(ctx);							
+									});
+								}
+
+							with initial context: 
+
+								"M": 3,
+								"Entry": {
+									"X": "SELECT p0,p1,p2 FROM Htest WHERE least(?,1)",
+									"y": "SELECT FPR from Htest WHERE least(?,1)"
+								}
+
+							uses MATHJS -- a js-compatible Matlab emulator -- to do a regression analysis.  Here, 
+							the `Name`, `Used` and `M` parameters -- acquired from the URL and/or context query -- are 
+							used to retrieve data 
+							from the `Htest` **dataset**.  This data is then used to setup a regression companion 
+							matrix `X` and measurement vector `y`.  Regression results `a` are then saved into 
+							a `b` vector (which, for example, may be saved with a Context.entry sql).
+
+							# Engine context
+							A **js-engine** can extract the following methods from its arguments:  
+							> [$trace](https://www.github.com/totemstan/enums)( "Log Message" )  
+							> [$log](https://www.github.com/totemstan/enums)( ... )  
+							> [$pipe](https://www.github.com/totemstan/pipe)( batch => { if (batch) { do whatever } else { stream ended } )  
+							> [$ran](https://www.github.com/totemstan/randpr)( opts )  
+							> [$task](https://www.github.com/totemstan/totem)( { keys ... } , $ => {}, msg => {} )  
+							> [$jimp](https://www.npmjs.com/package/jimp)  
+							> [$copy](https://www.github.com/totemstan/enums)(src,tar,deep)  
+							> [$each](https://www.github.com/totemstan/enums)(obj, (key,val) => {...} )  
+							> [$](https://www.github.com/totemstan/man)( "[mathjs script](https://mathjs.org/)" , ctx)  
+							> [$](https://www.github.com/totemstan/man).FUNCTION(args)  
+
+							In addition, a **js-engine** has access to global *Array* and *String* prototypes like:  
+							> [ ... ] . [$](https://www.github.com/totemstan/man)( "KEY=KEY & KEY=EVAL & KEY ..." )  
+							> "FILE ? _OPTION=VALUE ... & KEY=KEY & KEY=EVAL & KEY ..." . [$](https://www.github.com/totemstan/man)( batch => { ... } )  
+							
 					tab.R
 						:markdown
-							Although R **engines** are implemented, they have not yet been documented.
+							Although R **engines** are implemented, they have not yet been documented.  
 
 					tab.sh
 						:markdown
@@ -1010,94 +1098,6 @@ append site_body
 							**notebook** can store data in any CTX key, its `Save` key interfaces directly with the **notebook**
 							workflow.  Python **engines** are also provided SYS, JSON, JIMP and CAFFE (if 
 							on GPU VMs) libs, as well as the SQL0 (read) and SQL1 (write) cursors.					
-
-					tab.js
-						:markdown
-							# Example1
-
-							This [js-engine](/jsdemo1.run):
-
-								function jsdemo1(ctx, res, {$log} ) {
-									$log("jsdemo1 ctx", ctx);
-									var debug = false;
-
-									if (debug) {
-										$log("A="+ctx.A.length+" by "+ctx.A[0].length);
-										$log("B="+ctx.B.length+" by "+ctx.B[0].length);
-									}
-
-									ctx.Save = [ {u: ctx.M}, {u:ctx.M+1}, {u:ctx.M+2} ];
-									res(ctx);
-
-									if (debug)
-										$( "D=A`A'; E=D+D`3; disp(entry); ", ctx, ctx => {
-											$log( "D=", ctx.D, "E=", ctx.E);
-										});
-
-							with initial context: 
-
-								"M": 3, 
-								"query": {  // default sql-entry query parms if none supplied on url
-									"Name": "DefaultTestName"
-								},
-								"Entry": {
-									"A": "SELECT a2,a3,a6 FROM MATtest WHERE least(?,1)",
-									"B": "SELECT a1,a6 FROM MATtest WHERE least(?,1)"
-								},
-								"Exit": {
-									"A": "INSERT INTO ?? SET ?"
-								}
-
-							will, on entry, prime its `A` and `B` context keys using its `Entry` queries: the "?" therein
-							references its context `query` hash (as overridden by url query parameters).  On
-							exit, its context `B` context variable is exported by its `Exit` queries.   
-
-							# Example2
-
-							This [js-engine](/jsdemo2.exe?name=test):
-
-								function jsdemo2(ctx,res,{$log}) {
-									$("a = inv(X' * X) * X' * y", ctx, ctx => {
-										$log(ctx);
-
-										var 
-											a = ctx.a,
-											N = ctx.N = a.length,
-											b = $(N, (n,B) => B[n] = a[n]);
-
-										res(ctx);							
-									});
-								}
-
-							with initial context: 
-
-								"M": 3,
-								"Entry": {
-									"X": "SELECT p0,p1,p2 FROM Htest WHERE least(?,1)",
-									"y": "SELECT FPR from Htest WHERE least(?,1)"
-								}
-
-							uses MATHJS -- a js-compatible Matlab emulator -- to do a regression analysis.  Here, 
-							the `Name`, `Used` and `M` parameters -- acquired from the URL and/or context query -- are 
-							used to retrieve data 
-							from the `Htest` **dataset**.  This data is then used to setup a regression companion 
-							matrix `X` and measurement vector `y`.  Regression results `a` are then saved into 
-							a `b` vector (which, for example, may be saved with a Context.entry sql).
-
-							# Passed context
-
-							In addition to global *Array* and *String* prototypes, the following can be
-							extracted by any *js-engine*:  
-							+ [$trace](https://www.github.com/totemstan/enums) ( "Log Message" )  
-							+ [$log](https://www.github.com/totemstan/enums) ( ... )  
-							+ [$pipe](https://www.github.com/totemstan/pipe) ( batch => { if (batch) { do whatever } else { stream ended } )  
-							+ [$ran](https://www.github.com/totemstan/randpr) ( opts )  
-							+ [$task](https://www.github.com/totemstan/totem) ( { keys ... } , $ => {}, msg => {} )  
-							+ [$jimp](https://www.npmjs.com/package/jimp)  
-							+ [$copy](https://www.github.com/totemstan/enums) (src,tar,deep)  
-							+ [$each](https://www.github.com/totemstan/enums) (obj, (key,val) => {...} )  
-							+ [$](https://www.github.com/totemstan/man) ( "[mathjs script](https://mathjs.org/)" , ctx)  
-							+ [$](https://www.github.com/totemstan/man) . FUNCTION(args)  
 
 	tab.Machines
 		:markdown
