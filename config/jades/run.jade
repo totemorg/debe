@@ -34,7 +34,7 @@ append site_body
 	- dsDims = [1200,800]
 	- tasks = []
 	- more = parseInt(query.more) || 0
-	- dsPath = query.src.replace(".run",".db") //`${query.src}.db` //+ "&$drop:=Save*"
+	- dsPath = query.src.replace(".run",".db?!Save_*") //`${query.src}.db` //+ "&$drop:=Save*"
 	- links = {}
 	- addBrief = false
 	- addToU = false

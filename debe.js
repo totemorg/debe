@@ -6483,7 +6483,7 @@ function runPlugin(req, res) {  //< callback res(ctx) with resulting ctx or cb(n
 			//Log(">>>init run", runCtx);
 			//Log(">>>book", TOTEM.$master);
 
-			sql.getSelects( `app.${book}`, "Field NOT LIKE Save_%", (keys,types) => {		// generate use cases
+			sql.getSelects( `app.${book}`, {"!Save_*":""}, (keys,types) => {		// generate use cases
 
 				sql.query( `DELETE FROM app.${book} WHERE Name LIKE '${ctx.Name}-%' ` );
 
