@@ -1317,8 +1317,17 @@ as described in the [Notebooks api](/api.view). `,
 		function initNIF(cb) {
 			sql.getTables( "app", books => {	// config notebook i/f
 				books.forEach( book => {
-					pluginLibs["$"+book] = function (query, cb) {
-						`${book}.nb?${query}`.get( cb );
+					pluginLibs["$"+book] = function (index, cb) {
+						const
+							[name,query] = index.split("?");
+						
+						Log( "notebook get", `${book}.db?name=${name}&${query}` );
+						
+						if ( query ) 
+							`/${book}.db?name=${name}&${query}`.get( cb );
+						
+						else
+							`/${book}.db?name=${name}`.get( cb );
 					};
 				});
 				cb();
@@ -1449,9 +1458,10 @@ as described in the [Notebooks api](/api.view). `,
 					const 
 						{saveKeys,scripts} = $;
 
-					sql.getFields("openv._stats", null, [], keys => {		//  init shared file stats
+					/*
+					sql.getFields("openv._stats", {}, keys => {		//  init shared file stats
 						keys.forEach( key => saveKeys[key] = true );
-					});
+					}); */
 
 					sql.query("SELECT * FROM app.scripts", [], (err,recs) => {
 						if ( !err )
@@ -6473,18 +6483,21 @@ function runPlugin(req, res) {  //< callback res(ctx) with resulting ctx or cb(n
 			//Log(">>>init run", runCtx);
 			//Log(">>>book", TOTEM.$master);
 
-			sql.getFields( `app.${book}`, {Type:"json"}, {}, jsons => {		// generate use cases
+			sql.getSelects( `app.${book}`, "Field NOT LIKE Save_%", (keys,types) => {		// generate use cases
 
 				sql.query( `DELETE FROM app.${book} WHERE Name LIKE '${ctx.Name}-%' ` );
 
 				crossParms( 0 , Object.keys(Pipe), Pipe, {}, {}, (setCtx,idxCtx) => {	// enumerate keys to provide a setCtx key-context for each enumeration
 					//Log("set", setCtx, idxCtx, Pipe.Name);
-					var 
+					const 
+						{json} = types,
 						fix = {X: idxCtx, L:jobs.length, N: ctx.Name},
 						set = Copy(setCtx, {}, "."),
 						job = Copy(setCtx, Copy(runCtx, {}), "." );
 
 					//Log(">>>set", setCtx, set, fix);
+					if ( json ) 
+						json.forEach( key => job[key] = JSON.stringify( job[key] ) );
 
 					Each( set, (key,val) => set[key] = job[key] );
 
@@ -6493,14 +6506,11 @@ function runPlugin(req, res) {  //< callback res(ctx) with resulting ctx or cb(n
 					job.Name = ( Pipe.Name || "${N}-${L}" ).parse$( fix );
 
 					//Log(">>>>debug", job);
+					
 					Each( job, (key,val) => {	// build sub replaceor
 						if ( val )
 							if ( !(key in ctx) ) // remove job keys not in the ctx
 								delete job[key];
-
-							else
-							if ( jsons[key] )	 // parse the json store
-								job[key] = set[key] = JSON.stringify(val);
 					});
 
 					jobs.push( job );
@@ -6883,7 +6893,22 @@ clients, users, system health, etc).`
 		
 	case "lab":
 		DEBE.config({}, sql => {
-			Log("$lab is up");
+			console.log(`
+See the API /api.view:
+$log( ... )  
+$pipe( batch => { if (batch) { do whatever } else { stream ended } )  
+$ran( opts )  
+$task( { keys ... } , $ => {}, msg => {} )  
+$jimp  
+$copy(src,tar,deep)  
+$each(obj, (key,val) => {...} )  
+$( "[mathjs](https://mathjs.org/)" , ctx)  
+$.FUNCTION(args)  
+[ ... ] . $( "KEY=EVAL & ..." )  
+"FILE ? _OPTION=VALUE & ... & KEY=EVAL & ..." . $( batch => { ... } )  
+$NOTEBOOK( "USECASE", ctx => { ... } )  
+`);
+
 			const 
 				ctx = REPL.start({prompt: "$> ", useGlobal: true}).context;
 
