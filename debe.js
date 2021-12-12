@@ -1303,6 +1303,9 @@ as described in the [Notebooks api](/api.view). `,
 								
 							else
 								switch (name) {
+									case "edit":
+										CP.exec( `code ./notebooks/${book}.js`, logRun );
+										break;
 									case "view":
 									case "run":
 									case "xpdf":
