@@ -736,7 +736,8 @@ const
 		$sql: sqlThread,
 		$neo: neoThread,
 		$copy: Copy,
-		$each: Each
+		$each: Each,
+		$api: () => CP.exec( `firefox ${site.master}/quickapi.view` )
 	},
 	
 	/**
@@ -1244,21 +1245,57 @@ as described in the [Notebooks api](/api.view). `,
 		function initNIF(cb) {
 			sql.getTables( "app", books => {	// config notebook i/f
 				books.forEach( book => {
-					pluginLibs["$"+book] = function (index, cb) {
-						const
-							[name,query] = index.split("?");
+					pluginLibs["$"+book] = (index, cb) => {
 						
-						Log( "notebook get", `${book}.db?name=${name}&${query}` );
+						function logRun( data ) {
+							Log(">"+book, data);
+						}
 						
-						if ( query ) 
-							`/${book}.db?name=${name}&${query}`.get( cb );
+						function run(sql,ctx) {
+							const
+								req = {
+									sql: sql,
+									table: book,
+									query: ctx,
+									type: "exe"
+								};
+
+							runPlugin(req, status => cb || logRun );
+						}
+
+						if ( isString(index) ) {
+							const
+								[name,query] = index.split("?");
+
+							if ( query ) 
+								`/${book}.db?name=${name}&${query}`.get( cb || logRun );
+								
+							else
+								switch (name) {
+									case "view":
+									case "run":
+									case "xpdf":
+									case "xjpg":
+									case "tou":
+									case "usage":
+									case "brief":
+									case "rtp":
+									case "pub":
+									case "stores":
+										CP.exec( `firefox ${site.master}/${book}.${name}`, logRun );
+										break;
+
+									default:
+										sqlThread( sql => run(sql, {Name:name}) );
+								}
+						}
 						
 						else
-							`/${book}.db?name=${name}`.get( cb );
+							sqlThread( sql => run(sql, Copy( index, {Name:book} )) );
 					};
 				});
 				cb();
-			});			
+			});
 		}
 		
 		/*
@@ -4119,16 +4156,15 @@ Respond with system configuration information on requested module mod = NAME or 
 				}
 			});
 
-			sql.query("SHOW TABLES FROM app")
-			.on("result", rec => {
-				if ( name = rec.Tables_in_app )
+			sql.getTables( "app", names => {
+				names.forEach( name => {
 					if ( !name.startsWith("_") )
 						if ( name.indexOf("demo") < 0 )
 							tables[ name ] = name.link( `/${name}` );
-			})
-			.on("end", (x) => {
-				Each( byTable, table => {
-					xtables[ table ] = table.link( `/${table}` );
+				});
+				
+				Each( byTable, name => {
+					xtables[ name ] = name.link( `/${name}` );
 				});
 
 				Fetch( "file:/notebooks", plugins => {
@@ -6477,7 +6513,7 @@ responds with res(results).
 function runPlugin(req, res) {  //< callback res(ctx) with resulting ctx or cb(null) if error
 
 	const 
-		{ sql, table, query, client, profile, url, type } = req,
+		{ sql, table, query, type } = req,
 		{ random } = Math,
 		book = table,
 		trace = true,			
@@ -6962,26 +6998,15 @@ clients, users, system health, etc).`
 		
 	case "lab":
 		DEBE.config({}, sql => {
-			console.log(`
-See the API /api.view:
-$log( ... )  
-$pipe( batch => { if (batch) { do whatever } else { stream ended } )  
-$ran( opts )  
-$task( { keys ... } , $ => {}, msg => {} )  
-$jimp  
-$copy(src,tar,deep)  
-$each(obj, (key,val) => {...} )  
-$( "[mathjs](https://mathjs.org/)" , ctx)  
-$.FUNCTION(args)  
-[ ... ] . $( "KEY=EVAL & ..." )  
-"FILE ? _OPTION=VALUE & ... & KEY=EVAL & ..." . $( batch => { ... } )  
-$NOTEBOOK( "USECASE", ctx => { ... } )  
-`);
+			Log( "Welcome to TOTEM Lab!" );
 
 			const 
+				{$api} = pluginLibs,
 				ctx = REPL.start({prompt: "$> ", useGlobal: true}).context;
 
 			Each( pluginLibs, (key,lib) => ctx[key] = lib );
+			
+			$api();
 		});
 }
 

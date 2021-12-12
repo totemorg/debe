@@ -820,7 +820,6 @@ append site_body
 				folder#Examples(dock="right")
 					tab.js
 						:markdown
-							# Example1
 							This [js-engine](/jsdemo1.run):
 
 								function jsdemo1(ctx, res, {$log} ) {
@@ -858,8 +857,7 @@ append site_body
 							references its context `query` hash (as overridden by url query parameters).  On
 							exit, its context `B` context variable is exported by its `Exit` queries.   
 
-							# Example2
-							This [js-engine](/jsdemo2.exe?name=test):
+							The following [js-engine](/jsdemo2.exe?name=test):
 
 								function jsdemo2(ctx,res,{$log}) {
 									$("a = inv(X' * X) * X' * y", ctx, ctx => {
@@ -889,10 +887,10 @@ append site_body
 							matrix `X` and measurement vector `y`.  Regression results `a` are then saved into 
 							a `b` vector (which, for example, may be saved with a Context.entry sql).
 
-							# Engine context
-							A **js-engine** can extract the following methods from its arguments:  
-							> [$trace](https://www.github.com/totemstan/enums)( "Log Message" )  
+							Engine context.  
+							Your **js-engine** can extract the following methods from its arguments:  
 							> [$log](https://www.github.com/totemstan/enums)( ... )  
+							> [$trace](https://www.github.com/totemstan/enums)( "Log Message" )  
 							> [$pipe](https://www.github.com/totemstan/pipe)( batch => { if (batch) { do whatever } else { stream ended } )  
 							> [$ran](https://www.github.com/totemstan/randpr)( opts )  
 							> [$task](https://www.github.com/totemstan/totem)( { keys ... } , $ => {}, msg => {} )  
@@ -905,7 +903,7 @@ append site_body
 							In addition, a **js-engine** has access to global *Array* and *String* prototypes like:  
 							> [ ... ] . [$](https://www.github.com/totemstan/man)( "KEY=EVAL & ..." )  
 							> "FILE ? _OPTION=VALUE & ... & KEY=EVAL & ..." . [$](https://www.github.com/totemstan/man)( batch => { ... } )  
-							
+
 					tab.R
 						:markdown
 							Although R **engines** are implemented, they have not yet been documented.  
