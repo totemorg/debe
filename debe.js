@@ -1368,13 +1368,6 @@ as described in the [Notebooks api](/api.view). `,
 				site: TOTEM.site						// Site parameters
 			}); */
 
-			GEO.config({	// voxelizing geo surfaces
-				//source: "",
-				taskPlugin: null,
-				sqlThread: sqlThread,
-				//fetch: fetch
-			});
-
 			$.config({		// matrix manipulator
 				sqlThread: sqlThread,
 				runTask: runTask,
