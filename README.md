@@ -108,7 +108,7 @@ Simply install and start its federated docker image (
 	npm run debug						# Start debe in debug mode
 	npm run oper						# Start debe in operational mode
 	npm run updateio					# Update totemstan.github.io from jades/totemblog
-	npm run gen --in=src --out=tar		# Generate target file from source url
+	npm run raster --in=src --out=tar	# Rasterize source url into a target file 
 	npm run lab							# Start the matrix workshop
 
 ## Usage
@@ -294,84 +294,6 @@ in accordance with [jsdoc](https://jsdoc.app/).
 **Author**: [ACMESDS](https://totemstan.github.io)  
 **Example**  
 ```js
-// npm test D1
-// Start challenge-protected service with onFile handlers
-
-DEBE.config({
-	riddles: 10,
-	onFile: {
-		"./uploads/": function (sql, name, path) {  // watch changes to a file				
-
-			sql.forFirst(  // get client for registered file
-				"UPLOAD",
-				"SELECT ID,Client,Added FROM openv.bricks WHERE least(?) LIMIT 1", 
-				{Name: name}, file => {
-
-				if (file) {  // ingest only registered file
-					var 
-						now = new Date(),
-						exit = new Date(),
-						client = file.Client,
-						added = file.Added,
-						site = DEBE.site,
-						port = name.link( "/files.view" ),
-						url = site.worker,
-						metrics = "metrics".link( url+"/airspace.view" ),
-						poc = site.distro.d;
-
-					sql.forFirst(  // credit client for upload
-						"UPLOAD",
-						"SELECT `Group` FROM openv.profiles WHERE ? LIMIT 1", 
-						{Client:client}, 
-						function (prof) {
-
-						exit.offsetDays( 30 );
-
-						if ( prof ) {
-							var 					
-								group = prof.Group,
-								revised = "revised".link( `/files.view?ID=${file.ID}` ),
-								notes = `
-Thank you ${client} for your sample deposited to ${port} on ${now}.  If your 
-sample passes initial quality assessments, additional ${metrics} will become available.  Unless
-${revised}, these samples will expire on ${exit}.  Should you wish to remove these quality 
-assessments from our worldwide reporting system, please contact ${poc}.
-`;
-							sql.query("UPDATE openv.bricks SET ? WHERE ?", [{
-									_State_Notes: notes,
-									Added: now,
-									PoP_Expires: exit
-								}, {ID: file.ID}
-							], err => {
-								DEBE.ingestFile(sql, path, name, file.ID, aoi => {
-									//Log( `CREDIT ${client}` );
-
-									sql.query("UPDATE openv.profiles SET Credit=Credit+? WHERE Client=?", [aoi.snr, client]);
-
-									if (false)  // put upload into LTS - move this to file watchDog
-										exec(`zip ${path}.zip ${path}; rm ${path}; touch ${path}`, err => {
-											Log(`PURGED ${name}`);
-										});
-								});
-							});
-
-						}
-					});
-				}
-			});
-		}
-	}
-}, sql => {
-	Log( 
-`Yowzers - this does everything but eat!  An encrypted service, a database, a jade UI for clients,
-usecase-engine plugins, file-upload watchers, and watch dogs that monitor system resources (jobs, files, 
-clients, users, system health, etc).` 
-	);
-
-});
-```
-**Example**  
-```js
 // npm test D2
 // Start challenge-protected server with additional byTable-routed entpoints.
 
@@ -489,7 +411,6 @@ DEBE.config({
     * [~licenseCode()](#module_DEBE..licenseCode)
     * [~sendMail()](#module_DEBE..sendMail)
     * [~initialize(sql, init)](#module_DEBE..initialize)
-    * [~ingestFile()](#module_DEBE..ingestFile)
     * [~SOAPsession(req, res, proxy)](#module_DEBE..SOAPsession)
     * [~genDoc(recs, req, res)](#module_DEBE..genDoc)
     * [~setAutorun()](#module_DEBE..setAutorun)
@@ -497,7 +418,7 @@ DEBE.config({
     * [~getEngine()](#module_DEBE..getEngine)
     * [~getContext()](#module_DEBE..getContext)
     * [~fileUpload()](#module_DEBE..fileUpload)
-    * [~getDoc()](#module_DEBE..getDoc)
+    * [~savePage()](#module_DEBE..savePage)
     * [~statusPlugin()](#module_DEBE..statusPlugin)
     * [~matchPlugin()](#module_DEBE..matchPlugin)
     * [~docPlugin()](#module_DEBE..docPlugin)
@@ -896,10 +817,6 @@ Initialize DEBE on startup.
 | sql | <code>Object</code> | MySQL connector |
 | init | <code>function</code> | callback(sql) when service init completed |
 
-<a name="module_DEBE..ingestFile"></a>
-
-### DEBE~ingestFile()
-**Kind**: inner method of [<code>DEBE</code>](#module_DEBE)  
 <a name="module_DEBE..SOAPsession"></a>
 
 ### DEBE~SOAPsession(req, res, proxy)
@@ -947,9 +864,9 @@ Convert records to requested req.type office file.
 
 ### DEBE~fileUpload()
 **Kind**: inner method of [<code>DEBE</code>](#module_DEBE)  
-<a name="module_DEBE..getDoc"></a>
+<a name="module_DEBE..savePage"></a>
 
-### DEBE~getDoc()
+### DEBE~savePage()
 **Kind**: inner method of [<code>DEBE</code>](#module_DEBE)  
 <a name="module_DEBE..statusPlugin"></a>
 

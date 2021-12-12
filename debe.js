@@ -39,7 +39,6 @@ const
 	ATOM = require("atomic"), 
 	ENUMS = require("enums"),
 	$ = require("man"),
-	GEO = require("geohack"),
 	RAN = require("randpr"),
 	PIPE = require("pipe"),
 	SKIN = require("skin"),
@@ -59,7 +58,7 @@ const
 	{ JIMP } = $,
 	{ 
 		/*
-		getDoc,
+		savePage,
 		exePlugin, simPlugin,
 		exportPlugin, importPlugin, blogPlugin, statusPlugin, storesPlugin, usersPlugin, suitorsPlugin, helpPlugin, getPlugin, 
 		modifyPlugin, docPlugin, 
@@ -622,84 +621,6 @@ in accordance with [jsdoc]{@link https://jsdoc.app/}.
 @requires skin
 @requires blog
 @requires dogs
-
-@example 
-
-// npm test D1
-// Start challenge-protected service with onFile handlers
-
-DEBE.config({
-	riddles: 10,
-	onFile: {
-		"./uploads/": function (sql, name, path) {  // watch changes to a file				
-
-			sql.forFirst(  // get client for registered file
-				"UPLOAD",
-				"SELECT ID,Client,Added FROM openv.bricks WHERE least(?) LIMIT 1", 
-				{Name: name}, file => {
-
-				if (file) {  // ingest only registered file
-					var 
-						now = new Date(),
-						exit = new Date(),
-						client = file.Client,
-						added = file.Added,
-						site = DEBE.site,
-						port = name.link( "/files.view" ),
-						url = site.worker,
-						metrics = "metrics".link( url+"/airspace.view" ),
-						poc = site.distro.d;
-
-					sql.forFirst(  // credit client for upload
-						"UPLOAD",
-						"SELECT `Group` FROM openv.profiles WHERE ? LIMIT 1", 
-						{Client:client}, 
-						function (prof) {
-
-						exit.offsetDays( 30 );
-
-						if ( prof ) {
-							var 					
-								group = prof.Group,
-								revised = "revised".link( `/files.view?ID=${file.ID}` ),
-								notes = `
-Thank you ${client} for your sample deposited to ${port} on ${now}.  If your 
-sample passes initial quality assessments, additional ${metrics} will become available.  Unless
-${revised}, these samples will expire on ${exit}.  Should you wish to remove these quality 
-assessments from our worldwide reporting system, please contact ${poc}.
-`;
-							sql.query("UPDATE openv.bricks SET ? WHERE ?", [{
-									_State_Notes: notes,
-									Added: now,
-									PoP_Expires: exit
-								}, {ID: file.ID}
-							], err => {
-								DEBE.ingestFile(sql, path, name, file.ID, aoi => {
-									//Log( `CREDIT ${client}` );
-
-									sql.query("UPDATE openv.profiles SET Credit=Credit+? WHERE Client=?", [aoi.snr, client]);
-
-									if (false)  // put upload into LTS - move this to file watchDog
-										exec(`zip ${path}.zip ${path}; rm ${path}; touch ${path}`, err => {
-											Log(`PURGED ${name}`);
-										});
-								});
-							});
-
-						}
-					});
-				}
-			});
-		}
-	}
-}, sql => {
-	Log( 
-`Yowzers - this does everything but eat!  An encrypted service, a database, a jade UI for clients,
-usecase-engine plugins, file-upload watchers, and watch dogs that monitor system resources (jobs, files, 
-clients, users, system health, etc).` 
-	);
-
-});
 
 @example 
 
@@ -4489,9 +4410,9 @@ size, pixels, scale, step, range, detects, infile, outfile, channel.  This endpo
 	*/			
 	"byType.": {
 		// doc generators
-		xpdf: getDoc,
-		xjpg: getDoc,
-		xgif: getDoc,
+		xpdf: savePage,
+		xjpg: savePage,
+		xgif: savePage,
 		
 		// skins
 		proj: renderSkin,
@@ -4888,17 +4809,6 @@ size, pixels, scale, step, range, detects, infile, outfile, channel.  This endpo
 	},  		//< reserved for soap interfaces
 		
 	/**
-	*/
-	ingestFile: function(sql, filePath, fileName, fileID, cb) {  // ingest events from file with callback cb(aoi).
-		
-		//Log("ingest file", filePath, fileName, fileID);
-		
-		GEO.ingestFile(sql, filePath, fileID, aoi => {			
-			Log("INGESTED", aoi);
-		});
-	},
-	
-	/**
 	Enable for double-blind testing 
 	@type {Boolean}
 	*/
@@ -5265,36 +5175,40 @@ function fileUpload(req, res) {
 
 /**
 */
-function getDoc(req,res) {
+function savePage(req,res) {
 	const
 		{ type,query,table} = req,
 		master = "http://localhost:8080", //site.master,	
 		Type = type.substr(1),
 		name = table,
-		docf = `./temps/docs/${name}.${Type}`;	
+		src = `${master}/${name}.view`.tag("?", query),
+		tar = `./uploads/${name}.${Type}`;	
 
 	if (type == "help")
-	return res("Stage a document");
+	return res("Save a web page and stage its delivery");
 
-	res( "Claim file "+"here".link(docf) );
+	res( "Claim your results "+"here".link(tar) );
 
 	switch (Type) {
 		case "pdf":
 		case "jpg":
 		case "gif":
-
-			var 
-				url = `${master}/${name}.view`.tag("?", query),
-				res = (type != "pdf") ? "1920px" : "";
-
-			Trace("SCRAPE", url);
+			/*
 			CP.execFile( "node", ["phantomjs", "rasterize.js", url, docf, res], function (err,stdout) { 
 				if (err) Log(err,stdout);
+			});  */
+			CP.exec(`phantomjs rasterize.js ${src} ${tar}`, (err,log) => {
+				Log(err || `SAVED ${url}` );
 			});
 			break;
 
-		default:
-
+		case "html":
+			Fetch( src, html => {
+				FS.writeFile(tar, html, err => {
+					Log(err || `SAVED ${url}` );
+				});
+			});
+			break;	
 	}
 }
 
@@ -6854,10 +6768,13 @@ switch ( process.argv[2] ) { // unit tests
 	case "oper":
 	case "prod":
 	case "prot":
+		const
+			{ ingestFile } = require("geohack");
+		
 		DEBE.config({
 			riddles: 10,
 			onFile: {
-				"./config/uploads/": function (sql, name, path) {  // watch changes to a file				
+				"./uploads/": (sql, name, path) => {  // watch changes to a file				
 
 					sql.forFirst(  // get client for registered file
 						"UPLOAD",
@@ -6870,7 +6787,6 @@ switch ( process.argv[2] ) { // unit tests
 								exit = new Date(),
 								client = file.Client,
 								added = file.Added,
-								site = DEBE.site,
 								port = name.link( "/files.view" ),
 								url = site.worker,
 								metrics = "metrics".link( url+"/airspace.view" ),
@@ -6880,7 +6796,7 @@ switch ( process.argv[2] ) { // unit tests
 								"UPLOAD",
 								"SELECT `Group` FROM openv.profiles WHERE ? LIMIT 1", 
 								{Client:client}, 
-								function (prof) {
+								prof => {
 
 								exit.offsetDays( 30 );
 
@@ -6900,7 +6816,7 @@ assessments from our worldwide reporting system, please contact ${poc}.
 											PoP_Expires: exit
 										}, {ID: file.ID}
 									], err => {
-										DEBE.ingestFile(sql, path, name, file.ID, aoi => {
+										ingestFile(sql, path, file.ID, aoi => {
 											//Log( `CREDIT ${client}` );
 
 											sql.query("UPDATE openv.profiles SET Credit=Credit+? WHERE Client=?", [aoi.snr, client]);
@@ -7015,25 +6931,25 @@ clients, users, system health, etc).`
 		pdf( "./config.stores/ocrTest01.pdf", txt => Log(txt) );
 		break;
 		
-	case "blog":
+	case "raster":
 		const 
 			[xcmd,xdebe,xblog,src,tar] = process.argv;
 		
 		DEBE.config({
 		}, sql => {
-			Trace(`Blogging ${src} => ${tar}`);
+			Trace(`Rasterizing ${src} => ${tar}`);
 			
 			if ( tar.endsWith(".html") ) 
 				Fetch( src, html => {
 					FS.writeFile(tar, html, err => {
-						Log(err || "blogged");
+						Log(err || "rastered");
 						DEBE.stop( () => process.exit() );
 					});
 				});
 
 			else
 				CP.exec(`phantomjs rasterize.js ${src} ${tar}`, (err,log) => {
-					Log(err || "blogged");
+					Log(err || "rastered");
 					DEBE.stop( () => process.exit() );
 				});
 		});
