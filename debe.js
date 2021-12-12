@@ -4406,6 +4406,8 @@ size, pixels, scale, step, range, detects, infile, outfile, channel.  This endpo
 		xpdf: savePage,
 		xjpg: savePage,
 		xgif: savePage,
+		xrtp: savePage,
+		xrun: savePage,
 		
 		// skins
 		proj: renderSkin,
@@ -5174,6 +5176,7 @@ function savePage(req,res) {
 		master = "http://localhost:8080", //site.master,	
 		Type = type.substr(1),
 		name = table,
+		xsrc = `${master}/${name}.${Type}`.tag("?", query),
 		src = `${master}/${name}.view`.tag("?", query),
 		tar = `./uploads/${name}.${Type}`;	
 
@@ -5202,6 +5205,12 @@ function savePage(req,res) {
 				});
 			});
 			break;	
+			
+		default:
+			CP.exec(`phantomjs rasterize.js ${xsrc} ${tar}`, (err,log) => {
+				Log(err || `SAVED ${url}` );
+			});
+			
 	}
 }
 
