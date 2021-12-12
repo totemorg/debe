@@ -783,7 +783,7 @@ const
 	Trace: (msg,req,res) => "debe".trace(msg,req,res),
 		
 	/**
-	Inspect doc
+	Inspect doc - kludge i/f to support nlp project
 	*/
 	inspector: (doc,to,cb) => {
 		
@@ -910,6 +910,9 @@ const
 		aoi: pipeAOI
 	}, */
 	
+	/**
+	Route table to a database according to security requirements.
+	*/
 	"tableRoutes.": {  //< sql table re-routers
 		profiles: req => "openv.profiles",
 		sessions: req => "openv.sessions",
@@ -1045,6 +1048,8 @@ as described in the [Notebooks api](/api.view). `,
 	
 	licenseOnDownload: true,
 			
+	/**
+	*/
 	sendMail: (opts,cb) => {
 	
 		const {txMail} = DEBE;
@@ -1078,7 +1083,8 @@ as described in the [Notebooks api](/api.view). `,
 
 	/**
 	Initialize DEBE on startup.
-	@param {Object} err error
+	@param {Object} sql MySQL connector
+	@param {Function} init callback(sql) when service init completed
 	*/
 	initialize: (sql,init) => {	//< initialize service
 		
@@ -1514,7 +1520,10 @@ as described in the [Notebooks api](/api.view). `,
 		counts: {State: ""}
 	},
 
-	"reqFlags." : {  //< endpoint request flags
+	/**
+	Filters via request flags
+	*/
+	"filterFlag." : {  
 		
 		"traps.": {  // TRAP=name flags can modify the request flags
 			/*
@@ -1707,9 +1716,10 @@ as described in the [Notebooks api](/api.view). `,
 		
 	},
 											 
-	// router cofiguration
-		
-	"filterRecords." : { //< endpoint types to filter dataset recs on specifed req-res thread
+	/**
+	Filter dataset recs on specifed req-res thread
+	*/	
+	"filterType." : { 
 		
 		dbx: (recs, req, res) => {
 			var Recs = [];
@@ -1873,13 +1883,21 @@ Usage: ${uses.join(", ")}  `);
 		*/
 	},
 
+	/**
+	Endpoints /AREA/FILE routes by file area on specifed req-res thread
+	*/
 	"byArea.": {
 		default: navigate
 	},
 
+	/**
+	Endpoints /TABLE routes by table name on specifed req-res thread
+	*/
 	"byTable.": {
 		// nlp
 
+		/**
+		*/
 		search: (req,res) => {
 			const
 				{ sql, query, type } = req,
@@ -1941,6 +1959,8 @@ Usage: ${uses.join(", ")}  `);
 				res( new Error("missing find parameter") );
 		},
 
+		/**
+		*/
 		searches: (req,res) => {
 			const 
 				{ sql, query, type } = req,
@@ -2088,6 +2108,8 @@ Usage: ${uses.join(", ")}  `);
 
 		},
 
+		/**
+		*/
 		words: (req,res) => {
 			const
 				{ sql, query, type } = req,
@@ -2101,10 +2123,10 @@ Usage: ${uses.join(", ")}  `);
 
 			if ( type == "help" ) 
 			return res(`
-	Using the Porter-Lancaster stemmer, respond with a count of matched and unmatched words by comparing N 
-	randomlly selected documents from stores/SOURCE*.txt with its associated src = SOURCE database documents 
-	at the specified keys = KEY,... 
-	`);
+Using the Porter-Lancaster stemmer, respond with a count of matched and unmatched words by comparing N 
+randomlly selected documents from stores/SOURCE*.txt with its associated src = SOURCE database documents 
+at the specified keys = KEY,... 
+`);
 
 			var
 				matches = [],
@@ -2163,6 +2185,8 @@ Usage: ${uses.join(", ")}  `);
 
 		// image tiles
 
+		/**
+		*/
 		wms: (req,res) => {
 
 			const
@@ -2184,6 +2208,8 @@ Usage: ${uses.join(", ")}  `);
 				Fetch(url.tag("?", query), rtn => Log("wms returned", rtn) );
 		},
 
+		/**
+		*/
 		wfs: (req,res) => {  //< Respond with ess-compatible image catalog
 			const
 				{ sql, query, type } = req,
@@ -2199,8 +2225,9 @@ Usage: ${uses.join(", ")}  `);
 
 			if ( type == "help" ) 
 			return res(`
-	Respond with ess-compatible image catalog for service src = dglobe | omar | ess and desired ring = [ [lat,lon], ....]
-	`);
+Respond with ess-compatible image catalog for service src = dglobe | omar | ess and 
+desired ring = [ [lat,lon], ....]
+`);
 
 			switch (src) {
 				case "DGLOBE":
@@ -2336,6 +2363,9 @@ Usage: ${uses.join(", ")}  `);
 				res( "" );
 		},
 
+		/**
+		Provide image tips.
+		*/
 		tips: (req, res) => {
 			const
 				{sql, log, query, type} = req;
@@ -2379,6 +2409,9 @@ Usage: ${uses.join(", ")}  `);
 
 		// web links
 
+		/**
+		Track web links.
+		*/
 		follow: (req,res) => {  // follow a link
 			const {sql,query,type} = req;
 
@@ -2398,6 +2431,9 @@ Usage: ${uses.join(", ")}  `);
 
 		// quizes
 
+		/**
+		Proctor quizes.
+		*/
 		proctor: (req,res) => {  //< grade quiz results
 			const 
 				{sql, query, client, type} = req;
@@ -2471,6 +2507,8 @@ Usage: ${uses.join(", ")}  `);
 		uploads: fileUpload,
 		stores: fileUpload, 
 
+		/**
+		*/
 		likeus: (req, res) => {
 			const
 				{sql, loq, query, type, profile, client} = req,
@@ -2513,6 +2551,8 @@ Usage: ${uses.join(", ")}  `);
 
 		},
 
+		/**
+		*/
 		users: (req, res) => {
 			const
 				{sql, query, type } = req;
@@ -2525,6 +2565,9 @@ Usage: ${uses.join(", ")}  `);
 				(err, recs) => res(err || recs) );
 		},
 
+		/**
+		Folder navigator.
+		*/
 		navigate: (req,res) => {
 			function sendFolder(res,recs) {
 				//Log("sending",cwd, recs);
@@ -3733,13 +3776,13 @@ Usage: ${uses.join(", ")}  `);
 
 			if ( type == "help" )
 			return res( `
-	Append a job or claim a job to/from an agent job queue where:
-	push = NAME of job to append to agent queue
-	pull = NAME of job to claim from agent queue
-	flush = NAME of matlab thread to flush
-	load = CLIENT.HOST.CASE to load
-	save = CLIENT.HOST.CASE to save
-	` );
+Append a job or claim a job to/from an agent job queue where:
+push = NAME of job to append to agent queue
+pull = NAME of job to claim from agent queue
+flush = NAME of matlab thread to flush
+load = CLIENT.HOST.CASE to load
+save = CLIENT.HOST.CASE to save
+` );
 
 			if (push) 
 				CRYPTO.randomBytes(64, (err, jobid) => {
@@ -3790,7 +3833,7 @@ Usage: ${uses.join(", ")}  `);
 
 			else
 			if ( save ) {
-				var 
+				const 
 					[client,host,usecase] = save.split(".");
 
 				sql.forFirst("agent", "SELECT * FROM openv.agents WHERE ? LIMIT 1", {queue: save}, agent => {
@@ -3867,7 +3910,11 @@ Usage: ${uses.join(", ")}  `);
 			process.exit();
 		},
 
-		activity: (req, res) => {
+		/**
+		@param {Object} req Totem request
+		@param {Function} res Totem response
+		*/
+		devstatus: (req, res) => {
 			function statRepo(sql) {
 				var lookups = {
 					issues: "Action",
@@ -3953,10 +4000,15 @@ Usage: ${uses.join(", ")}  `);
 			statRepo(sql);	
 		},
 
+		/**
+		@param {Object} req Totem request
+		@param {Function} res Totem response
+		*/
 		milestones: (req, res) => {
 			const 
 				{sql,log,query,type} = req,
-				map = {SeqNum:1,Num:1,Hours:1,Complete:1,Task:1};
+				map = {SeqNum:1,Num:1,Hours:1,Complete:1,Task:1},
+				{xlsx} = readers;
 
 			if (type == "help")
 			return res("Provide milestone status information");
@@ -3964,17 +4016,20 @@ Usage: ${uses.join(", ")}  `);
 			for (var n=0;n<=10;n++) map["W"+n] = 1;
 
 			sql.query("DELETE FROM openv.milestones");
-			FLEX.RDR.xlsx(sql,"milestones.xlsx","stores",function (rec) {
+			
+			xlsx( sql, "milestones.xlsx","stores", rec => {
 				for (var n in map) map[n] = rec[n] || "";
 
-				sql.query("INSERT INTO openv.milestones SET ?",map, err => {
-					if (err) Log(err);
-				});
+				sql.query("INSERT INTO openv.milestones SET ?",map, err => Log(err) );
 			});
 
 			res(SUBMITTED);
 		},	
 
+		/**
+		@param {Object} req Totem request
+		@param {Function} res Totem response
+		*/
 		config: (req,res) => {
 			const 
 				{sql,query,type} = req,
@@ -3982,8 +4037,8 @@ Usage: ${uses.join(", ")}  `);
 
 			if ( type == "help" ) 
 			return res(`
-	Respond with system configuration information on requested module mod = NAME or all modules if unspecified.
-	`);
+Respond with system configuration information on requested module mod = NAME or all modules if unspecified.
+`);
 
 			if (mod) 
 				CP.exec(`cd ../${mod}; npm list`, (err,cfg) => {			
@@ -4021,6 +4076,10 @@ Usage: ${uses.join(", ")}  `);
 				}); }); }); }); });
 		},
 
+		/**
+		@param {Object} req Totem request
+		@param {Function} res Totem response
+		*/
 		info: (req,res) => {
 			function toSchema( path, obj ) {
 				if ( isObject(obj) ) {
@@ -4283,12 +4342,22 @@ Usage: ${uses.join(", ")}  `);
 
 		// i/f to other services
 
-		DG: (req, res) => {  // Digital globe interface
+		/**
+		Digital globe interface.
+		@param {Object} req Totem request
+		@param {Function} res Totem response
+		*/		
+		DG: (req, res) => {  
 			const 
 				{sql,log,query} = req;
 			res("tbd");
 		},
 
+		/**
+		Hydra interface.
+		@param {Object} req Totem request
+		@param {Function} res Totem response
+		*/		
 		HYDRA: (req, res) => { // Hydra interface
 
 			const
@@ -4307,11 +4376,13 @@ Usage: ${uses.join(", ")}  `);
 
 			if ( type == "help" ) 
 			return res(`
-	This is a legacy/reserved endpoint to run specified Hydra detection algorithms.  Parameters include
-	size, pixels, scale, step, range, detects, infile, outfile, channel.  This endpoint has been retired.
-	`);
+This is a legacy/reserved endpoint to run specified Hydra detection algorithms.  Parameters include
+size, pixels, scale, step, range, detects, infile, outfile, channel.  This endpoint has been retired.
+`);
 
+			res("legacy");
 			// Hydra args dropped in favor of detector parms attached to requested channel
+			/*
 			sql.query("SELECT * FROM openv.detectors WHERE ?", {Channel:query.CHANNEL})
 			.on("result", function (det) {
 
@@ -4338,21 +4409,48 @@ Usage: ${uses.join(", ")}  `);
 				});
 
 			});
-
+			*/
+			
 		},
 
+		/**
+		NCL interface.
+		@param {Object} req Totem request
+		@param {Function} res Totem response
+		*/		
 		NCL: (req, res) => { // Reserved for NCL and ESS service alerts
 			const 
 				{sql,log,query} = req;
 			res("tbd");
 		},
 
+		/**
+		ESS interface.
+		@param {Object} req Totem request
+		@param {Function} res Totem response
+		*/		
 		ESS: (req, res) => { // Reserved for NCL and ESS service alerts
 			const 
 				{sql,log,query} = req;
 			res("tbd");
 		},
 
+		/**
+		MIDB interface.
+		@param {Object} req Totem request
+		@param {Function} res Totem response
+		*/		
+		MIDB: (req, res) => { // Reserved for NCL and ESS service alerts
+			const 
+				{sql,log,query} = req;
+			res("tbd");
+		},
+		
+		/**
+		Matlab interface.
+		@param {Object} req Totem request
+		@param {Function} res Totem response
+		*/		
 		matlab: (req,res) => {
 			const
 				{sql, query, type} = req;
@@ -4363,7 +4461,12 @@ Usage: ${uses.join(", ")}  `);
 			res("matlab queue flushed");		
 		},
 
-		remedy: (req,res) => {
+		/**
+		ESC remedy interface.
+		@param {Object} req Totem request
+		@param {Function} res Totem response
+		*/		
+		ESC: (req,res) => {
 			const
 				{sql, query, type} = req,
 				{from} = query;
@@ -4380,7 +4483,10 @@ Usage: ${uses.join(", ")}  `);
 			}
 		}		
 	},
-		
+	
+	/**
+	Endpoints /TABLE.TYPE routes by table type on specifed req-res thread
+	*/			
 	"byType.": {
 		// doc generators
 		xpdf: getDoc,
@@ -4491,6 +4597,9 @@ Usage: ${uses.join(", ")}  `);
 		*/
 	//},
 		
+	/**
+	Site skinning context
+	*/
 	"site.": { 		//< initial site context
 		by: "NGA/R".link( ENV.BY || "http://BY.undefined" ),
 		
@@ -4595,6 +4704,8 @@ Usage: ${uses.join(", ")}  `);
 
 	},
 	
+	/**
+	*/
 	"errors.": {  //< error messages
 		ok: "ok",
 		noMarkdown: new Error("no markdown"),
@@ -4646,6 +4757,8 @@ Usage: ${uses.join(", ")}  `);
 		//noUploader: new Error("file uplaoder not available")		
 	},
 	
+	/**
+	*/
 	"paths.": {  //< append paths to things
 		low: {
 			notices: "//gold/office/office03/R/2_NonRecords/R7-Anticipatory/WeeklyUpdates/".replace(/\//g,"\\")
@@ -4690,14 +4803,14 @@ Usage: ${uses.join(", ")}  `);
 	},
 	
 	/**
-		Enable to give-away plugin services
-		@type {boolean}
+	Enable to give-away plugin services
+	@type {boolean}
 	*/
 	probono: true,  //< enable to run plugins unregulated
 		
 	/**
-		Enabled when this is child server spawned by a master server
-		@type {Boolean}
+	Enabled when this is child server spawned by a master server
+	@type {Boolean}
 	*/
 	isSpawned: false, 			//< Enabled when this is child server spawned by a master server
 
@@ -4734,8 +4847,8 @@ Usage: ${uses.join(", ")}  `);
 	}, */
 		
 	/**
-		Reserved for soap interfaces
-		@type {Object}
+	Reserved for soap interfaces
+	@type {Object}
 	*/
 	bySOAP : { 						//< action:route hash for XML-driven engines
 		get: "",
@@ -4744,6 +4857,8 @@ Usage: ${uses.join(", ")}  `);
 		post: "/service/algorithm/:proxy"		//< hydra endpoint
 	},  		//< reserved for soap interfaces
 		
+	/**
+	*/
 	ingestFile: function(sql, filePath, fileName, fileID, cb) {  // ingest events from file with callback cb(aoi).
 		
 		//Log("ingest file", filePath, fileName, fileID);
@@ -4761,12 +4876,12 @@ Usage: ${uses.join(", ")}  `);
 }, TOTEM, ".");
 
 /**
-	Process an bySOAP session peer-to-peer request.  Currently customized for Hydra-peer and 
-	could/should be revised to support more generic peer-to-peer bySOAP interfaces.
+Process an bySOAP session peer-to-peer request.  Currently customized for Hydra-peer and 
+could/should be revised to support more generic peer-to-peer bySOAP interfaces.
 
-	@param {Object} req HTTP request
-	@param {Object} res HTTP response
-	@param {Function} proxy Name of APP proxy function to handle this session.
+@param {Object} req HTTP request
+@param {Object} res HTTP response
+@param {Function} proxy Name of APP proxy function to handle this session.
 */
 function SOAPsession(req,res,peer,action) {
 	sqlThread( sql => {
@@ -6826,8 +6941,10 @@ clients, users, system health, etc).`
 		
 	case "D4":
 		function readFile(sql, path, cb) {
+			const {xlsx} = readers;
+			
 			sql.beginBulk();
-			readers.xls( "./config.stores/test.xls", rec => { 
+			xlsx( "./config.stores/test.xls", rec => { 
 				if (rec) 
 					cb(rec,sql);
 				
@@ -6864,7 +6981,8 @@ clients, users, system health, etc).`
 		break;
 		
 	case "D5":
-		readers.pdf("./config.stores/ocrTest01.pdf", txt => Log(txt) );
+		const {pdf} = readers;
+		pdf( "./config.stores/ocrTest01.pdf", txt => Log(txt) );
 		break;
 		
 	case "blog":

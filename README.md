@@ -444,13 +444,52 @@ DEBE.config({
 ```
 
 * [DEBE](#module_DEBE)
+    * [~tableRoutes.](#module_DEBE..tableRoutes.)
+    * [~filterFlag.](#module_DEBE..filterFlag.)
+    * [~filterType.](#module_DEBE..filterType.)
+    * [~byArea.](#module_DEBE..byArea.)
+    * [~byTable.](#module_DEBE..byTable.)
+        * [.search()](#module_DEBE..byTable..search)
+        * [.searches()](#module_DEBE..byTable..searches)
+        * [.words()](#module_DEBE..byTable..words)
+        * [.wms()](#module_DEBE..byTable..wms)
+        * [.wfs()](#module_DEBE..byTable..wfs)
+        * [.tips()](#module_DEBE..byTable..tips)
+        * [.follow()](#module_DEBE..byTable..follow)
+        * [.proctor()](#module_DEBE..byTable..proctor)
+        * [.likeus()](#module_DEBE..byTable..likeus)
+        * [.users()](#module_DEBE..byTable..users)
+        * [.navigate()](#module_DEBE..byTable..navigate)
+        * [.graph(req, res)](#module_DEBE..byTable..graph)
+        * [.ingest(req, res)](#module_DEBE..byTable..ingest)
+        * [.decode(req, res)](#module_DEBE..byTable..decode)
+        * [.agent(req, res)](#module_DEBE..byTable..agent)
+        * [.alert(req, res)](#module_DEBE..byTable..alert)
+        * [.stop(req, res)](#module_DEBE..byTable..stop)
+        * [.devstatus(req, res)](#module_DEBE..byTable..devstatus)
+        * [.milestones(req, res)](#module_DEBE..byTable..milestones)
+        * [.config(req, res)](#module_DEBE..byTable..config)
+        * [.info(req, res)](#module_DEBE..byTable..info)
+        * [.DG(req, res)](#module_DEBE..byTable..DG)
+        * [.HYDRA(req, res)](#module_DEBE..byTable..HYDRA)
+        * [.NCL(req, res)](#module_DEBE..byTable..NCL)
+        * [.ESS(req, res)](#module_DEBE..byTable..ESS)
+        * [.MIDB(req, res)](#module_DEBE..byTable..MIDB)
+        * [.matlab(req, res)](#module_DEBE..byTable..matlab)
+        * [.ESC(req, res)](#module_DEBE..byTable..ESC)
+    * [~byType.](#module_DEBE..byType.)
+    * [~site.](#module_DEBE..site.)
+    * [~errors.](#module_DEBE..errors.)
+    * [~paths.](#module_DEBE..paths.)
     * [~probono](#module_DEBE..probono) : <code>boolean</code>
     * [~isSpawned](#module_DEBE..isSpawned) : <code>Boolean</code>
     * [~bySOAP](#module_DEBE..bySOAP) : <code>Object</code>
     * [~blindTesting](#module_DEBE..blindTesting) : <code>Boolean</code>
     * [~inspector()](#module_DEBE..inspector)
     * [~licenseCode()](#module_DEBE..licenseCode)
-    * [~initialize(err)](#module_DEBE..initialize)
+    * [~sendMail()](#module_DEBE..sendMail)
+    * [~initialize(sql, init)](#module_DEBE..initialize)
+    * [~ingestFile()](#module_DEBE..ingestFile)
     * [~SOAPsession(req, res, proxy)](#module_DEBE..SOAPsession)
     * [~genDoc(recs, req, res)](#module_DEBE..genDoc)
     * [~setAutorun()](#module_DEBE..setAutorun)
@@ -476,6 +515,335 @@ DEBE.config({
     * [~runPlugin(req, res)](#module_DEBE..runPlugin)
     * [~getCert(req, res)](#module_DEBE..getCert)
 
+<a name="module_DEBE..tableRoutes."></a>
+
+### DEBE~tableRoutes.
+Route table to a database according to security requirements.
+
+**Kind**: inner property of [<code>DEBE</code>](#module_DEBE)  
+<a name="module_DEBE..filterFlag."></a>
+
+### DEBE~filterFlag.
+Filters via request flags
+
+**Kind**: inner property of [<code>DEBE</code>](#module_DEBE)  
+<a name="module_DEBE..filterType."></a>
+
+### DEBE~filterType.
+Filter dataset recs on specifed req-res thread
+
+**Kind**: inner property of [<code>DEBE</code>](#module_DEBE)  
+<a name="module_DEBE..byArea."></a>
+
+### DEBE~byArea.
+Endpoints /AREA/FILE routes by file area on specifed req-res thread
+
+**Kind**: inner property of [<code>DEBE</code>](#module_DEBE)  
+<a name="module_DEBE..byTable."></a>
+
+### DEBE~byTable.
+Endpoints /TABLE routes by table name on specifed req-res thread
+
+**Kind**: inner property of [<code>DEBE</code>](#module_DEBE)  
+
+* [~byTable.](#module_DEBE..byTable.)
+    * [.search()](#module_DEBE..byTable..search)
+    * [.searches()](#module_DEBE..byTable..searches)
+    * [.words()](#module_DEBE..byTable..words)
+    * [.wms()](#module_DEBE..byTable..wms)
+    * [.wfs()](#module_DEBE..byTable..wfs)
+    * [.tips()](#module_DEBE..byTable..tips)
+    * [.follow()](#module_DEBE..byTable..follow)
+    * [.proctor()](#module_DEBE..byTable..proctor)
+    * [.likeus()](#module_DEBE..byTable..likeus)
+    * [.users()](#module_DEBE..byTable..users)
+    * [.navigate()](#module_DEBE..byTable..navigate)
+    * [.graph(req, res)](#module_DEBE..byTable..graph)
+    * [.ingest(req, res)](#module_DEBE..byTable..ingest)
+    * [.decode(req, res)](#module_DEBE..byTable..decode)
+    * [.agent(req, res)](#module_DEBE..byTable..agent)
+    * [.alert(req, res)](#module_DEBE..byTable..alert)
+    * [.stop(req, res)](#module_DEBE..byTable..stop)
+    * [.devstatus(req, res)](#module_DEBE..byTable..devstatus)
+    * [.milestones(req, res)](#module_DEBE..byTable..milestones)
+    * [.config(req, res)](#module_DEBE..byTable..config)
+    * [.info(req, res)](#module_DEBE..byTable..info)
+    * [.DG(req, res)](#module_DEBE..byTable..DG)
+    * [.HYDRA(req, res)](#module_DEBE..byTable..HYDRA)
+    * [.NCL(req, res)](#module_DEBE..byTable..NCL)
+    * [.ESS(req, res)](#module_DEBE..byTable..ESS)
+    * [.MIDB(req, res)](#module_DEBE..byTable..MIDB)
+    * [.matlab(req, res)](#module_DEBE..byTable..matlab)
+    * [.ESC(req, res)](#module_DEBE..byTable..ESC)
+
+<a name="module_DEBE..byTable..search"></a>
+
+#### byTable..search()
+**Kind**: static method of [<code>byTable.</code>](#module_DEBE..byTable.)  
+<a name="module_DEBE..byTable..searches"></a>
+
+#### byTable..searches()
+**Kind**: static method of [<code>byTable.</code>](#module_DEBE..byTable.)  
+<a name="module_DEBE..byTable..words"></a>
+
+#### byTable..words()
+**Kind**: static method of [<code>byTable.</code>](#module_DEBE..byTable.)  
+<a name="module_DEBE..byTable..wms"></a>
+
+#### byTable..wms()
+**Kind**: static method of [<code>byTable.</code>](#module_DEBE..byTable.)  
+<a name="module_DEBE..byTable..wfs"></a>
+
+#### byTable..wfs()
+**Kind**: static method of [<code>byTable.</code>](#module_DEBE..byTable.)  
+<a name="module_DEBE..byTable..tips"></a>
+
+#### byTable..tips()
+Provide image tips.
+
+**Kind**: static method of [<code>byTable.</code>](#module_DEBE..byTable.)  
+<a name="module_DEBE..byTable..follow"></a>
+
+#### byTable..follow()
+Track web links.
+
+**Kind**: static method of [<code>byTable.</code>](#module_DEBE..byTable.)  
+<a name="module_DEBE..byTable..proctor"></a>
+
+#### byTable..proctor()
+Proctor quizes.
+
+**Kind**: static method of [<code>byTable.</code>](#module_DEBE..byTable.)  
+<a name="module_DEBE..byTable..likeus"></a>
+
+#### byTable..likeus()
+**Kind**: static method of [<code>byTable.</code>](#module_DEBE..byTable.)  
+<a name="module_DEBE..byTable..users"></a>
+
+#### byTable..users()
+**Kind**: static method of [<code>byTable.</code>](#module_DEBE..byTable.)  
+<a name="module_DEBE..byTable..navigate"></a>
+
+#### byTable..navigate()
+Folder navigator.
+
+**Kind**: static method of [<code>byTable.</code>](#module_DEBE..byTable.)  
+<a name="module_DEBE..byTable..graph"></a>
+
+#### byTable..graph(req, res)
+Endpoint to retrieve [requested neo4j graph](/api.view#sysGraph).
+
+**Kind**: static method of [<code>byTable.</code>](#module_DEBE..byTable.)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| req | <code>Object</code> | Totem request |
+| res | <code>function</code> | Totem response |
+
+<a name="module_DEBE..byTable..ingest"></a>
+
+#### byTable..ingest(req, res)
+Endpoint to ingest a source into the sql database
+
+**Kind**: static method of [<code>byTable.</code>](#module_DEBE..byTable.)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| req | <code>Object</code> | Totem request |
+| res | <code>function</code> | Totem response |
+
+<a name="module_DEBE..byTable..decode"></a>
+
+#### byTable..decode(req, res)
+Endpoint to return release information about requested license.
+
+**Kind**: static method of [<code>byTable.</code>](#module_DEBE..byTable.)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| req | <code>Object</code> | Totem request |
+| res | <code>function</code> | Totem response |
+
+<a name="module_DEBE..byTable..agent"></a>
+
+#### byTable..agent(req, res)
+Endpoint to send notice to outsource jobs to agents.
+
+**Kind**: static method of [<code>byTable.</code>](#module_DEBE..byTable.)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| req | <code>Object</code> | Totem request |
+| res | <code>function</code> | Totem response |
+
+<a name="module_DEBE..byTable..alert"></a>
+
+#### byTable..alert(req, res)
+Endpoint to send notice to all clients
+
+**Kind**: static method of [<code>byTable.</code>](#module_DEBE..byTable.)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| req | <code>Object</code> | Totem request |
+| res | <code>function</code> | Totem response |
+
+<a name="module_DEBE..byTable..stop"></a>
+
+#### byTable..stop(req, res)
+Endpoint to send emergency message to all clients then halt totem
+
+**Kind**: static method of [<code>byTable.</code>](#module_DEBE..byTable.)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| req | <code>Object</code> | Totem request |
+| res | <code>function</code> | Totem response |
+
+<a name="module_DEBE..byTable..devstatus"></a>
+
+#### byTable..devstatus(req, res)
+**Kind**: static method of [<code>byTable.</code>](#module_DEBE..byTable.)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| req | <code>Object</code> | Totem request |
+| res | <code>function</code> | Totem response |
+
+<a name="module_DEBE..byTable..milestones"></a>
+
+#### byTable..milestones(req, res)
+**Kind**: static method of [<code>byTable.</code>](#module_DEBE..byTable.)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| req | <code>Object</code> | Totem request |
+| res | <code>function</code> | Totem response |
+
+<a name="module_DEBE..byTable..config"></a>
+
+#### byTable..config(req, res)
+**Kind**: static method of [<code>byTable.</code>](#module_DEBE..byTable.)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| req | <code>Object</code> | Totem request |
+| res | <code>function</code> | Totem response |
+
+<a name="module_DEBE..byTable..info"></a>
+
+#### byTable..info(req, res)
+**Kind**: static method of [<code>byTable.</code>](#module_DEBE..byTable.)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| req | <code>Object</code> | Totem request |
+| res | <code>function</code> | Totem response |
+
+<a name="module_DEBE..byTable..DG"></a>
+
+#### byTable..DG(req, res)
+Digital globe interface.
+
+**Kind**: static method of [<code>byTable.</code>](#module_DEBE..byTable.)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| req | <code>Object</code> | Totem request |
+| res | <code>function</code> | Totem response |
+
+<a name="module_DEBE..byTable..HYDRA"></a>
+
+#### byTable..HYDRA(req, res)
+Hydra interface.
+
+**Kind**: static method of [<code>byTable.</code>](#module_DEBE..byTable.)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| req | <code>Object</code> | Totem request |
+| res | <code>function</code> | Totem response |
+
+<a name="module_DEBE..byTable..NCL"></a>
+
+#### byTable..NCL(req, res)
+NCL interface.
+
+**Kind**: static method of [<code>byTable.</code>](#module_DEBE..byTable.)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| req | <code>Object</code> | Totem request |
+| res | <code>function</code> | Totem response |
+
+<a name="module_DEBE..byTable..ESS"></a>
+
+#### byTable..ESS(req, res)
+ESS interface.
+
+**Kind**: static method of [<code>byTable.</code>](#module_DEBE..byTable.)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| req | <code>Object</code> | Totem request |
+| res | <code>function</code> | Totem response |
+
+<a name="module_DEBE..byTable..MIDB"></a>
+
+#### byTable..MIDB(req, res)
+MIDB interface.
+
+**Kind**: static method of [<code>byTable.</code>](#module_DEBE..byTable.)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| req | <code>Object</code> | Totem request |
+| res | <code>function</code> | Totem response |
+
+<a name="module_DEBE..byTable..matlab"></a>
+
+#### byTable..matlab(req, res)
+Matlab interface.
+
+**Kind**: static method of [<code>byTable.</code>](#module_DEBE..byTable.)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| req | <code>Object</code> | Totem request |
+| res | <code>function</code> | Totem response |
+
+<a name="module_DEBE..byTable..ESC"></a>
+
+#### byTable..ESC(req, res)
+ESC remedy interface.
+
+**Kind**: static method of [<code>byTable.</code>](#module_DEBE..byTable.)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| req | <code>Object</code> | Totem request |
+| res | <code>function</code> | Totem response |
+
+<a name="module_DEBE..byType."></a>
+
+### DEBE~byType.
+Endpoints /TABLE.TYPE routes by table type on specifed req-res thread
+
+**Kind**: inner property of [<code>DEBE</code>](#module_DEBE)  
+<a name="module_DEBE..site."></a>
+
+### DEBE~site.
+Site skinning context
+
+**Kind**: inner property of [<code>DEBE</code>](#module_DEBE)  
+<a name="module_DEBE..errors."></a>
+
+### DEBE~errors.
+**Kind**: inner property of [<code>DEBE</code>](#module_DEBE)  
+<a name="module_DEBE..paths."></a>
+
+### DEBE~paths.
+**Kind**: inner property of [<code>DEBE</code>](#module_DEBE)  
 <a name="module_DEBE..probono"></a>
 
 ### DEBE~probono : <code>boolean</code>
@@ -503,7 +871,7 @@ Enable for double-blind testing
 <a name="module_DEBE..inspector"></a>
 
 ### DEBE~inspector()
-Inspect doc
+Inspect doc - kludge i/f to support nlp project
 
 **Kind**: inner method of [<code>DEBE</code>](#module_DEBE)  
 <a name="module_DEBE..licenseCode"></a>
@@ -512,22 +880,31 @@ Inspect doc
 License code
 
 **Kind**: inner method of [<code>DEBE</code>](#module_DEBE)  
+<a name="module_DEBE..sendMail"></a>
+
+### DEBE~sendMail()
+**Kind**: inner method of [<code>DEBE</code>](#module_DEBE)  
 <a name="module_DEBE..initialize"></a>
 
-### DEBE~initialize(err)
+### DEBE~initialize(sql, init)
 Initialize DEBE on startup.
 
 **Kind**: inner method of [<code>DEBE</code>](#module_DEBE)  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| err | <code>Object</code> | error |
+| sql | <code>Object</code> | MySQL connector |
+| init | <code>function</code> | callback(sql) when service init completed |
 
+<a name="module_DEBE..ingestFile"></a>
+
+### DEBE~ingestFile()
+**Kind**: inner method of [<code>DEBE</code>](#module_DEBE)  
 <a name="module_DEBE..SOAPsession"></a>
 
 ### DEBE~SOAPsession(req, res, proxy)
 Process an bySOAP session peer-to-peer request.  Currently customized for Hydra-peer and 
-	could/should be revised to support more generic peer-to-peer bySOAP interfaces.
+could/should be revised to support more generic peer-to-peer bySOAP interfaces.
 
 **Kind**: inner method of [<code>DEBE</code>](#module_DEBE)  
 
