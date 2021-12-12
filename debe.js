@@ -153,7 +153,7 @@ Copy({  // array prototypes
 					const heads = {}, rec0 = recs[0];
 
 					if (rehead && rec0) {
-						if ( rec0.length )
+						if ( rec0.forEach )
 							rec0.forEach( (val,key) => heads[key] = rehead[key] || key );
 
 						else																		
@@ -169,7 +169,7 @@ Copy({  // array prototypes
 						var row = "", intro = true;
 						Each(heads, (key,val) => {
 							if (val = rec[key])
-								row += isArray(val)
+								row += val.forEach
 									? table(val)
 									: (val+"").linkify().tag("td", intro ? {class:"intro"} : {});
 							else
@@ -4660,15 +4660,38 @@ size, pixels, scale, step, range, detects, infile, outfile, channel.  This endpo
 					+ "".tag("iframe",{src:fn+".html"}).tag("div",{class:"ctr"}).tag("div",{class:"mid"})
 				).tag("div",{class:"container"});
 		},
-
-		/**
-		@method gridify
-		@memberof Skinning
-		*/
+		tag: (arg,el,at) => arg.tag(el,at),
+		link: (arg,to) => arg.tag("a",{href:to}),
+		get: (recs,idx,ctx) => recs.get(idx,ctx),
 		gridify: (recs,rehead,style) => recs.gridify(rehead,style),
+		invite: d => "Invite".tag("button",{id:"_invite",onclick:"alert(123)"}) + d.users + " AS " + d.roles,
+		embed: (url,w,h) => {
+			const
+				keys = {},
+				[urlPath] = url.parsePath(keys,{},{},{}),
+				urlName = urlPath,
+				W = w||keys.w||400,
+				H = h||keys.h||400,
+				urlType = "",
+				x = urlPath.replace(/(.*)\.(.*)/, (str,L,R) => {
+					urlName = L;
+					urlType = R;
+					return "#";
+				});
 
-		get: (recs, idx) => recs.get(idx,{}),
+			//Log("link", url, urlPath, keys);
+			switch (urlType) { 
+				case "jpg":  
+				case "png":
+					return "".tag("img", { src:`${url}?killcache=${new Date()}`, width:W, height:H });
+					break;
 
+				case "view": 
+				default:
+					return "".tag("iframe", { src: url, width:W, height:H });
+			}
+		},
+		
 		banner: "",	// disabled
 		
 		/*classif: {
@@ -4685,6 +4708,13 @@ size, pixels, scale, step, range, detects, infile, outfile, channel.  This endpo
 		jira: ENV.JIRA || "http://JIRA?",
 		ras: ENV.RAS || "http://RAS?",
 		repo: ENV.REPO || "http://REPO?",
+
+		reqts: {   // defaults
+			js:  ["nodejs-12.14.0", "machine learning library-1.0".tag( "https://sc.appdev.proj.coe.ic.gov://acmesds/man" )].join(", "),
+			py: "anconda2-2019.7 (iPython 5.1.0 debugger), numpy 1.11.3, scipy 0.18.1, utm 0.4.2, Python 2.7.13",
+			m: "matlab R18, odbc, simulink, stateflow",
+			R: "R-3.6.0, MariaDB, MySQL-connector"
+		},
 		
 		/*
 		match: function (recs,where,get) {
