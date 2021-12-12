@@ -5177,13 +5177,12 @@ function savePage(req,res) {
 		Type = type.substr(1),
 		name = table,
 		xsrc = `${master}/${name}.${Type}`.tag("?", query),
+		xtar = `./uploads/${name}.pdf`,
 		src = `${master}/${name}.view`.tag("?", query),
 		tar = `./uploads/${name}.${Type}`;	
 
 	if (type == "help")
 	return res("Save a web page and stage its delivery");
-
-	res( "Claim your results "+"here".link(tar) );
 
 	switch (Type) {
 		case "pdf":
@@ -5193,12 +5192,15 @@ function savePage(req,res) {
 			CP.execFile( "node", ["phantomjs", "rasterize.js", url, docf, res], function (err,stdout) { 
 				if (err) Log(err,stdout);
 			});  */
+			res( "Claim your results "+"here".link(tar) );
+			
 			CP.exec(`phantomjs rasterize.js ${src} ${tar}`, (err,log) => {
 				Log(err || `SAVED ${url}` );
 			});
 			break;
 
 		case "html":
+			res( "Claim your results "+"here".link(tar) );
 			Fetch( src, html => {
 				FS.writeFile(tar, html, err => {
 					Log(err || `SAVED ${url}` );
@@ -5207,7 +5209,8 @@ function savePage(req,res) {
 			break;	
 			
 		default:
-			CP.exec(`phantomjs rasterize.js ${xsrc} ${tar}`, (err,log) => {
+			res( "Claim your results "+"here".link(xtar) );
+			CP.exec(`phantomjs rasterize.js ${xsrc} ${xtar}`, (err,log) => {
 				Log(err || `SAVED ${url}` );
 			});
 			
