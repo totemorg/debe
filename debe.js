@@ -697,7 +697,7 @@ DEBE.config({
 */
 
 const
-	{ sendMail, Log, Trace, routeTable, pluginLibs,
+	{ sendMail, Log, Trace, routeTable, $libs,
 	 	licenseOnDownload, defaultDocs } = DEBE = module.exports = Copy({
 	
 	Log: (...args) => console.log(">>>debe", args),
@@ -726,17 +726,48 @@ const
 		});
 			
 	},
-		
-	pluginLibs: {   // share these modules with engines
+	
+	/**
+	*/
+	$libs: {   // share these modules with engines
+		/**
+		See [man]{@link https://github.com/totemstan/man/}
+		*/
 		$: $,
+		/**
+		See [man]{@link https://github.com/totemstan/man/}
+		*/
 		$ran: opts => new RAN(opts),
+		/**
+		See [debe]{@link https://github.com/totemstan/debe/}
+		*/
 		$log: console.log,
+		/**
+		See [debe]{@link https://github.com/totemstan/debe/}
+		*/
 		$task: runTask,
+		/**
+		See [man]{@link https://github.com/totemstan/man/}
+		*/
 		$jimp: JIMP,
+		/**
+		See [jsdb]{@link https://github.com/totemstan/jsdb/}
+		*/
 		$sql: sqlThread,
+		/**
+		See [jsdb]{@link https://github.com/totemstan/jsdb/}
+		*/
 		$neo: neoThread,
+		/**
+		See [enums]{@link https://github.com/totemstan/enums/}
+		*/
 		$copy: Copy,
+		/**
+		See [enums]{@link https://github.com/totemstan/enums/}
+		*/
 		$each: Each,
+		/**
+		*/
 		$api: () => CP.exec( `firefox ${site.master}/quickapi.view` )
 	},
 	
@@ -1245,7 +1276,7 @@ as described in the [Notebooks api](/api.view). `,
 		function initNIF(cb) {
 			sql.getTables( "app", books => {	// config notebook i/f
 				books.forEach( book => {
-					pluginLibs["$"+book] = (index, cb) => {
+					$libs["$"+book] = (index, cb) => {
 						
 						function logRun( data ) {
 							Log(">"+book, data);
@@ -1396,7 +1427,7 @@ as described in the [Notebooks api](/api.view). `,
 				sqlThread: sqlThread,
 				//emitter: DEBE.IO ? DEBE.IO.sockets.emit : null,
 				//skinner: JADE,
-				// $libs: pluginLibs,
+				// $libs: $libs,
 				sendMail: sendMail,
 				createCert: TOTEM.createCert,
 				//diag: TOTEM.diag,
@@ -1449,7 +1480,7 @@ as described in the [Notebooks api](/api.view). `,
 				sqlThread: sqlThread,
 				cores: 0,
 				node: ENV.HOSTNAME,
-				"$libs.": pluginLibs
+				"$libs.": $libs
 			});
 
 			READ.config({
@@ -7001,10 +7032,10 @@ clients, users, system health, etc).`
 			Log( "Welcome to TOTEM Lab!" );
 
 			const 
-				{$api} = pluginLibs,
+				{$api} = $libs,
 				ctx = REPL.start({prompt: "$> ", useGlobal: true}).context;
 
-			Each( pluginLibs, (key,lib) => ctx[key] = lib );
+			Each( $libs, (key,lib) => ctx[key] = lib );
 			
 			$api();
 		});

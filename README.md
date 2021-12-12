@@ -366,6 +366,17 @@ DEBE.config({
 ```
 
 * [DEBE](#module_DEBE)
+    * [~$libs](#module_DEBE..$libs)
+        * [.$](#module_DEBE..$libs.$)
+        * [.$log](#module_DEBE..$libs.$log)
+        * [.$task](#module_DEBE..$libs.$task)
+        * [.$jimp](#module_DEBE..$libs.$jimp)
+        * [.$sql](#module_DEBE..$libs.$sql)
+        * [.$neo](#module_DEBE..$libs.$neo)
+        * [.$copy](#module_DEBE..$libs.$copy)
+        * [.$each](#module_DEBE..$libs.$each)
+        * [.$ran()](#module_DEBE..$libs.$ran)
+        * [.$api()](#module_DEBE..$libs.$api)
     * [~tableRoutes.](#module_DEBE..tableRoutes.)
     * [~filterFlag.](#module_DEBE..filterFlag.)
     * [~filterType.](#module_DEBE..filterType.)
@@ -436,6 +447,81 @@ DEBE.config({
     * [~runPlugin(req, res)](#module_DEBE..runPlugin)
     * [~getCert(req, res)](#module_DEBE..getCert)
 
+<a name="module_DEBE..$libs"></a>
+
+### DEBE~$libs
+**Kind**: inner property of [<code>DEBE</code>](#module_DEBE)  
+
+* [~$libs](#module_DEBE..$libs)
+    * [.$](#module_DEBE..$libs.$)
+    * [.$log](#module_DEBE..$libs.$log)
+    * [.$task](#module_DEBE..$libs.$task)
+    * [.$jimp](#module_DEBE..$libs.$jimp)
+    * [.$sql](#module_DEBE..$libs.$sql)
+    * [.$neo](#module_DEBE..$libs.$neo)
+    * [.$copy](#module_DEBE..$libs.$copy)
+    * [.$each](#module_DEBE..$libs.$each)
+    * [.$ran()](#module_DEBE..$libs.$ran)
+    * [.$api()](#module_DEBE..$libs.$api)
+
+<a name="module_DEBE..$libs.$"></a>
+
+#### $libs.$
+See [man](https://github.com/totemstan/man/)
+
+**Kind**: static property of [<code>$libs</code>](#module_DEBE..$libs)  
+<a name="module_DEBE..$libs.$log"></a>
+
+#### $libs.$log
+See [debe](https://github.com/totemstan/debe/)
+
+**Kind**: static property of [<code>$libs</code>](#module_DEBE..$libs)  
+<a name="module_DEBE..$libs.$task"></a>
+
+#### $libs.$task
+See [debe](https://github.com/totemstan/debe/)
+
+**Kind**: static property of [<code>$libs</code>](#module_DEBE..$libs)  
+<a name="module_DEBE..$libs.$jimp"></a>
+
+#### $libs.$jimp
+See [man](https://github.com/totemstan/man/)
+
+**Kind**: static property of [<code>$libs</code>](#module_DEBE..$libs)  
+<a name="module_DEBE..$libs.$sql"></a>
+
+#### $libs.$sql
+See [jsdb](https://github.com/totemstan/jsdb/)
+
+**Kind**: static property of [<code>$libs</code>](#module_DEBE..$libs)  
+<a name="module_DEBE..$libs.$neo"></a>
+
+#### $libs.$neo
+See [jsdb](https://github.com/totemstan/jsdb/)
+
+**Kind**: static property of [<code>$libs</code>](#module_DEBE..$libs)  
+<a name="module_DEBE..$libs.$copy"></a>
+
+#### $libs.$copy
+See [enums](https://github.com/totemstan/enums/)
+
+**Kind**: static property of [<code>$libs</code>](#module_DEBE..$libs)  
+<a name="module_DEBE..$libs.$each"></a>
+
+#### $libs.$each
+See [enums](https://github.com/totemstan/enums/)
+
+**Kind**: static property of [<code>$libs</code>](#module_DEBE..$libs)  
+<a name="module_DEBE..$libs.$ran"></a>
+
+#### $libs.$ran()
+See [man](https://github.com/totemstan/man/)
+
+**Kind**: static method of [<code>$libs</code>](#module_DEBE..$libs)  
+<a name="module_DEBE..$libs.$api"></a>
+
+#### $libs.$api()
+**Kind**: static method of [<code>$libs</code>](#module_DEBE..$libs)  
 <a name="module_DEBE..tableRoutes."></a>
 
 ### DEBE~tableRoutes.
