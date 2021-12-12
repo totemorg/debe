@@ -297,7 +297,7 @@ in accordance with [jsdoc](https://jsdoc.app/).
 // npm test D2
 // Start challenge-protected server with additional byTable-routed entpoints.
 
-DEBE.config({
+config({
 	riddles: 10,
 	"byTable.": {
 		wfs: function (req,res) {
@@ -317,7 +317,7 @@ DEBE.config({
 // npm test D3
 // Start server using default config
 
-DEBE.config({
+config({
 }, sql => {
 	Log( "Stateful network flow manger started" );
 });
@@ -338,7 +338,7 @@ function readFile(sql, path, cb) {
 	});
 }
 
-DEBE.config({
+config({
 }, sql => {
 	var recs = 0, now = new Date();
 	readFile( sql, "./config.stores/test.xls", (rec,sql) => {
@@ -378,24 +378,49 @@ DEBE.config({
         * [.$ran()](#module_DEBE..$libs.$ran)
         * [.$api()](#module_DEBE..$libs.$api)
     * [~tableRoutes.](#module_DEBE..tableRoutes.)
+    * [~defaultDocs](#module_DEBE..defaultDocs)
+    * [~licenseOnDownload](#module_DEBE..licenseOnDownload)
     * [~filterFlag.](#module_DEBE..filterFlag.)
+        * [.traps.](#module_DEBE..filterFlag..traps.)
+            * [.browse()](#module_DEBE..filterFlag..traps..browse)
+            * [.view()](#module_DEBE..filterFlag..traps..view)
+        * [.select()](#module_DEBE..filterFlag..select)
+        * [.blog()](#module_DEBE..filterFlag..blog)
+        * [.$()](#module_DEBE..filterFlag..$)
     * [~filterType.](#module_DEBE..filterType.)
+        * [.xdoc](#module_DEBE..filterType..xdoc)
+        * [.xxls](#module_DEBE..filterType..xxls)
+        * [.xpps](#module_DEBE..filterType..xpps)
+        * [.xppt](#module_DEBE..filterType..xppt)
+        * [.dbx(recs, req, res)](#module_DEBE..filterType..dbx)
+        * [.db(recs, req, res)](#module_DEBE..filterType..db)
+        * [.kml(recs, req, res)](#module_DEBE..filterType..kml)
+        * [.flat(recs, req, res)](#module_DEBE..filterType..flat)
+        * [.txt(recs, req, res)](#module_DEBE..filterType..txt)
+        * [.html(recs, req, res)](#module_DEBE..filterType..html)
+        * [.tree(recs, req, res)](#module_DEBE..filterType..tree)
+        * [.schema(recs, req, res)](#module_DEBE..filterType..schema)
     * [~byArea.](#module_DEBE..byArea.)
+        * [.default](#module_DEBE..byArea..default)
     * [~byTable.](#module_DEBE..byTable.)
-        * [.search()](#module_DEBE..byTable..search)
-        * [.searches()](#module_DEBE..byTable..searches)
-        * [.words()](#module_DEBE..byTable..words)
-        * [.wms()](#module_DEBE..byTable..wms)
-        * [.wfs()](#module_DEBE..byTable..wfs)
-        * [.tips()](#module_DEBE..byTable..tips)
-        * [.follow()](#module_DEBE..byTable..follow)
-        * [.proctor()](#module_DEBE..byTable..proctor)
-        * [.likeus()](#module_DEBE..byTable..likeus)
-        * [.users()](#module_DEBE..byTable..users)
-        * [.navigate()](#module_DEBE..byTable..navigate)
+        * [.uploads](#module_DEBE..byTable..uploads)
+        * [.stores](#module_DEBE..byTable..stores)
+        * [.search(req, res)](#module_DEBE..byTable..search)
+        * [.searches(req, res)](#module_DEBE..byTable..searches)
+        * [.words(req, res)](#module_DEBE..byTable..words)
+        * [.wms(req, res)](#module_DEBE..byTable..wms)
+        * [.wfs(req, res)](#module_DEBE..byTable..wfs)
+        * [.tips(req, res)](#module_DEBE..byTable..tips)
+        * [.follow(req, res)](#module_DEBE..byTable..follow)
+        * [.proctor(req, res)](#module_DEBE..byTable..proctor)
+        * [.likeus(req, res)](#module_DEBE..byTable..likeus)
+        * [.users(req, res)](#module_DEBE..byTable..users)
+        * [.navigate(req, res)](#module_DEBE..byTable..navigate)
         * [.graph(req, res)](#module_DEBE..byTable..graph)
+        * [.notebooks(req, res)](#module_DEBE..byTable..notebooks)
         * [.ingest(req, res)](#module_DEBE..byTable..ingest)
         * [.decode(req, res)](#module_DEBE..byTable..decode)
+        * [.restart(req, res)](#module_DEBE..byTable..restart)
         * [.agent(req, res)](#module_DEBE..byTable..agent)
         * [.alert(req, res)](#module_DEBE..byTable..alert)
         * [.stop(req, res)](#module_DEBE..byTable..stop)
@@ -421,6 +446,7 @@ DEBE.config({
     * [~inspector()](#module_DEBE..inspector)
     * [~licenseCode()](#module_DEBE..licenseCode)
     * [~sendMail()](#module_DEBE..sendMail)
+    * [~onUpdate()](#module_DEBE..onUpdate)
     * [~initialize(sql, init)](#module_DEBE..initialize)
     * [~SOAPsession(req, res, proxy)](#module_DEBE..SOAPsession)
     * [~genDoc(recs, req, res)](#module_DEBE..genDoc)
@@ -528,24 +554,227 @@ See [man](https://github.com/totemstan/man/)
 Route table to a database according to security requirements.
 
 **Kind**: inner property of [<code>DEBE</code>](#module_DEBE)  
+<a name="module_DEBE..defaultDocs"></a>
+
+### DEBE~defaultDocs
+**Kind**: inner property of [<code>DEBE</code>](#module_DEBE)  
+<a name="module_DEBE..licenseOnDownload"></a>
+
+### DEBE~licenseOnDownload
+**Kind**: inner property of [<code>DEBE</code>](#module_DEBE)  
 <a name="module_DEBE..filterFlag."></a>
 
 ### DEBE~filterFlag.
 Filters via request flags
 
 **Kind**: inner property of [<code>DEBE</code>](#module_DEBE)  
+
+* [~filterFlag.](#module_DEBE..filterFlag.)
+    * [.traps.](#module_DEBE..filterFlag..traps.)
+        * [.browse()](#module_DEBE..filterFlag..traps..browse)
+        * [.view()](#module_DEBE..filterFlag..traps..view)
+    * [.select()](#module_DEBE..filterFlag..select)
+    * [.blog()](#module_DEBE..filterFlag..blog)
+    * [.$()](#module_DEBE..filterFlag..$)
+
+<a name="module_DEBE..filterFlag..traps."></a>
+
+#### filterFlag..traps.
+**Kind**: static property of [<code>filterFlag.</code>](#module_DEBE..filterFlag.)  
+
+* [.traps.](#module_DEBE..filterFlag..traps.)
+    * [.browse()](#module_DEBE..filterFlag..traps..browse)
+    * [.view()](#module_DEBE..filterFlag..traps..view)
+
+<a name="module_DEBE..filterFlag..traps..browse"></a>
+
+##### traps..browse()
+**Kind**: static method of [<code>traps.</code>](#module_DEBE..filterFlag..traps.)  
+<a name="module_DEBE..filterFlag..traps..view"></a>
+
+##### traps..view()
+**Kind**: static method of [<code>traps.</code>](#module_DEBE..filterFlag..traps.)  
+<a name="module_DEBE..filterFlag..select"></a>
+
+#### filterFlag..select()
+**Kind**: static method of [<code>filterFlag.</code>](#module_DEBE..filterFlag.)  
+<a name="module_DEBE..filterFlag..blog"></a>
+
+#### filterFlag..blog()
+**Kind**: static method of [<code>filterFlag.</code>](#module_DEBE..filterFlag.)  
+<a name="module_DEBE..filterFlag..$"></a>
+
+#### filterFlag..$()
+**Kind**: static method of [<code>filterFlag.</code>](#module_DEBE..filterFlag.)  
 <a name="module_DEBE..filterType."></a>
 
 ### DEBE~filterType.
 Filter dataset recs on specifed req-res thread
 
 **Kind**: inner property of [<code>DEBE</code>](#module_DEBE)  
+
+* [~filterType.](#module_DEBE..filterType.)
+    * [.xdoc](#module_DEBE..filterType..xdoc)
+    * [.xxls](#module_DEBE..filterType..xxls)
+    * [.xpps](#module_DEBE..filterType..xpps)
+    * [.xppt](#module_DEBE..filterType..xppt)
+    * [.dbx(recs, req, res)](#module_DEBE..filterType..dbx)
+    * [.db(recs, req, res)](#module_DEBE..filterType..db)
+    * [.kml(recs, req, res)](#module_DEBE..filterType..kml)
+    * [.flat(recs, req, res)](#module_DEBE..filterType..flat)
+    * [.txt(recs, req, res)](#module_DEBE..filterType..txt)
+    * [.html(recs, req, res)](#module_DEBE..filterType..html)
+    * [.tree(recs, req, res)](#module_DEBE..filterType..tree)
+    * [.schema(recs, req, res)](#module_DEBE..filterType..schema)
+
+<a name="module_DEBE..filterType..xdoc"></a>
+
+#### filterType..xdoc
+**Kind**: static property of [<code>filterType.</code>](#module_DEBE..filterType.)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| recs | <code>Array</code> | Records to filter |
+| req | <code>Object</code> | Totem request |
+| res | <code>function</code> | Totem response |
+
+<a name="module_DEBE..filterType..xxls"></a>
+
+#### filterType..xxls
+**Kind**: static property of [<code>filterType.</code>](#module_DEBE..filterType.)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| recs | <code>Array</code> | Records to filter |
+| req | <code>Object</code> | Totem request |
+| res | <code>function</code> | Totem response |
+
+<a name="module_DEBE..filterType..xpps"></a>
+
+#### filterType..xpps
+**Kind**: static property of [<code>filterType.</code>](#module_DEBE..filterType.)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| recs | <code>Array</code> | Records to filter |
+| req | <code>Object</code> | Totem request |
+| res | <code>function</code> | Totem response |
+
+<a name="module_DEBE..filterType..xppt"></a>
+
+#### filterType..xppt
+**Kind**: static property of [<code>filterType.</code>](#module_DEBE..filterType.)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| recs | <code>Array</code> | Records to filter |
+| req | <code>Object</code> | Totem request |
+| res | <code>function</code> | Totem response |
+
+<a name="module_DEBE..filterType..dbx"></a>
+
+#### filterType..dbx(recs, req, res)
+**Kind**: static method of [<code>filterType.</code>](#module_DEBE..filterType.)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| recs | <code>Array</code> | Records to filter |
+| req | <code>Object</code> | Totem request |
+| res | <code>function</code> | Totem response |
+
+<a name="module_DEBE..filterType..db"></a>
+
+#### filterType..db(recs, req, res)
+**Kind**: static method of [<code>filterType.</code>](#module_DEBE..filterType.)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| recs | <code>Array</code> | Records to filter |
+| req | <code>Object</code> | Totem request |
+| res | <code>function</code> | Totem response |
+
+<a name="module_DEBE..filterType..kml"></a>
+
+#### filterType..kml(recs, req, res)
+**Kind**: static method of [<code>filterType.</code>](#module_DEBE..filterType.)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| recs | <code>Array</code> | Records to filter |
+| req | <code>Object</code> | Totem request |
+| res | <code>function</code> | Totem response |
+
+<a name="module_DEBE..filterType..flat"></a>
+
+#### filterType..flat(recs, req, res)
+**Kind**: static method of [<code>filterType.</code>](#module_DEBE..filterType.)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| recs | <code>Array</code> | Records to filter |
+| req | <code>Object</code> | Totem request |
+| res | <code>function</code> | Totem response |
+
+<a name="module_DEBE..filterType..txt"></a>
+
+#### filterType..txt(recs, req, res)
+**Kind**: static method of [<code>filterType.</code>](#module_DEBE..filterType.)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| recs | <code>Array</code> | Records to filter |
+| req | <code>Object</code> | Totem request |
+| res | <code>function</code> | Totem response |
+
+<a name="module_DEBE..filterType..html"></a>
+
+#### filterType..html(recs, req, res)
+**Kind**: static method of [<code>filterType.</code>](#module_DEBE..filterType.)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| recs | <code>Array</code> | Records to filter |
+| req | <code>Object</code> | Totem request |
+| res | <code>function</code> | Totem response |
+
+<a name="module_DEBE..filterType..tree"></a>
+
+#### filterType..tree(recs, req, res)
+**Kind**: static method of [<code>filterType.</code>](#module_DEBE..filterType.)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| recs | <code>Array</code> | Records to filter |
+| req | <code>Object</code> | Totem request |
+| res | <code>function</code> | Totem response |
+
+<a name="module_DEBE..filterType..schema"></a>
+
+#### filterType..schema(recs, req, res)
+**Kind**: static method of [<code>filterType.</code>](#module_DEBE..filterType.)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| recs | <code>Array</code> | Records to filter |
+| req | <code>Object</code> | Totem request |
+| res | <code>function</code> | Totem response |
+
 <a name="module_DEBE..byArea."></a>
 
 ### DEBE~byArea.
 Endpoints /AREA/FILE routes by file area on specifed req-res thread
 
 **Kind**: inner property of [<code>DEBE</code>](#module_DEBE)  
+<a name="module_DEBE..byArea..default"></a>
+
+#### byArea..default
+**Kind**: static property of [<code>byArea.</code>](#module_DEBE..byArea.)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| req | <code>Object</code> | Totem request |
+| res | <code>function</code> | Totem response |
+
 <a name="module_DEBE..byTable."></a>
 
 ### DEBE~byTable.
@@ -554,20 +783,24 @@ Endpoints /TABLE routes by table name on specifed req-res thread
 **Kind**: inner property of [<code>DEBE</code>](#module_DEBE)  
 
 * [~byTable.](#module_DEBE..byTable.)
-    * [.search()](#module_DEBE..byTable..search)
-    * [.searches()](#module_DEBE..byTable..searches)
-    * [.words()](#module_DEBE..byTable..words)
-    * [.wms()](#module_DEBE..byTable..wms)
-    * [.wfs()](#module_DEBE..byTable..wfs)
-    * [.tips()](#module_DEBE..byTable..tips)
-    * [.follow()](#module_DEBE..byTable..follow)
-    * [.proctor()](#module_DEBE..byTable..proctor)
-    * [.likeus()](#module_DEBE..byTable..likeus)
-    * [.users()](#module_DEBE..byTable..users)
-    * [.navigate()](#module_DEBE..byTable..navigate)
+    * [.uploads](#module_DEBE..byTable..uploads)
+    * [.stores](#module_DEBE..byTable..stores)
+    * [.search(req, res)](#module_DEBE..byTable..search)
+    * [.searches(req, res)](#module_DEBE..byTable..searches)
+    * [.words(req, res)](#module_DEBE..byTable..words)
+    * [.wms(req, res)](#module_DEBE..byTable..wms)
+    * [.wfs(req, res)](#module_DEBE..byTable..wfs)
+    * [.tips(req, res)](#module_DEBE..byTable..tips)
+    * [.follow(req, res)](#module_DEBE..byTable..follow)
+    * [.proctor(req, res)](#module_DEBE..byTable..proctor)
+    * [.likeus(req, res)](#module_DEBE..byTable..likeus)
+    * [.users(req, res)](#module_DEBE..byTable..users)
+    * [.navigate(req, res)](#module_DEBE..byTable..navigate)
     * [.graph(req, res)](#module_DEBE..byTable..graph)
+    * [.notebooks(req, res)](#module_DEBE..byTable..notebooks)
     * [.ingest(req, res)](#module_DEBE..byTable..ingest)
     * [.decode(req, res)](#module_DEBE..byTable..decode)
+    * [.restart(req, res)](#module_DEBE..byTable..restart)
     * [.agent(req, res)](#module_DEBE..byTable..agent)
     * [.alert(req, res)](#module_DEBE..byTable..alert)
     * [.stop(req, res)](#module_DEBE..byTable..stop)
@@ -583,63 +816,159 @@ Endpoints /TABLE routes by table name on specifed req-res thread
     * [.matlab(req, res)](#module_DEBE..byTable..matlab)
     * [.ESC(req, res)](#module_DEBE..byTable..ESC)
 
+<a name="module_DEBE..byTable..uploads"></a>
+
+#### byTable..uploads
+**Kind**: static property of [<code>byTable.</code>](#module_DEBE..byTable.)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| req | <code>Object</code> | Totem request |
+| res | <code>function</code> | Totem response |
+
+<a name="module_DEBE..byTable..stores"></a>
+
+#### byTable..stores
+**Kind**: static property of [<code>byTable.</code>](#module_DEBE..byTable.)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| req | <code>Object</code> | Totem request |
+| res | <code>function</code> | Totem response |
+
 <a name="module_DEBE..byTable..search"></a>
 
-#### byTable..search()
+#### byTable..search(req, res)
 **Kind**: static method of [<code>byTable.</code>](#module_DEBE..byTable.)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| req | <code>Object</code> | Totem request |
+| res | <code>function</code> | Totem response |
+
 <a name="module_DEBE..byTable..searches"></a>
 
-#### byTable..searches()
+#### byTable..searches(req, res)
 **Kind**: static method of [<code>byTable.</code>](#module_DEBE..byTable.)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| req | <code>Object</code> | Totem request |
+| res | <code>function</code> | Totem response |
+
 <a name="module_DEBE..byTable..words"></a>
 
-#### byTable..words()
+#### byTable..words(req, res)
 **Kind**: static method of [<code>byTable.</code>](#module_DEBE..byTable.)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| req | <code>Object</code> | Totem request |
+| res | <code>function</code> | Totem response |
+
 <a name="module_DEBE..byTable..wms"></a>
 
-#### byTable..wms()
+#### byTable..wms(req, res)
 **Kind**: static method of [<code>byTable.</code>](#module_DEBE..byTable.)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| req | <code>Object</code> | Totem request |
+| res | <code>function</code> | Totem response |
+
 <a name="module_DEBE..byTable..wfs"></a>
 
-#### byTable..wfs()
+#### byTable..wfs(req, res)
 **Kind**: static method of [<code>byTable.</code>](#module_DEBE..byTable.)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| req | <code>Object</code> | Totem request |
+| res | <code>function</code> | Totem response |
+
 <a name="module_DEBE..byTable..tips"></a>
 
-#### byTable..tips()
+#### byTable..tips(req, res)
 Provide image tips.
 
 **Kind**: static method of [<code>byTable.</code>](#module_DEBE..byTable.)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| req | <code>Object</code> | Totem request |
+| res | <code>function</code> | Totem response |
+
 <a name="module_DEBE..byTable..follow"></a>
 
-#### byTable..follow()
+#### byTable..follow(req, res)
 Track web links.
 
 **Kind**: static method of [<code>byTable.</code>](#module_DEBE..byTable.)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| req | <code>Object</code> | Totem request |
+| res | <code>function</code> | Totem response |
+
 <a name="module_DEBE..byTable..proctor"></a>
 
-#### byTable..proctor()
+#### byTable..proctor(req, res)
 Proctor quizes.
 
 **Kind**: static method of [<code>byTable.</code>](#module_DEBE..byTable.)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| req | <code>Object</code> | Totem request |
+| res | <code>function</code> | Totem response |
+
 <a name="module_DEBE..byTable..likeus"></a>
 
-#### byTable..likeus()
+#### byTable..likeus(req, res)
 **Kind**: static method of [<code>byTable.</code>](#module_DEBE..byTable.)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| req | <code>Object</code> | Totem request |
+| res | <code>function</code> | Totem response |
+
 <a name="module_DEBE..byTable..users"></a>
 
-#### byTable..users()
+#### byTable..users(req, res)
 **Kind**: static method of [<code>byTable.</code>](#module_DEBE..byTable.)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| req | <code>Object</code> | Totem request |
+| res | <code>function</code> | Totem response |
+
 <a name="module_DEBE..byTable..navigate"></a>
 
-#### byTable..navigate()
+#### byTable..navigate(req, res)
 Folder navigator.
 
 **Kind**: static method of [<code>byTable.</code>](#module_DEBE..byTable.)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| req | <code>Object</code> | Totem request |
+| res | <code>function</code> | Totem response |
+
 <a name="module_DEBE..byTable..graph"></a>
 
 #### byTable..graph(req, res)
 Endpoint to retrieve [requested neo4j graph](/api.view#sysGraph).
 
+**Kind**: static method of [<code>byTable.</code>](#module_DEBE..byTable.)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| req | <code>Object</code> | Totem request |
+| res | <code>function</code> | Totem response |
+
+<a name="module_DEBE..byTable..notebooks"></a>
+
+#### byTable..notebooks(req, res)
 **Kind**: static method of [<code>byTable.</code>](#module_DEBE..byTable.)  
 
 | Param | Type | Description |
@@ -663,6 +992,18 @@ Endpoint to ingest a source into the sql database
 
 #### byTable..decode(req, res)
 Endpoint to return release information about requested license.
+
+**Kind**: static method of [<code>byTable.</code>](#module_DEBE..byTable.)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| req | <code>Object</code> | Totem request |
+| res | <code>function</code> | Totem response |
+
+<a name="module_DEBE..byTable..restart"></a>
+
+#### byTable..restart(req, res)
+Endpoint to restart totem if authorized.
 
 **Kind**: static method of [<code>byTable.</code>](#module_DEBE..byTable.)  
 
@@ -884,12 +1225,16 @@ Inspect doc - kludge i/f to support nlp project
 <a name="module_DEBE..licenseCode"></a>
 
 ### DEBE~licenseCode()
-License code
+License notebook engine code.
 
 **Kind**: inner method of [<code>DEBE</code>](#module_DEBE)  
 <a name="module_DEBE..sendMail"></a>
 
 ### DEBE~sendMail()
+**Kind**: inner method of [<code>DEBE</code>](#module_DEBE)  
+<a name="module_DEBE..onUpdate"></a>
+
+### DEBE~onUpdate()
 **Kind**: inner method of [<code>DEBE</code>](#module_DEBE)  
 <a name="module_DEBE..initialize"></a>
 

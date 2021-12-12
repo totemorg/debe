@@ -627,7 +627,7 @@ in accordance with [jsdoc]{@link https://jsdoc.app/}.
 // npm test D2
 // Start challenge-protected server with additional byTable-routed entpoints.
 
-DEBE.config({
+config({
 	riddles: 10,
 	"byTable.": {
 		wfs: function (req,res) {
@@ -647,7 +647,7 @@ DEBE.config({
 // npm test D3
 // Start server using default config
 
-DEBE.config({
+config({
 }, sql => {
 	Log( "Stateful network flow manger started" );
 });
@@ -668,7 +668,7 @@ function readFile(sql, path, cb) {
 	});
 }
 
-DEBE.config({
+config({
 }, sql => {
 	var recs = 0, now = new Date();
 	readFile( sql, "./config.stores/test.xls", (rec,sql) => {
@@ -697,7 +697,7 @@ DEBE.config({
 */
 
 const
-	{ sendMail, Log, Trace, routeTable, $libs,
+	{ sendMail, Log, Trace, routeTable, $libs, config,
 	 	licenseOnDownload, defaultDocs } = DEBE = module.exports = Copy({
 	
 	Log: (...args) => console.log(">>>debe", args),
@@ -772,7 +772,7 @@ const
 	},
 	
 	/**
-	License code
+	License notebook engine code.
 	*/
 	licenseCode: ( sql, code, pub, cb ) => {  //< callback cb(pub) or cb(null) on error
 
@@ -933,6 +933,8 @@ const
 
 	// blogContext: BLOG,		//< blogging / skinning context
 	
+	/**
+	*/
 	defaultDocs: {	// default plugin docs (db key comments)
 		nodoc: "no documentation provided",
 
@@ -999,6 +1001,8 @@ as described in the [Notebooks api](/api.view). `,
 
 	},
 	
+	/**
+	*/
 	licenseOnDownload: true,
 			
 	/**
@@ -1021,7 +1025,9 @@ as described in the [Notebooks api](/api.view). `,
 			});
 		}
 	},
-	
+
+	/**
+	*/
 	onUpdate: function (sql,ds,body) { //< runs when dataset changed
 		//Log("update", ds, body);
 		if (false)
@@ -1510,6 +1516,8 @@ as described in the [Notebooks api](/api.view). `,
 	*/
 	"filterFlag." : {  
 		
+		/**
+		*/
 		"traps.": {  // TRAP=name flags can modify the request flags
 			/*
 			save: function (req) {  //< _save=name retains query in named engine
@@ -1526,6 +1534,8 @@ as described in the [Notebooks api](/api.view). `,
 				});
 			}, */
 
+			/**
+			*/
 			browse: function(req) {	//< _browse=name navigates named folder
 				var query = req.query, flags = req.flags;
 				query.NodeID = parseInt(query.init) ? "" : query.target || "";
@@ -1536,6 +1546,8 @@ as described in the [Notebooks api](/api.view). `,
 				delete query.tree;
 			},
 
+			/**
+			*/
 			view: function (req) {   //< ?_view=name correlates named view to request dataset
 				req.sql.query("INSERT INTO openv.viewers SET ?", {
 					Viewer: req.flags.view,
@@ -1544,6 +1556,8 @@ as described in the [Notebooks api](/api.view). `,
 			}
 		},
 		
+		/**
+		*/
 		select: (recs,req,res) => {
 			const
 				{ flags } = req,
@@ -1559,6 +1573,8 @@ as described in the [Notebooks api](/api.view). `,
 											 	// `window.open("/nb.mod?"+_Client_Type.value+"="+${id}.value)`}) );			
 		},
 		
+		/**
+		*/
 		blog: (recs,req,res) => {  //< renders dataset records
 			const 
 				{ flags, table, query } = req,
@@ -1577,6 +1593,8 @@ as described in the [Notebooks api](/api.view). `,
 				res(recs);
 		},
 		
+		/**
+		*/
 		$: (recs,req,res) => {
 			const { flags } = req;
 			var rtn = recs;
@@ -1706,6 +1724,11 @@ as described in the [Notebooks api](/api.view). `,
 	*/	
 	"filterType." : { 
 		
+		/**
+		@param {Array} recs Records to filter
+		@param {Object} req Totem request
+		@param {Function} res Totem response
+		*/
 		dbx: (recs, req, res) => {
 			var Recs = [];
 			recs.forEach( rec => {
@@ -1719,6 +1742,11 @@ as described in the [Notebooks api](/api.view). `,
 			Log(Recs);
 		},
 		
+		/**
+		@param {Array} recs Records to filter
+		@param {Object} req Totem request
+		@param {Function} res Totem response
+		*/
 		db: (recs, req, res) => {	
 			res({ 
 				success: true,
@@ -1747,10 +1775,20 @@ as described in the [Notebooks api](/api.view). `,
 			}); */
 		},
 		
+		/**
+		@param {Array} recs Records to filter
+		@param {Object} req Totem request
+		@param {Function} res Totem response
+		*/
 		kml: (recs,req,res) => {  //< dataset.kml converts to kml
 			res( TOKML({}) );
 		},
 		
+		/**
+		@param {Array} recs Records to filter
+		@param {Object} req Totem request
+		@param {Function} res Totem response
+		*/
 		flat: (recs,req,res) => { //< dataset.flat flattens records
 			recs.forEach( (rec,n) => {
 				var rtns = new Array();
@@ -1760,6 +1798,11 @@ as described in the [Notebooks api](/api.view). `,
 			res( recs );
 		},
 		
+		/**
+		@param {Array} recs Records to filter
+		@param {Object} req Totem request
+		@param {Function} res Totem response
+		*/
 		txt: (recs,req,res) => { //< dataset.txt convert to text
 			var head = recs[0], cols = [], cr = String.fromCharCode(13), txt="", list = ",";
 
@@ -1809,16 +1852,45 @@ Usage: ${uses.join(", ")}  `);
 			
 		}, */
 		
+		/**
+		@param {Array} recs Records to filter
+		@param {Object} req Totem request
+		@param {Function} res Totem response
+		*/
 		html: (recs,req,res) => { //< dataset.html converts to html
 			res( recs.gridify({},{border: "1"}) );
 		},
 
 		// MS office doc types
+		/**
+		@param {Array} recs Records to filter
+		@param {Object} req Totem request
+		@param {Function} res Totem response
+		*/
 		xdoc: genDoc,
+		/**
+		@param {Array} recs Records to filter
+		@param {Object} req Totem request
+		@param {Function} res Totem response
+		*/
 		xxls: genDoc,
+		/**
+		@param {Array} recs Records to filter
+		@param {Object} req Totem request
+		@param {Function} res Totem response
+		*/
 		xpps: genDoc,
+		/**
+		@param {Array} recs Records to filter
+		@param {Object} req Totem request
+		@param {Function} res Totem response
+		*/
 		xppt: genDoc,
-		
+		/**
+		@param {Array} recs Records to filter
+		@param {Object} req Totem request
+		@param {Function} res Totem response
+		*/
 		tree: (recs,req,res) => { //< dataset.tree treeifies records sorted with _sort=keys
 			var 
 				flags = req.flags,
@@ -1834,7 +1906,11 @@ Usage: ${uses.join(", ")}  `);
 			else
 				res( new Error("missing sorts=key,... flag") );
 		},
-		
+		/**
+		@param {Array} recs Records to filter
+		@param {Object} req Totem request
+		@param {Function} res Totem response
+		*/
 		schema: (recs,req,res) => { //< dataset.schema 
 			var 
 				flags = req.flags,
@@ -1872,6 +1948,10 @@ Usage: ${uses.join(", ")}  `);
 	Endpoints /AREA/FILE routes by file area on specifed req-res thread
 	*/
 	"byArea.": {
+		/**
+		@param {Object} req Totem request
+		@param {Function} res Totem response		
+		*/
 		default: navigate
 	},
 
@@ -1882,6 +1962,8 @@ Usage: ${uses.join(", ")}  `);
 		// nlp
 
 		/**
+		@param {Object} req Totem request
+		@param {Function} res Totem response		
 		*/
 		search: (req,res) => {
 			const
@@ -1945,6 +2027,8 @@ Usage: ${uses.join(", ")}  `);
 		},
 
 		/**
+		@param {Object} req Totem request
+		@param {Function} res Totem response		
 		*/
 		searches: (req,res) => {
 			const 
@@ -2094,6 +2178,8 @@ Usage: ${uses.join(", ")}  `);
 		},
 
 		/**
+		@param {Object} req Totem request
+		@param {Function} res Totem response		
 		*/
 		words: (req,res) => {
 			const
@@ -2171,6 +2257,8 @@ at the specified keys = KEY,...
 		// image tiles
 
 		/**
+		@param {Object} req Totem request
+		@param {Function} res Totem response		
 		*/
 		wms: (req,res) => {
 
@@ -2194,6 +2282,8 @@ at the specified keys = KEY,...
 		},
 
 		/**
+		@param {Object} req Totem request
+		@param {Function} res Totem response		
 		*/
 		wfs: (req,res) => {  //< Respond with ess-compatible image catalog
 			const
@@ -2350,6 +2440,8 @@ desired ring = [ [lat,lon], ....]
 
 		/**
 		Provide image tips.
+		@param {Object} req Totem request
+		@param {Function} res Totem response		
 		*/
 		tips: (req, res) => {
 			const
@@ -2396,6 +2488,8 @@ desired ring = [ [lat,lon], ....]
 
 		/**
 		Track web links.
+		@param {Object} req Totem request
+		@param {Function} res Totem response		
 		*/
 		follow: (req,res) => {  // follow a link
 			const {sql,query,type} = req;
@@ -2418,6 +2512,8 @@ desired ring = [ [lat,lon], ....]
 
 		/**
 		Proctor quizes.
+		@param {Object} req Totem request
+		@param {Function} res Totem response		
 		*/
 		proctor: (req,res) => {  //< grade quiz results
 			const 
@@ -2489,10 +2585,20 @@ desired ring = [ [lat,lon], ....]
 
 		// files
 
+		/**
+		@param {Object} req Totem request
+		@param {Function} res Totem response		
+		*/
 		uploads: fileUpload,
+		/**
+		@param {Object} req Totem request
+		@param {Function} res Totem response		
+		*/
 		stores: fileUpload, 
 
 		/**
+		@param {Object} req Totem request
+		@param {Function} res Totem response		
 		*/
 		likeus: (req, res) => {
 			const
@@ -2537,6 +2643,8 @@ desired ring = [ [lat,lon], ....]
 		},
 
 		/**
+		@param {Object} req Totem request
+		@param {Function} res Totem response		
 		*/
 		users: (req, res) => {
 			const
@@ -2552,6 +2660,8 @@ desired ring = [ [lat,lon], ....]
 
 		/**
 		Folder navigator.
+		@param {Object} req Totem request
+		@param {Function} res Totem response		
 		*/
 		navigate: (req,res) => {
 			function sendFolder(res,recs) {
@@ -3513,6 +3623,10 @@ desired ring = [ [lat,lon], ....]
 
 		// notebooks
 
+		/**
+		@param {Object} req Totem request
+		@param {Function} res Totem response		
+		*/
 		notebooks: (req,res) => {
 			const
 				{sql,query,type} = req,
@@ -3723,6 +3837,12 @@ desired ring = [ [lat,lon], ....]
 			});
 		},
 
+		/**
+		Endpoint to restart totem if authorized.
+
+		@param {Object} req Totem request
+		@param {Function} res Totem response
+		*/
 		restart: (req,res) => {
 			const
 				{sql,query,type} = req,
@@ -6846,7 +6966,7 @@ switch ( process.argv[2] ) { // unit tests
 		const
 			{ ingestFile } = require("geohack");
 		
-		DEBE.config({
+		config({
 			riddles: 10,
 			onFile: {
 				"./uploads/": (sql, name, path) => {  // watch changes to a file				
@@ -6925,7 +7045,7 @@ clients, users, system health, etc).`
 	@memberof UnitTest
 	*/
 	case "D2":
-		DEBE.config({
+		config({
 			riddles: 10,
 			"byTable.": {
 				wfs: function (req,res) {
@@ -6948,7 +7068,7 @@ clients, users, system health, etc).`
 	*/
 		
 	case "D3":
-		DEBE.config({
+		config({
 		}, sql => {
 			Log( "Stateful network flow manger started" );
 		});
@@ -6974,7 +7094,7 @@ clients, users, system health, etc).`
 			});
 		}
 			
-		DEBE.config({
+		config({
 		}, sql => {
 			var recs = 0, now = new Date();
 			readFile( sql, "./config.stores/test.xls", (rec,sql) => {
@@ -7010,7 +7130,7 @@ clients, users, system health, etc).`
 		const 
 			[xcmd,xdebe,xblog,src,tar] = process.argv;
 		
-		DEBE.config({
+		config({
 		}, sql => {
 			Trace(`Rasterizing ${src} => ${tar}`);
 			
@@ -7031,7 +7151,7 @@ clients, users, system health, etc).`
 		break;
 		
 	case "lab":
-		DEBE.config({}, sql => {
+		config({}, sql => {
 			Log( "Welcome to TOTEM Lab!" );
 
 			const 
