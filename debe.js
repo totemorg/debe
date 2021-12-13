@@ -1305,8 +1305,63 @@ as described in the [Notebooks api](/api.view). `,
 								[name,query] = index.split("?");
 
 							if ( query ) 
-								`/${book}.db?name=${name}&${query}`.get( cb || logRun );
-								
+								if ( cb || cb==0 )
+									if ( cb.constructor.name == "Function" )
+										sqlThread( sql => {
+											const
+												[store,key] = query.split("$"),
+												ds = `app.${book}`;
+											
+											if ( key )
+												sql.query(
+													`SELECT json_extract(${store}, '$${key}') AS val FROM ?? WHERE ?`,
+													[ ds, {Name:name} ], (err,recs) => {
+														
+														if ( err ) 
+															Log(err);
+														
+														else
+															cb( recs );
+														
+													});
+											
+											else
+												sql.query(
+													`SELECT ${store.split('&').join(',')} FROM ?? WHERE ?`,
+													[ ds, {Name:name} ], (err,recs) => {
+														
+														if ( err ) 
+															Log(err);
+														
+														else
+															cb( recs.get(store) );
+														
+													});
+										});
+
+									else 
+										sqlThread( sql => {
+											const
+												[store,key] = query.split("$"),
+												ds = `app.${book}`,
+												val = JSON.stringify(cb);
+											
+											if ( key )
+												sql.query(
+													`UPDATE ?? SET ${store} = json_set(${store}, '$${key}', ?) WHERE ?`, 
+													[ ds, val, {Name:name} ],
+													err => Log(err) );
+											
+											else
+												sql.query(
+													`UPDATE ?? SET ${store} = ? WHERE ?`,
+													[ ds, val, {Name:name} ],
+													err => Log(err) );
+										});
+											
+								else
+									logRun( "no callback||data provided" );
+							
 							else
 								switch (name) {
 									case "edit":
