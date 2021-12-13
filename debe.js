@@ -1289,6 +1289,7 @@ as described in the [Notebooks api](/api.view). `,
 					const $book = "$"+book;
 					
 					$libs[$book] = Copy({
+						edit: query => CP.exec( `code ./notebooks/${book}.js`, logRun ),						
 						run: query => open("run",query),
 						xpdf: query => open("xpdf",query),
 						brief: query => open("brief",query),
@@ -1380,26 +1381,7 @@ as described in the [Notebooks api](/api.view). `,
 										logRun( "no callback||data provided" );
 
 								else
-									switch (name) {
-										case "edit":
-											CP.exec( `code ./notebooks/${book}.js`, logRun );
-											break;
-										case "view":
-										case "run":
-										case "xpdf":
-										case "xjpg":
-										case "tou":
-										case "usage":
-										case "brief":
-										case "rtp":
-										case "pub":
-										case "stores":
-											CP.exec( `firefox ${site.master}/${book}.${name}`.tag("?",cb||{}), logRun );
-											break;
-
-										default:
-											sqlThread( sql => run(sql, {Name:name}) );
-									}
+									sqlThread( sql => run(sql, {Name:name}) );
 							}
 
 							else
