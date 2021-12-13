@@ -1282,7 +1282,23 @@ as described in the [Notebooks api](/api.view). `,
 		function initNIF(cb) {
 			sql.getTables( "app", books => {	// config notebook i/f
 				books.forEach( book => {
-					$libs["$"+book] = (index, cb) => {
+					function open(type,query) {
+						CP.exec( `firefox ${site.master}/${book}.${type}`.tag("?",query||{})+"", err => Log(err) );
+					}
+					
+					const $book = "$"+book;
+					
+					$libs[$book] = Copy({
+						run: query => open("run",query),
+						xpdf: query => open("xpdf",query),
+						brief: query => open("brief",query),
+						usage: query => open("usage",query),
+						view: query => open("view",query),
+						tou: query => open("tou",query),
+						rtp: query => open("rtp",query),
+						pub: query => open("pub",query),
+						stores: query => open("stores",query)
+					}, (index, cb) => {
 						
 						function logRun( data ) {
 							Log(">"+book, data);
@@ -1300,94 +1316,108 @@ as described in the [Notebooks api](/api.view). `,
 							runPlugin(req, status => cb || logRun );
 						}
 
-						if ( isString(index) ) {
-							const
-								[name,query] = index.split("?");
+						if ( index )
+							if ( isString(index) ) {
+								const
+									[name,query] = index.split("?");
 
-							if ( query ) 
-								if ( cb || cb==0 )
-									if ( cb.constructor.name == "Function" )
-										sqlThread( sql => {
-											const
-												[store,key] = query.split("$"),
-												ds = `app.${book}`;
-											
-											if ( key )
-												sql.query(
-													`SELECT json_extract(${store}, '$${key}') AS val FROM ?? WHERE ?`,
-													[ ds, {Name:name} ], (err,recs) => {
-														
-														if ( err ) 
-															Log(err);
-														
-														else
-															cb( recs );
-														
-													});
-											
-											else
-												sql.query(
-													`SELECT ${store.split('&').join(',')} FROM ?? WHERE ?`,
-													[ ds, {Name:name} ], (err,recs) => {
-														
-														if ( err ) 
-															Log(err);
-														
-														else
-															cb( recs.get(store) );
-														
-													});
-										});
+								if ( query ) 
+									if ( cb || cb==0 )
+										if ( cb.constructor.name == "Function" )
+											sqlThread( sql => {
+												const
+													[store,key] = query.split("$"),
+													ds = `app.${book}`;
 
-									else 
-										sqlThread( sql => {
-											const
-												[store,key] = query.split("$"),
-												ds = `app.${book}`,
-												val = JSON.stringify(cb);
-											
-											if ( key )
-												sql.query(
-													`UPDATE ?? SET ${store} = json_set(${store}, '$${key}', ?) WHERE ?`, 
-													[ ds, val, {Name:name} ],
-													err => Log(err) );
-											
-											else
-												sql.query(
-													`UPDATE ?? SET ${store} = ? WHERE ?`,
-													[ ds, val, {Name:name} ],
-													err => Log(err) );
-										});
-											
+												if ( key )
+													sql.query(
+														`SELECT json_extract(${store}, '$${key}') AS val FROM ?? WHERE ?`,
+														[ ds, {Name:name} ], (err,recs) => {
+
+															if ( err ) 
+																Log(err);
+
+															else
+																cb( recs );
+
+														});
+
+												else
+													sql.query(
+														`SELECT ${store.split('&').join(',')} FROM ?? WHERE ?`,
+														[ ds, {Name:name} ], (err,recs) => {
+
+															if ( err ) 
+																Log(err);
+
+															else
+																cb( recs.get(store) );
+
+														});
+											});
+
+										else 
+											sqlThread( sql => {
+												const
+													[store,key] = query.split("$"),
+													ds = `app.${book}`,
+													val = JSON.stringify(cb);
+
+												if ( key )
+													sql.query(
+														`UPDATE ?? SET ${store} = json_set(${store}, '$${key}', ?) WHERE ?`, 
+														[ ds, val, {Name:name} ],
+														err => Log(err) );
+
+												else
+													sql.query(
+														`UPDATE ?? SET ${store} = ? WHERE ?`,
+														[ ds, val, {Name:name} ],
+														err => Log(err) );
+											});
+
+									else
+										logRun( "no callback||data provided" );
+
 								else
-									logRun( "no callback||data provided" );
-							
-							else
-								switch (name) {
-									case "edit":
-										CP.exec( `code ./notebooks/${book}.js`, logRun );
-										break;
-									case "view":
-									case "run":
-									case "xpdf":
-									case "xjpg":
-									case "tou":
-									case "usage":
-									case "brief":
-									case "rtp":
-									case "pub":
-									case "stores":
-										CP.exec( `firefox ${site.master}/${book}.${name}`, logRun );
-										break;
+									switch (name) {
+										case "edit":
+											CP.exec( `code ./notebooks/${book}.js`, logRun );
+											break;
+										case "view":
+										case "run":
+										case "xpdf":
+										case "xjpg":
+										case "tou":
+										case "usage":
+										case "brief":
+										case "rtp":
+										case "pub":
+										case "stores":
+											CP.exec( `firefox ${site.master}/${book}.${name}`.tag("?",cb||{}), logRun );
+											break;
 
-									default:
-										sqlThread( sql => run(sql, {Name:name}) );
-								}
-						}
+										default:
+											sqlThread( sql => run(sql, {Name:name}) );
+									}
+							}
+
+							else
+								sqlThread( sql => run(sql, Copy( index, {Name:book} )) );
 						
 						else
-							sqlThread( sql => run(sql, Copy( index, {Name:book} )) );
-					};
+							console.log(`
+Usage
+	${$book}( "usecase?store", putdata || getdata => { ... } ) 
+	${$book}( "usecase" || {...}, results => { ... } ) 		   
+	${$book}( "OP", query )  
+	${$book}.OP( query )  						   
+
+where
+	OP = run || xpdf || view || brief || ...
+	query = { KEY: value, ... }
+` );
+					});
 				});
 				cb();
 			});
@@ -7206,6 +7236,7 @@ clients, users, system health, etc).`
 		break;
 		
 	case "lab":
+		
 		config({}, sql => {
 			Log( "Welcome to TOTEM Lab!" );
 
