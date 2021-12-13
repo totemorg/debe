@@ -248,6 +248,67 @@ Array.prototype.Extend = function (con) {
 	@param {String} at tag attributes = {key: val, ...}
 	@return {String} tagged results
 	*/
+	function tag(el,at) {
+		switch (el) {
+			case "/":
+			case "?":
+			case "&":   // tag a url
+				var rtn = this;
+
+				if (rtn.indexOf("?") >= 0) el = "&";
+				
+				Each(at, (key,val) => {
+					if ( val ) {
+						rtn += el + key + "=" + val;
+						el = "&";
+					}
+				});
+
+				return rtn;	
+
+			case "[]":
+			case "()":
+				var rtn = this+el.substr(0,1), sep="";
+				Each(at, (key,val) => {
+					rtn += sep + key + ":" + JSON.stringify(val);
+					sep = ",";
+				});
+				return rtn+el.substr(-1);
+
+			case ":":
+			case "=":
+				var rtn = this, sep="";
+				Each(at, (key,val) => {
+					rtn += sep + key + el + JSON.stringify(val);
+					sep = ",";
+				});
+				return rtn;
+
+			case "":
+				return `<a href="${el}">${this}</a>`;
+
+			default: // tag html
+
+				var rtn = "<"+el+" ";
+
+				if ( at )
+					Each( at, (key,val) => {
+						if ( val )
+							rtn += key + "='" + val + "' ";
+					});
+
+				switch (el) {
+					case "embed":
+					case "img":
+					case "link":
+					case "input":
+						return rtn+">" + this;
+					default:
+						return rtn+">" + this + "</"+el+">";
+				}
+		}
+	},
+	/*
 	function tag (el,at) {
 
 		//if (!at) { at = {href: el}; el = "a"; }
@@ -287,7 +348,7 @@ Array.prototype.Extend = function (con) {
 					return rtn+">" + this + "</"+el+">";
 			}
 		}
-	},
+	},  */
 
 	/**
 	Parse "$.KEY" || "$[INDEX]" expressions given $ hash.

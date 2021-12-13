@@ -194,6 +194,67 @@ To uncomment the dom, then render it, then activate it.
 	@return {String} tagged results
 	*/
 	function tag(el,at) {
+		switch (el) {
+			case "/":
+			case "?":
+			case "&":   // tag a url
+				var rtn = this;
+				
+				if (rtn.indexOf("?") >= 0) el = "&";
+				
+				Each(at, (key,val) => {
+					if ( val ) {
+						rtn += el + key + "=" + val;
+						el = "&";
+					}
+				});
+
+				return rtn;	
+
+			case "[]":
+			case "()":
+				var rtn = this+el.substr(0,1), sep="";
+				Each(at, (key,val) => {
+					rtn += sep + key + ":" + JSON.stringify(val);
+					sep = ",";
+				});
+				return rtn+el.substr(-1);
+
+			case ":":
+			case "=":
+				var rtn = this, sep="";
+				Each(at, (key,val) => {
+					rtn += sep + key + el + JSON.stringify(val);
+					sep = ",";
+				});
+				return rtn;
+
+			case "":
+				return `<a href="${el}">${this}</a>`;
+
+			default: // tag html
+
+				var rtn = "<"+el+" ";
+
+				if ( at )
+					Each( at, (key,val) => {
+						if ( val )
+							rtn += key + "='" + val + "' ";
+					});
+
+				switch (el) {
+					case "embed":
+					case "img":
+					case "link":
+					case "input":
+						return rtn+">" + this;
+					default:
+						return rtn+">" + this + "</"+el+">";
+				}
+		}
+	},
+	/*
+	function tag(el,at) {
 
 		//if (!at) { at = {href: el}; el = "a"; }
 
@@ -232,7 +293,7 @@ To uncomment the dom, then render it, then activate it.
 					return rtn+">" + this + "</"+el+">";
 			}
 		}
-	},
+	}, */
 
 	/**
 	Parse "$.KEY" || "$[INDEX]" expressions given $ hash.
@@ -1395,7 +1456,7 @@ $().ready( () => {
 				cols = $el.attr("cols"),
 				_cols = $el.attr("_cols"),
 				path = $el.attr("path"),
-				blog = $el.attr("blog") || "Description",
+				blogger = $el.attr("blog") || "Description",
 				menu = $el.attr("menu") || "",
 				head = $el.attr("head") || "",
 				status = $el.attr("status") || "ready",
@@ -1425,11 +1486,13 @@ $().ready( () => {
 						? '<input type="checkbox" class="editor-active" onclick="return false;" checked>'
 						: '<input type="checkbox" onclick="return false;" class="editor-active">'
 				},
+				tags = {},
 				toggle = {
 					blog: false,
 					responsive: false,
 					select: false
 				},
+				selRec = {Name:"undefined"},
 				icon = i => "".tag("img",{src:`/clients/icons/actions/${i}.png`,width:15,height:15}),
 				{dataTable,easyui,w2grid,jqGrid} = $.fn;
 
@@ -1623,20 +1686,14 @@ $().ready( () => {
 								text: icon("blog"),
 								titleAttr: "Blog",
 								action: ( e, dt, node, config ) => {
-									//alert( 'Blog' );
-									//console.log(dt,node);
-									toggle.blog = !toggle.blog;
-									//console.log("blog key", path, blog, toggle);
-									
+									//alert( JSON.stringify(selRec) );
 									$.ajax({
-										url: toggle.blog ? `${path}&_blog=${blog}` : path,
+										url:  path.tag("?",{ _blog: (toggle.blog = !toggle.blog) ? blogger : "", name:selRec.Name}),
 										type: 'GET',
 										data: "",
 										success: res => {
-											//console.log("res",res);
 											dt.clear().rows.add( res.data ).draw();
 											//table.ajax.reload();
-											//alert("yay!");
 										},
 										error: () => {
 											alert(errors.nobackend);
@@ -1649,15 +1706,8 @@ $().ready( () => {
 								text: icon("run"),
 								titleAttr: "Run",
 								action: ( e, dt, node, config ) => {
-									var 
-										run = path.replace(".db",".exe"),
-										data = dt.rows({selected:true}).data(),
-										sel = data[0] || {},
-										name = sel.Name || "";
-
-									//console.log( "sel", sel, name );
 									$.ajax({
-										url: `${run}?Name=${name}`,
+										url: path.replace(".db",".exe").tag("?",{name:selRec.Name}),
 										type: 'GET',
 										data: "",
 										success: res => {
@@ -1683,16 +1733,14 @@ $().ready( () => {
 								titleAttr: 'Select',
 								action: ( e, dt, node, config ) => {
 									const
-										selectedRows = dt.rows( { selected: true } ),
-										data = selectedRows.data() || [],
-										row = data[0] || {Name:""};
+										data = dt.rows( { selected: true } ).data() || [];
 									
-									//console.log(row);
-									//alert( 'Select' + path + toggle.select + " name="+row.Name );
-									toggle.select = !toggle.select;
+									if ( data[0] ) Copy( data[0], selRec ); else selRec.Name = "undefined";
+									
+									//alert( JSON.stringify(selRec) );
 									
 									$.ajax({
-										url: toggle.select ? `${path}?name=${row.Name}` : path,
+										url: (toggle.select = !toggle.select) ? path.tag("?",{name:selRec.Name}) : path,
 										type: 'GET',
 										data: "",
 										success: res => {
@@ -1730,12 +1778,11 @@ $().ready( () => {
 								text: icon("clone"),
 								titleAttr: "Clone",
 								action: ( e, dt, node, config ) => {
-
-									var 
+									const 
 										data = dt.rows({selected:true}).data(),
 										sel = data[0] || {};
 
-									sel.Name = "???";
+									sel.Name = "undefined";
 
 									//console.log( "sel", sel );
 									$.ajax({

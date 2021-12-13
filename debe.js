@@ -260,8 +260,9 @@ Copy({  // array prototypes
 		//Log(">>>blog", ctx);
 		var
 			fetchBlog = ( rec, cb ) => {
-				var 
-					isEnum = (rec.Pipe||"").startsWith("{"),		// is client doing an enumerated pipe ?
+				Log(rec);
+				const 
+					isEnum = !isString(rec.Pipe||""),	// is client doing an enumerated pipe ?
 					src = (ds+".json").tag("?", { 		// define default src key
 						name: isEnum
 							? rec.Name + "-*"	// request all children cases
@@ -1280,126 +1281,152 @@ as described in the [Notebooks api](/api.view). `,
 		}
 
 		function initNIF(cb) {
+			const foci = {};
+			
 			sql.getTables( "app", books => {	// config notebook i/f
 				books.forEach( book => {
 					function open(type,query) {
 						CP.exec( `firefox ${site.master}/${book}.${type}`.tag("?",query||{})+"", err => Log(err) );
 					}
 					
-					const $book = "$"+book;
-					
-					$libs[$book] = Copy({
-						edit: query => CP.exec( `code ./notebooks/${book}.js`, logRun ),						
-						run: query => open("run",query),
-						xpdf: query => open("xpdf",query),
-						brief: query => open("brief",query),
-						usage: query => open("usage",query),
-						view: query => open("view",query),
-						tou: query => open("tou",query),
-						rtp: query => open("rtp",query),
-						pub: query => open("pub",query),
-						stores: query => open("stores",query)
-					}, (index, cb) => {
-						
-						function logRun( data ) {
-							Log(">"+book, data);
-						}
-						
-						function run(sql,ctx) {
-							const
-								req = {
-									sql: sql,
-									table: book,
-									query: ctx,
-									type: "exe"
-								};
+					const 
+						$book = "$"+book,
+						$me = $libs[$book] = Copy({
+							plot: ( ...args) => {
+								const 
+									names = ["x","y"],
+									keys = [];
+								
+								args.forEach( (arg,i) => {
+									const
+										name = names[i % names.length];
+									
+									if ( isString(arg) ) 
+										keys.push( `${name}=${arg}` );
+									
+									else {
+										$me( `?Save_${name}`, arg );
+										keys.push( `${name}=Save_${name}` );
+									}
+								});
+								
+								$me( "?Description", "$plot{?" + keys.join("&") + "}" );
+							},
+							blog: data => $me( "?Description", data ),
+							edit: query => CP.exec( `code ./notebooks/${book}.js`, logRun ),
+							focus: usecase => foci[book] = usecase,
+							run: query => open("run",query),
+							xpdf: query => open("xpdf",query),
+							brief: query => open("brief",query),
+							usage: query => open("usage",query),
+							view: query => open("view",query),
+							tou: query => open("tou",query),
+							rtp: query => open("rtp",query),
+							pub: query => open("pub",query),
+							stores: query => open("stores",query)
+						}, (index, cb) => {
 
-							runPlugin(req, status => cb || logRun );
-						}
-
-						if ( index )
-							if ( isString(index) ) {
-								const
-									[name,query] = index.split("?");
-
-								if ( query ) 
-									if ( cb || cb==0 )
-										if ( cb.constructor.name == "Function" )
-											sqlThread( sql => {
-												const
-													[store,key] = query.split("$"),
-													ds = `app.${book}`;
-
-												if ( key )
-													sql.query(
-														`SELECT json_extract(${store}, '$${key}') AS val FROM ?? WHERE ?`,
-														[ ds, {Name:name} ], (err,recs) => {
-
-															if ( err ) 
-																Log(err);
-
-															else
-																cb( recs );
-
-														});
-
-												else
-													sql.query(
-														`SELECT ${store.split('&').join(',')} FROM ?? WHERE ?`,
-														[ ds, {Name:name} ], (err,recs) => {
-
-															if ( err ) 
-																Log(err);
-
-															else
-																cb( recs.get(store) );
-
-														});
-											});
-
-										else 
-											sqlThread( sql => {
-												const
-													[store,key] = query.split("$"),
-													ds = `app.${book}`,
-													val = JSON.stringify(cb);
-
-												if ( key )
-													sql.query(
-														`UPDATE ?? SET ${store} = json_set(${store}, '$${key}', ?) WHERE ?`, 
-														[ ds, val, {Name:name} ],
-														err => Log(err) );
-
-												else
-													sql.query(
-														`UPDATE ?? SET ${store} = ? WHERE ?`,
-														[ ds, val, {Name:name} ],
-														err => Log(err) );
-											});
-
-									else
-										logRun( "no callback||data provided" );
-
-								else
-									sqlThread( sql => run(sql, {Name:name}) );
+							function logRun( data ) {
+								Log(">"+book, data);
 							}
 
-							else
-								sqlThread( sql => run(sql, Copy( index, {Name:book} )) );
-						
-						else
-							console.log(`
-Usage
-	${$book}( "usecase?store", putdata || getdata => { ... } ) 
-	${$book}( "usecase" || {...}, results => { ... } ) 		   
-	${$book}( "OP", query )  
-	${$book}.OP( query )  						   
+							function run(sql,ctx) {
+								const
+									req = {
+										sql: sql,
+										table: book,
+										query: ctx,
+										type: "exe"
+									};
 
-where
-	OP = run || xpdf || view || brief || ...
-	query = { KEY: value, ... }
+								runPlugin(req, status => cb || logRun );
+							}
+
+							if ( index )
+								if ( isString(index) ) {
+									const
+										[usecase,query] = index.split("?"),
+										Usecase = {Name: usecase || foci[book] || "noFocus"};
+
+									if ( query ) 
+										if ( cb || cb==0 )
+											if ( cb.constructor.name == "Function" )
+												sqlThread( sql => {
+													const
+														[store,key] = query.split("$"),
+														ds = `app.${book}`;
+
+													if ( key )
+														sql.query(
+															`SELECT json_extract(${store}, '$${key}') AS val FROM ?? WHERE ?`,
+															[ ds, Usecase ], (err,recs) => {
+
+																if ( err ) 
+																	Log(err);
+
+																else
+																	cb( recs );
+
+															});
+
+													else
+														sql.query(
+															`SELECT ${store.split('&').join(',')} FROM ?? WHERE ?`,
+															[ ds, Usecase ], (err,recs) => {
+
+																if ( err ) 
+																	Log(err);
+
+																else
+																	cb( recs.get(store) );
+
+															});
+												});
+
+											else 
+												sqlThread( sql => {
+													const
+														[store,key] = query.split("$"),
+														ds = `app.${book}`,
+														val = JSON.stringify(cb);
+
+													if ( key )
+														sql.query(
+															`UPDATE ?? SET ${store} = json_set(${store}, '$${key}', ?) WHERE ?`, 
+															[ ds, val, Usecase ],
+															err => Log(err) );
+
+													else
+														sql.query(
+															`UPDATE ?? SET ${store} = ? WHERE ?`,
+															[ ds, val, Usecase ],
+															err => Log(err) );
+												});
+
+										else
+											logRun( "no callback||data provided" );
+
+									else
+										sqlThread( sql => run(sql, Usecase) );
+								}
+
+								else
+									sqlThread( sql => run(sql, Copy( index, {Name:book} )) );
+
+							else
+								console.log(`
+Usage
+	${$book}( "USECASE?STORE$.KEY" || "USECASE?STORE$[KEY] || ...", PUTDATA || GETDATA => { ... } ) 
+	${$book}( "USECASE" || {...}, RESULTS => { ... } ) 
+	${$book}.run( { KEY: VALUE, ... } ) 
+	${$book}.brief( { KEY: VALUE, ... } ) 
+	${$book}.blog( { KEY: VALUE, ... } ) 
+	${$book}.run( { KEY: VALUE, ... } )
+	${$book}.plot( DATA || "STORE", ... )
+	${$book}.focus( "USECASE" )
+	${$book}.edit( ) 
 ` );
-					});
+						});
 				});
 				cb();
 			});
