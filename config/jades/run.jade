@@ -168,7 +168,15 @@ append site_body
 					:markdown
 						Your notebook''s [engine](/api.view) remains protected until it has been associated with 
 						your end-service provider per your Terms-of-Use below.
-			
+
+			tab.Mods
+				grid#Mods(
+					path="/mods.db?Name=#{ds}", 
+					cols="ID.n..hide,Mod.t,Made.d" )
+
+					:markdown
+						Any modifications that were made by the service administrator are shown here.
+
 		when "exam"
 		when "view"
 			tab(class=dsName)

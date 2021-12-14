@@ -923,6 +923,8 @@ const
 		
 		queues: req => "openv.queues",
 		
+		mods: req => "openv.mods",
+		
 		faqs: req => {
 			if ( set = req.set ) {
 				set._By = req.client;
@@ -1285,7 +1287,18 @@ as described in the [Notebooks api](/api.view). `,
 			
 			sql.getTables( "app", books => {	// config notebook i/f
 				books.forEach( book => {
+					function logMod() {
+						sqlThread( sql => {
+							sql.query("INSERT INTO openv.mods SET ?", {
+								Name: book,
+								Made: new Date(),
+								Mod: DEBE.replCmd
+							});
+						});
+					}
+					
 					function open(type,query) {
+						logMod();
 						CP.exec( `firefox ${site.master}/${book}.${type}`.tag("?",query||{})+"", err => Log(err) );
 					}
 					
@@ -1295,22 +1308,22 @@ as described in the [Notebooks api](/api.view). `,
 							plot: ( ...args) => {
 								const 
 									names = ["x","y"],
-									keys = [];
+									keys = {};
 								
 								args.forEach( (arg,i) => {
 									const
 										name = names[i % names.length];
 									
 									if ( isString(arg) ) 
-										keys.push( `${name}=${arg}` );
+										keys[name] = arg;
 									
 									else {
-										$me( `?Save_${name}`, arg );
-										keys.push( `${name}=Save_${name}` );
+										$me( `?Save$.{name}`, arg );
+										keys[name] = `Save$.{name}`;
 									}
 								});
 								
-								$me( "?Description", "$plot{?" + keys.join("&") + "}" );
+								$me( "?Description", "$plot{" + "".tag("?",keys) + "}" );
 							},
 							blog: data => $me( "?Description", data ),
 							edit: query => CP.exec( `code ./notebooks/${book}.js`, logRun ),
@@ -1342,6 +1355,8 @@ as described in the [Notebooks api](/api.view). `,
 								runPlugin(req, status => cb || logRun );
 							}
 
+							logMod();
+							
 							if ( index )
 								if ( isString(index) ) {
 									const
@@ -1421,7 +1436,6 @@ Usage
 	${$book}.run( { KEY: VALUE, ... } ) 
 	${$book}.brief( { KEY: VALUE, ... } ) 
 	${$book}.blog( { KEY: VALUE, ... } ) 
-	${$book}.run( { KEY: VALUE, ... } )
 	${$book}.plot( DATA || "STORE", ... )
 	${$book}.focus( "USECASE" )
 	${$book}.edit( ) 
@@ -7251,7 +7265,14 @@ clients, users, system health, etc).`
 
 			const 
 				{$api} = $libs,
-				ctx = REPL.start({prompt: "$> ", useGlobal: true}).context;
+				ctx = REPL.start({
+					eval: (cmd, ctx, filename, cb) => {
+						DEBE.replCmd = cmd;
+						cb( null, VM.runInContext(cmd,VM.createContext(ctx)));
+					},
+					prompt: "$> ", 
+					useGlobal: true
+				}).context;
 
 			Each( $libs, (key,lib) => ctx[key] = lib );
 			
