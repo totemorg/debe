@@ -1283,7 +1283,9 @@ as described in the [Notebooks api](/api.view). `,
 		}
 
 		function initNIF(cb) {
-			const foci = {};
+			const 
+				foci = {},
+				repo = "https://github.com/totemstan";
 			
 			sql.getTables( "app", books => {	// config notebook i/f
 				books.forEach( book => {
@@ -1301,12 +1303,19 @@ as described in the [Notebooks api](/api.view). `,
 					
 					function open(type,query) {
 						CP.exec( `firefox ${site.master}/${book}.${type}`.tag("?",query||{})+"", err => logRun(err||"ok") );
+						//return $me;
+					}
+					
+					function exec( cmd, log ) {
+						CP.exec( cmd, log );
+						//return $me;
 					}
 					
 					const 
 						$book = "$"+book,
 						$app = "app."+book,
 						$me = $libs[$book] = Copy({
+							help: query => exec( `firefox ${repo}/artifacts/tree/master/${book}` ),							
 							plot: ( ...args) => {
 								const 
 									names = ["x","y"],
@@ -1328,7 +1337,7 @@ as described in the [Notebooks api](/api.view). `,
 								return $me( "?Description", "$plot{" + "".tag("?",keys) + "}" );
 							},
 							blog: data => $me( "?Description", data ),
-							edit: query => CP.exec( `code ./notebooks/${book}.js`, logRun ),
+							edit: query => exec( `code ./notebooks/${book}.js`, logRun ),
 							focus: usecase => {
 								if (usecase) 
 									return foci[book] = usecase;
@@ -1446,12 +1455,15 @@ Usage:
 	${$book}.plot( DATA || "STORE", ... )
 	${$book}.focus( "USECASE" )
 	${$book}.edit( ) 
+	${$book}.help( )
 
 Keys:
 	${keys}
 ` );
 									});
 								});
+							
+							//return $me;
 						});
 				});
 				cb();
