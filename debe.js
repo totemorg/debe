@@ -1287,7 +1287,9 @@ as described in the [Notebooks api](/api.view). `,
 			
 			sql.getTables( "app", books => {	// config notebook i/f
 				books.forEach( book => {
-					function logMod() {
+					function logRun(data) {
+						console.log(book+">", data);
+						
 						sqlThread( sql => {
 							sql.query("INSERT INTO openv.mods SET ?", {
 								Name: book,
@@ -1298,8 +1300,7 @@ as described in the [Notebooks api](/api.view). `,
 					}
 					
 					function open(type,query) {
-						logMod();
-						CP.exec( `firefox ${site.master}/${book}.${type}`.tag("?",query||{})+"", err => Log(err) );
+						CP.exec( `firefox ${site.master}/${book}.${type}`.tag("?",query||{})+"", err => logRun(err||"ok") );
 					}
 					
 					const 
@@ -1318,16 +1319,22 @@ as described in the [Notebooks api](/api.view). `,
 										keys[name] = arg;
 									
 									else {
-										$me( `?Save$.{name}`, arg );
-										keys[name] = `Save$.{name}`;
+										$me( `?Save$.${name}`, arg );
+										keys[name] = `Save$.${name}`;
 									}
 								});
 								
-								$me( "?Description", "$plot{" + "".tag("?",keys) + "}" );
+								return $me( "?Description", "$plot{" + "".tag("?",keys) + "}" );
 							},
 							blog: data => $me( "?Description", data ),
 							edit: query => CP.exec( `code ./notebooks/${book}.js`, logRun ),
-							focus: usecase => foci[book] = usecase,
+							focus: usecase => {
+								if (usecase) 
+									return foci[book] = usecase;
+								
+								else
+									return foci[book];
+							},
 							run: query => open("run",query),
 							xpdf: query => open("xpdf",query),
 							brief: query => open("brief",query),
@@ -1339,10 +1346,6 @@ as described in the [Notebooks api](/api.view). `,
 							stores: query => open("stores",query)
 						}, (index, cb) => {
 
-							function logRun( data ) {
-								Log(">"+book, data);
-							}
-
 							function run(sql,ctx) {
 								const
 									req = {
@@ -1352,11 +1355,9 @@ as described in the [Notebooks api](/api.view). `,
 										type: "exe"
 									};
 
-								runPlugin(req, status => cb || logRun );
+								runPlugin(req, err => cb || logRun );
 							}
 
-							logMod();
-							
 							if ( index )
 								if ( isString(index) ) {
 									const
@@ -1407,19 +1408,22 @@ as described in the [Notebooks api](/api.view). `,
 
 													if ( key )
 														sql.query(
-															`UPDATE ?? SET ${store} = json_set(${store}, '$${key}', ?) WHERE ?`, 
+															`UPDATE ?? SET ${store} = json_set(${store}, '$${key}', cast(? AS JSON)) WHERE ?`, 
 															[ ds, val, Usecase ],
-															err => Log(err) );
+															err => {
+																Log(err);
+																logRun(err || "ok");
+															});
 
 													else
 														sql.query(
 															`UPDATE ?? SET ${store} = ? WHERE ?`,
 															[ ds, val, Usecase ],
-															err => Log(err) );
+															err => logRun(err || "ok") );
 												});
 
 										else
-											logRun( "no callback||data provided" );
+											Log( "no callback||data provided" );
 
 									else
 										sqlThread( sql => run(sql, Usecase) );
@@ -7267,8 +7271,10 @@ clients, users, system health, etc).`
 				{$api} = $libs,
 				ctx = REPL.start({
 					eval: (cmd, ctx, filename, cb) => {
-						DEBE.replCmd = cmd;
-						cb( null, VM.runInContext(cmd,VM.createContext(ctx)));
+						if ( cmd ) {
+							DEBE.replCmd = cmd;
+							cb( null, VM.runInContext(cmd,VM.createContext(ctx)));
+						}
 					},
 					prompt: "$> ", 
 					useGlobal: true
