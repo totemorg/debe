@@ -1305,6 +1305,7 @@ as described in the [Notebooks api](/api.view). `,
 					
 					const 
 						$book = "$"+book,
+						$app = "app."+book,
 						$me = $libs[$book] = Copy({
 							plot: ( ...args) => {
 								const 
@@ -1433,8 +1434,10 @@ as described in the [Notebooks api](/api.view). `,
 									sqlThread( sql => run(sql, Copy( index, {Name:book} )) );
 
 							else
-								console.log(`
-Usage
+								sqlThread( sql => {
+									sql.getFields( $app, "", keys => { 
+										console.log(`
+Usage:
 	${$book}( "USECASE?STORE$.KEY" || "USECASE?STORE$[KEY] || ...", PUTDATA || GETDATA => { ... } ) 
 	${$book}( "USECASE" || {...}, RESULTS => { ... } ) 
 	${$book}.run( { KEY: VALUE, ... } ) 
@@ -1443,7 +1446,12 @@ Usage
 	${$book}.plot( DATA || "STORE", ... )
 	${$book}.focus( "USECASE" )
 	${$book}.edit( ) 
+
+Keys:
+	${keys}
 ` );
+									});
+								});
 						});
 				});
 				cb();
