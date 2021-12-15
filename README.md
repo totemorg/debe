@@ -453,7 +453,6 @@ config({
     * [~setAutorun()](#module_DEBE..setAutorun)
     * [~exeAutorun()](#module_DEBE..exeAutorun)
     * [~getEngine()](#module_DEBE..getEngine)
-    * [~getContext()](#module_DEBE..getContext)
     * [~fileUpload()](#module_DEBE..fileUpload)
     * [~savePage()](#module_DEBE..savePage)
     * [~statusPlugin()](#module_DEBE..statusPlugin)
@@ -1286,10 +1285,6 @@ Convert records to requested req.type office file.
 <a name="module_DEBE..getEngine"></a>
 
 ### DEBE~getEngine()
-**Kind**: inner method of [<code>DEBE</code>](#module_DEBE)  
-<a name="module_DEBE..getContext"></a>
-
-### DEBE~getContext()
 **Kind**: inner method of [<code>DEBE</code>](#module_DEBE)  
 <a name="module_DEBE..fileUpload"></a>
 

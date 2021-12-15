@@ -441,7 +441,7 @@ append site_body
 						GET /NOTEBOOK.view				View aNOTEBOOK
 						GET /NOTEBOOK.run				View, run and manage NOTEBOOK
 
-					A NOTEBOOK''s context may include the following keys:  
+					You may include the following context keys in your NOTEBOOK:  
 					> !{links.Export} SWITCH results into a file  
 					> !{links.Ingest} SWITCH results into the database  
 					> !{links.Pipe} "PATH?OPTIONS" usecase in supervised workflow  
@@ -449,34 +449,37 @@ append site_body
 					> !{links.Entry} JSON prime context on entry  
 					> !{links.Exit} JSON save context on exit  
 					> !{links.Save} {at:"AT",...} events to in Save_AT stores   
-					> !{links.batch} NUMBER of records in each batch  
-					> !{links.limit} maximum NUMBER of records to feed  
-					> !{links.start} starting DATE  
-					> !{links.end} ending DATE  
-					> !{links.every} batching INTERVAL  
-					> !{links.backlog} NUMBER of records at start of baseline phase  
-					> !{links.budget} NUMBER of $/cycle budgeted during baseline phase  
-					> !{links.cost} NUMBER of $/record valued during baseline phase  
-					> !{links.load} NUMBER of records/cycle loading during baseline phase  					
-					> !{links.on} NUMBER of active-state steps (0=continious)  
-					> !{links.off} NUMBER of rest-state steps  
-					> !{links.rekey} [ FROM || REGEXP || (JS) || !rem ] => [ TO || !test ] || KEY || INDEX , ...   
-					> !{links.watch} NUMBER interval to monitor queue  
-					> !{links.propose} SWITCH make this pipe a proposal  
-					> !{links.baseline} NUMBER,.... baselines/training/validation phases   
-					> !{links.agent} NAME of agent to out-source task
 					
-					A **notebook** places a **dataset** into a buffered, regulated, enumerated, event or named `Pipe`:
+					//
+						as well as the following PIPE keys:
+						> !{links.batch} NUMBER of records in each batch  
+						> !{links.limit} maximum NUMBER of records to feed  
+						> !{links.start} starting DATE  
+						> !{links.end} ending DATE  
+						> !{links.every} batching INTERVAL  
+						> !{links.backlog} NUMBER of records at start of baseline phase  
+						> !{links.budget} NUMBER of $/cycle budgeted during baseline phase  
+						> !{links.cost} NUMBER of $/record valued during baseline phase  
+						> !{links.load} NUMBER of records/cycle loading during baseline phase  					
+						> !{links.on} NUMBER of active-state steps (0=continious)  
+						> !{links.off} NUMBER of rest-state steps  
+						> !{links.rekey} [ FROM || REGEXP || (JS) || !rem ] => [ TO || !test ] || KEY || INDEX , ...   
+						> !{links.watch} NUMBER interval to monitor queue  
+						> !{links.propose} SWITCH make this pipe a proposal  
+						> !{links.baseline} NUMBER,.... baselines/training/validation phases   
+						> !{links.agent} NAME of agent to out-source task
+					
+					When executed, your **notebook** places its **FILE.TYPE** source into a buffered, 
+					regulated, enumerated, event or named `Pipe`:
 
 						"PROTOCOL://HOST/ENDPOINT ? QUERY"
-						"/FILE.TYPE ? OPTION=VALUE & ..."
+						"/FILE.TYPE ? KEY=EVAL & KEY=KEY & KEY ..."
 						{ "KEY" :  [N, ...] || "MATHJS" , noClobber:N, noRun:N } || { "$" : "MATHJS" }
 						[ EVENT, ... ]
 						".CASE.NOTEBOOK"
 
 					where
 					+ FILE.TYPE may contain both `regular` and `${context key}` expressions 
-					+ OPTION can set any `Pipe_OPTION` 
 					+ MATHJS is a [mathjs](https://mathjs.org/) script (use ";" for "," when needed)  
 					+ NAMED references a [named pipe](/lookups.view?Ref=pipe)
 					+ TYPE = csv || txt || db streams records

@@ -1299,7 +1299,7 @@ as described in the [Notebooks api](/api.view). `,
 							sql.query("INSERT INTO openv.mods SET ?", {
 								Name: book,
 								Made: new Date(),
-								Mod: DEBE.replCmd
+								Mod: DEBE.replCmd + " => " + data
 							});
 						});
 					}
@@ -1319,7 +1319,21 @@ as described in the [Notebooks api](/api.view). `,
 						$ds = "app."+book,
 						$engine = {Name:book},
 						$me = $libs[$book] = Copy({
-							//help: query => exec( `firefox ${repo}/artifacts/tree/master/${book}` ),							
+							help: query => exec( `firefox ${repo}/artifacts/tree/master/${book}` ),
+							
+							insert: vals => sqlThread( sql => 
+								sql.query( isString(vals) 
+									? `INSERT INTO ? SET ${vals}`
+									: "INSERT INTO ? SET ?",
+									[ $ds, vals ], err => logRun( err || "ok" ) )),
+							
+							delete: usecase => sqlThread( sql => 
+								sql.query(
+									isString(usecase)
+									? `DELETE FROM ? WHERE ${usecase}`
+									: "DELETE FROM ? WHERE ?",
+									[$ds, {Name:usecase}], err => logRun( err || "ok" ) )),
+							
 							plot: ( ...args) => {
 								const 
 									names = ["x","y"],
@@ -1351,6 +1365,7 @@ as described in the [Notebooks api](/api.view). `,
 								else
 									return foci[book];
 							},
+							
 							run: query => openBrowser("run",query),
 							open: query => openBrowser("run",query),
 							xpdf: query => openBrowser("xpdf",query),
@@ -1382,7 +1397,7 @@ as described in the [Notebooks api](/api.view). `,
 							/*
 							function run(ctx) {
 								sqlThread( sql => {
-									sql.getFields( $ds, "FIELD NOT LIKE Save*", keys => { 
+									sql.getKeys( $ds, "FIELD NOT LIKE Save*", keys => { 
 										sql.query( `SELECT ${keys} FROM ?? WHERE ?`, [$ds,$usecase], (err,recs) => {
 											sql.query( "SELECT Code FROM app.engines WHERE ??", [$ds,$engine], (err,recs) => {
 												const														
@@ -1414,22 +1429,19 @@ as described in the [Notebooks api](/api.view). `,
 													const
 														[store,key] = query.split("$");
 
-													if ( key )
+													if ( query.indexOf("$") >= 0 )
 														sql.query(
-															`SELECT json_extract(${store}, '$${key}') AS val FROM ?? WHERE ? LIMIT 1`,
+															`SELECT json_extract(${store}, '$${key}') AS ${store} FROM ?? WHERE ? LIMIT 1`,
 															[ $ds, $usecase ], (err,recs) => {
 
 																if ( err ) 
 																	Log(err);
 
-																else
-																	try {
-																		cb( JSON.parse(recs[0]), vm );
-																	}
-
-																	catch (err) {
-																		cb( null, vm );
-																	}
+																else {
+																	const ctx = recs[0];
+																	ctx[store] = JSON.parse(ctx[store]);
+																	cb(ctx, vm );
+																}
 
 															});
 
@@ -1444,7 +1456,7 @@ as described in the [Notebooks api](/api.view). `,
 																else
 																	cb( recs.get(store), vm );
 
-															});
+															}); 
 												});
 
 											else 
@@ -1453,7 +1465,7 @@ as described in the [Notebooks api](/api.view). `,
 														[store,key] = query.split("$"),
 														val = JSON.stringify(cb);
 
-													if ( key )
+													if ( query.indexOf("$") >= 0 )
 														sql.query(
 															`UPDATE ?? SET ${store} = json_set(${store}, '$${key}', cast(? AS JSON)) WHERE ?`, 
 															[ $ds, val, $usecase ],
@@ -1471,12 +1483,14 @@ as described in the [Notebooks api](/api.view). `,
 
 									else
 										sqlThread( sql => {
-											sql.Index( $ds, {"!Save*": ""}, (keys,types,gets) => {
-												sql.query( `SELECT ${keys} FROM ?? WHERE ?`, [$ds,$usecase], (err,recs) => {
+											sql.getKeys( $ds, "Field NOT LIKE 'Save%'", ({Field,Type}) => {
+												sql.query( `SELECT ${Field.join(',')} FROM ?? WHERE ?`, [$ds,$usecase], (err,recs) => {
 													var ctx = recs[0] || {};
 													
-													if ( json = types.json )
-														json.forEach( f => ctx[f] = JSON.parse( ctx[f] ) );
+													Field.forEach( (key,i) => {
+														if ( Type[i] == "json" )
+															ctx[key] = JSON.parse( ctx[key] );
+													});
 													
 													cb( err ? null : ctx, vm);
 												});
@@ -1487,10 +1501,10 @@ as described in the [Notebooks api](/api.view). `,
 								else
 								if ( isFunction(index) )
 									sqlThread( sql => {
-										sql.getFields( $ds, "Field NOT LIKE 'Save%'", keys => {
+										sql.getKeys( $ds, "Field NOT LIKE 'Save%'", ({Field}) => {
 											sql.query( "SELECT Name FROM ??", [$ds], (err,recs) => {
 												index({ 
-													keys: keys,
+													keys: Field,
 													cases: err ? null : recs.get("Name").Name
 												}, vm);
 											});
@@ -1502,7 +1516,7 @@ as described in the [Notebooks api](/api.view). `,
 
 							else
 								sqlThread( sql => {
-									sql.getFields( $ds, "", keys => { 
+									sql.getKeys( $ds, "", ({Field}) => { 
 										console.log(`
 Usage:
 	${$book}( "USECASE?STORE$.KEY" || "USECASE?STORE$[KEY] || ...", PUTDATA || GETDATA => { ... } ) 
@@ -4138,7 +4152,7 @@ save = CLIENT.HOST.CASE to save
 						sql.query("DELETE FROM openv.agents WHERE ?", {ID: agent.ID});
 
 						if ( evs = JSON.parse(agent.script) )
-							getContext(sql, "app."+host, {ID: usecase}, ctx => {
+							sql.getContext("app."+host, {Name: usecase}, ctx => {
 								ctx.Save = evs;
 								res( sql.saveContext( ctx ) );
 							});
@@ -5410,6 +5424,7 @@ function getEngine( sql, name, cb ) {
 
 /**
 */
+/*
 function getContext( sql, host, query, cb ) {  //< callback cb(ctx) with primed plugin context or cb(null) if error
 
 	sql.forFirst("", "SELECT * FROM app.?? WHERE least(?,1) LIMIT 1", [host,query], ctx => {
@@ -5439,6 +5454,7 @@ function getContext( sql, host, query, cb ) {  //< callback cb(ctx) with primed 
 	});
 
 }
+*/
 
 /**
 */
@@ -6684,17 +6700,14 @@ Endpoint to execute plugin req.table using usecase req.query.ID || req.query.Nam
 */	
 function exePlugin(req,res) {	//< execute plugin in specified usecase context
 	const 
-		{ sql, client, profile, table, query, index, type } = req,
-		Name = query.name || query.Name,
-		now = new Date(),
-		host = table;
+		{ sql, client, profile, table, query, index, type } = req;
 
 	//Log("Execute", query);
 	
 	if (type == "help")
 	return res("Execute notebook");
 
-	if ( Name )  // run using named usecase
+	if ( query.name || query.Name )  // run using named usecase
 		runPlugin(req, status => res( status || errors.noContext ) );
 
 	else
@@ -6860,16 +6873,16 @@ function runPlugin(req, res) {  //< callback res(ctx) with resulting ctx or cb(n
 	const 
 		{ sql, table, query, type } = req,
 		{ random } = Math,
-		book = table,
+		book = "app."+table,
 		trace = true,			
 		{ agent } = query;
 
-	//Log(">>run", book);
+	// Log(">>run", book);
 
 	if (type == "help")
 	return res("Run notebook");
 
-	getContext( sql, book, query, ctx => {		// get context for this notebook
+	sql.getContext( book, query, ctx => {		// get context for this notebook
 		function tracePipe( msg, args ) {
 			"pipe".trace( msg, req, msg => console.log( msg, args ) );
 		}
@@ -6923,26 +6936,27 @@ function runPlugin(req, res) {  //< callback res(ctx) with resulting ctx or cb(n
 			//delete runCtx.Host;
 			delete runCtx.Name;
 			delete runCtx.Pipe;
-			for (var key in runCtx) if ( key.startsWith("Save") ) delete runCtx[key];
+			//for (var key in runCtx) if ( key.startsWith("Save") ) delete runCtx[key];
 
 			//Log(">>>init run", runCtx);
 			//Log(">>>book", TOTEM.$master);
 
-			sql.getSelects( `app.${book}`, {"!Save_*":""}, (keys,types) => {		// generate use cases
+			sql.getFields( `app.${book}`, "Field NOT LIKE 'Save%'", ({Field,Type}) => {		// generate use cases
 
 				sql.query( `DELETE FROM app.${book} WHERE Name LIKE '${ctx.Name}-%' ` );
 
 				crossParms( 0 , Object.keys(Pipe), Pipe, {}, {}, (setCtx,idxCtx) => {	// enumerate keys to provide a setCtx key-context for each enumeration
 					//Log("set", setCtx, idxCtx, Pipe.Name);
 					const 
-						{json} = types,
 						fix = {X: idxCtx, L:jobs.length, N: ctx.Name},
 						set = Copy(setCtx, {}, "."),
 						job = Copy(setCtx, Copy(runCtx, {}), "." );
 
 					//Log(">>>set", setCtx, set, fix);
-					if ( json ) 
-						json.forEach( key => job[key] = JSON.stringify( job[key] ) );
+					Field.forEach( (key,i) => {
+						if ( (key in job) && (Type[i] == "json") ) 
+							job[key] = JSON.stringify( job[key] );
+					});
 
 					Each( set, (key,val) => set[key] = job[key] );
 
@@ -6994,22 +7008,21 @@ function runPlugin(req, res) {  //< callback res(ctx) with resulting ctx or cb(n
 			Fetch(Pipe, buff => cb(buff) );
 		}
 
-		//Log(">>>pipe ctx", ctx);
+		// Log(">>>notebook ctx", ctx);
 
 		if (ctx) {
 			res("ok");
 
 			const { Pipe } = ctx;
 
+			ATOM.$libs.$trace = tracePipe;
+			req.query = ctx;
+
 			if (Pipe)
 				switch ( Pipe.constructor ) {
 					case String: // source pipe
-						
-						ATOM.$libs.$trace = tracePipe;
 						ATOM.$libs.$pipe = cb => PIPE(Pipe,cb); 
-
-						req.query = ctx;
-
+						
 						ATOM.select(req, ctx => {
 							//Log("pipe run ctx", ctx);
 							// Log("save ctx?", ctx?ctx._net?"net":ctx:false);
@@ -7020,9 +7033,6 @@ function runPlugin(req, res) {  //< callback res(ctx) with resulting ctx or cb(n
 						break;
 
 					case Array:  // event pipe
-						req.query = ctx;
-
-						ATOM.$libs.$trace = tracePipe;
 						ATOM.$libs.$pipe = eventPipe;
 
 						ATOM.select(req, ctx => {
@@ -7044,6 +7054,14 @@ function runPlugin(req, res) {  //< callback res(ctx) with resulting ctx or cb(n
 
 						break;
 				}
+			
+			else
+				ATOM.select(req, ctx => {
+					//Log("pipe run ctx", ctx);
+					Log("save ctx?", ctx);
+					if ( ctx )
+						Trace( sql.saveContext( ctx ) );
+				});	
 		}
 
 		else
@@ -7349,12 +7367,12 @@ clients, users, system health, etc).`
 			const 
 				{$api} = $libs,
 				ctx = REPL.start({
-					eval: (cmd, ctx, filename, cb) => {
+					/*eval: (cmd, ctx, filename, cb) => {
 						if ( cmd ) {
 							DEBE.replCmd = cmd;
 							cb( null, VM.runInContext(cmd,VM.createContext(ctx)));
 						}
-					},
+					}, */
 					prompt: "$> ", 
 					useGlobal: true
 				}).context;
