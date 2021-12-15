@@ -1285,7 +1285,10 @@ as described in the [Notebooks api](/api.view). `,
 		function initNIF(cb) {
 			const 
 				foci = {},
-				repo = "https://github.com/totemstan";
+				repo = "https://github.com/totemstan",
+				toggle = {
+					chain: false
+				};
 			
 			sql.getTables( "app", books => {	// config notebook i/f
 				books.forEach( book => {
@@ -1301,21 +1304,22 @@ as described in the [Notebooks api](/api.view). `,
 						});
 					}
 					
-					function open(type,query) {
+					function openBrowser(type,query) {
 						CP.exec( `firefox ${site.master}/${book}.${type}`.tag("?",query||{})+"", err => logRun(err||"ok") );
-						//return $me;
+						if (toggle.chain) return $me;
 					}
 					
-					function exec( cmd, log ) {
+					function runCommand( cmd, log ) {
 						CP.exec( cmd, log );
-						//return $me;
+						if (toggle.chain) return $me;
 					}
-					
+
 					const 
 						$book = "$"+book,
-						$app = "app."+book,
+						$ds = "app."+book,
+						$engine = {Name:book},
 						$me = $libs[$book] = Copy({
-							help: query => exec( `firefox ${repo}/artifacts/tree/master/${book}` ),							
+							//help: query => exec( `firefox ${repo}/artifacts/tree/master/${book}` ),							
 							plot: ( ...args) => {
 								const 
 									names = ["x","y"],
@@ -1334,10 +1338,12 @@ as described in the [Notebooks api](/api.view). `,
 									}
 								});
 								
-								return $me( "?Description", "$plot{" + "".tag("?",keys) + "}" );
+								$me( "?Description", "$plot{" + "".tag("?",keys) + "}" );
+								//return $me;
 							},
+							chain: query => toggle.chain = !toggle.chain,
 							blog: data => $me( "?Description", data ),
-							edit: query => exec( `code ./notebooks/${book}.js`, logRun ),
+							edit: query => runCommand( `code ./notebooks/${book}.js`, logRun ),
 							focus: usecase => {
 								if (usecase) 
 									return foci[book] = usecase;
@@ -1345,18 +1351,19 @@ as described in the [Notebooks api](/api.view). `,
 								else
 									return foci[book];
 							},
-							run: query => open("run",query),
-							xpdf: query => open("xpdf",query),
-							brief: query => open("brief",query),
-							usage: query => open("usage",query),
-							view: query => open("view",query),
-							tou: query => open("tou",query),
-							rtp: query => open("rtp",query),
-							pub: query => open("pub",query),
-							stores: query => open("stores",query)
+							run: query => openBrowser("run",query),
+							open: query => openBrowser("run",query),
+							xpdf: query => openBrowser("xpdf",query),
+							brief: query => openBrowser("brief",query),
+							usage: query => openBrowser("usage",query),
+							view: query => openBrowser("view",query),
+							tou: query => openBrowser("tou",query),
+							rtp: query => openBrowser("rtp",query),
+							pub: query => openBrowser("pub",query),
+							publish: query => openBrowser("pub",query),
+							stores: query => openBrowser("stores",query)
 						}, (index, cb) => {
-
-							function run(sql,ctx) {
+							function runNotebook(sql, ctx, cb) {
 								const
 									req = {
 										sql: sql,
@@ -1367,44 +1374,75 @@ as described in the [Notebooks api](/api.view). `,
 
 								runPlugin(req, err => cb || logRun );
 							}
+							
+							function vm(ctx) {
+								sqlThread( sql => runNotebook(sql, ctx, logRun) );
+							}
+													
+							/*
+							function run(ctx) {
+								sqlThread( sql => {
+									sql.getFields( $ds, "FIELD NOT LIKE Save*", keys => { 
+										sql.query( `SELECT ${keys} FROM ?? WHERE ?`, [$ds,$usecase], (err,recs) => {
+											sql.query( "SELECT Code FROM app.engines WHERE ??", [$ds,$engine], (err,recs) => {
+												const														
+													ctx = VM.createContext(recs[0] || {});
+
+												Log("ctx", ctx);
+
+											index({ 
+												ctx: ctx, 
+												vm: args => {
+													Log("exec", 
+												}
+											});
+										});
+									});
+								});
+							} */
 
 							if ( index )
 								if ( isString(index) ) {
 									const
 										[usecase,query] = index.split("?"),
-										Usecase = {Name: usecase || foci[book] || "noFocus"};
+										$usecase = {Name: usecase || foci[book] || "noFocus"};
 
 									if ( query ) 
-										if ( cb || cb==0 )
-											if ( cb.constructor.name == "Function" )
+										if ( cb )
+											if ( isFunction(cb) )
 												sqlThread( sql => {
 													const
-														[store,key] = query.split("$"),
-														ds = `app.${book}`;
+														[store,key] = query.split("$");
 
 													if ( key )
 														sql.query(
-															`SELECT json_extract(${store}, '$${key}') AS val FROM ?? WHERE ?`,
-															[ ds, Usecase ], (err,recs) => {
+															`SELECT json_extract(${store}, '$${key}') AS val FROM ?? WHERE ? LIMIT 1`,
+															[ $ds, $usecase ], (err,recs) => {
 
 																if ( err ) 
 																	Log(err);
 
 																else
-																	cb( recs );
+																	try {
+																		cb( JSON.parse(recs[0]), vm );
+																	}
+
+																	catch (err) {
+																		cb( null, vm );
+																	}
 
 															});
 
 													else
 														sql.query(
-															`SELECT ${store.split('&').join(',')} FROM ?? WHERE ?`,
-															[ ds, Usecase ], (err,recs) => {
+															`SELECT ${store.split('&').join(',')} FROM ?? WHERE ? LIMIT 1`,
+															[ $ds, $usecase ], (err,recs) => {
 
 																if ( err ) 
 																	Log(err);
 
 																else
-																	cb( recs.get(store) );
+																	cb( recs.get(store), vm );
 
 															});
 												});
@@ -1413,22 +1451,18 @@ as described in the [Notebooks api](/api.view). `,
 												sqlThread( sql => {
 													const
 														[store,key] = query.split("$"),
-														ds = `app.${book}`,
 														val = JSON.stringify(cb);
 
 													if ( key )
 														sql.query(
 															`UPDATE ?? SET ${store} = json_set(${store}, '$${key}', cast(? AS JSON)) WHERE ?`, 
-															[ ds, val, Usecase ],
-															err => {
-																Log(err);
-																logRun(err || "ok");
-															});
+															[ $ds, val, $usecase ],
+															err => logRun(err || "ok") );
 
 													else
 														sql.query(
 															`UPDATE ?? SET ${store} = ? WHERE ?`,
-															[ ds, val, Usecase ],
+															[ $ds, val, $usecase ],
 															err => logRun(err || "ok") );
 												});
 
@@ -1436,19 +1470,43 @@ as described in the [Notebooks api](/api.view). `,
 											Log( "no callback||data provided" );
 
 									else
-										sqlThread( sql => run(sql, Usecase) );
+										sqlThread( sql => {
+											sql.Index( $ds, {"!Save*": ""}, (keys,types,gets) => {
+												sql.query( `SELECT ${keys} FROM ?? WHERE ?`, [$ds,$usecase], (err,recs) => {
+													var ctx = recs[0] || {};
+													
+													if ( json = types.json )
+														json.forEach( f => ctx[f] = JSON.parse( ctx[f] ) );
+													
+													cb( err ? null : ctx, vm);
+												});
+											});
+										});
 								}
 
 								else
-									sqlThread( sql => run(sql, Copy( index, {Name:book} )) );
+								if ( isFunction(index) )
+									sqlThread( sql => {
+										sql.getFields( $ds, "Field NOT LIKE Save*", keys => {
+											sql.query( "SELECT Name FROM ??", [$ds], (err,recs) => {
+												index({ 
+													keys: keys,
+													cases: err ? null : recs.get("Name").Name
+												}, vm);
+											});
+										});
+									});
+								else
+									sqlThread( sql => runNotebook(sql, Copy( index, $engine )) );
 
 							else
 								sqlThread( sql => {
-									sql.getFields( $app, "", keys => { 
+									sql.getFields( $ds, "", keys => { 
 										console.log(`
 Usage:
 	${$book}( "USECASE?STORE$.KEY" || "USECASE?STORE$[KEY] || ...", PUTDATA || GETDATA => { ... } ) 
 	${$book}( "USECASE" || {...}, RESULTS => { ... } ) 
+	${$book}( {keys:[...], cases:[...]} => { ... } )  
 	${$book}.run( { KEY: VALUE, ... } ) 
 	${$book}.brief( { KEY: VALUE, ... } ) 
 	${$book}.blog( { KEY: VALUE, ... } ) 
@@ -1463,7 +1521,7 @@ Keys:
 									});
 								});
 							
-							//return $me;
+							if (toggle.chain) return $me;
 						});
 				});
 				cb();

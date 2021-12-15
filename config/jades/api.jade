@@ -899,9 +899,9 @@ append site_body
 							> [$each](https://www.github.com/totemstan/enums)( obj, (key,val) => {...} )  
 							> [$](https://www.github.com/totemstan/man)( "[mathjs](https://mathjs.org/)", ctx)  
 							> [$](https://www.github.com/totemstan/man).FUNCTION(args)  
-							> [$NOTEBOOK](https://www.github.com/totemstan/notebooks)( "usecase?store", putdata || getdata => { ... } )  
-							> [$NOTEBOOK](https://www.github.com/totemstan/notebooks)( "usecase" || {...}, results => { ... } )  	   
-							> [$NOTEBOOK.OP](https://www.github.com/totemstan/notebooks)( query )  
+							> [$NOTEBOOK](https://www.github.com/totemstan/notebooks)( "usecase?store", getctx || (putctx,vm) => { ... } )  
+							> [$NOTEBOOK](https://www.github.com/totemstan/notebooks)( "usecase" || {...}, (getctx,vm) => { ... } )  	   
+							> [$NOTEBOOK](https://www.github.com/totemstan/debe)( {keys:[...], cases:[...]} => { ... } )  							> [$NOTEBOOK.OP](https://www.github.com/totemstan/notebooks)( query )  
 							> [ ... ] . [$](https://www.github.com/totemstan/man)( "KEY=EVAL & ..." )  
 							> "FILE ? _OPTION=VALUE & ... & KEY=EVAL & ..." . [$](https://www.github.com/totemstan/man)( batch => { ... } )  
 
