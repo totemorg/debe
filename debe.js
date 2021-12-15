@@ -1487,7 +1487,7 @@ as described in the [Notebooks api](/api.view). `,
 								else
 								if ( isFunction(index) )
 									sqlThread( sql => {
-										sql.getFields( $ds, "Field NOT LIKE Save*", keys => {
+										sql.getFields( $ds, "Field NOT LIKE 'Save%'", keys => {
 											sql.query( "SELECT Name FROM ??", [$ds], (err,recs) => {
 												index({ 
 													keys: keys,
