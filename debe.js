@@ -1496,6 +1496,7 @@ as described in the [Notebooks api](/api.view). `,
 											});
 										});
 									});
+								
 								else
 									sqlThread( sql => runNotebook(sql, Copy( index, $engine )) );
 
