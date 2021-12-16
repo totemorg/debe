@@ -729,22 +729,22 @@ $().ready( () => {
 						header: "ui-header-" + status,
 						tipper: "tooltip"
 					},
-					types = {
-						int: "number",
-						bigint: "number",
-						autonum: "number",
-						number: "number",
-						float: "number",
-						double: "number",
-						n: "number",
-						i: "number",
-						f: "number",
+					types = {	// datatable *editor* fieldtypes
+						int: "text",
+						bigint: "text",
+						autonum: "text",
+						number: "text",
+						float: "text",
+						double: "text",
+						n: "text",
+						i: "text",
+						f: "text",
 
-						checkbox: "boolean",
-						boolean: "boolean",
-						tinyint: "boolean",
-						b: "boolean",
-						c: "boolean",
+						checkbox: "radio",	// radio, checkbox, boolean
+						boolean: "radio",
+						tinyint: "radio",
+						b: "radio",
+						c: "radio",
 
 						varchar: "text",
 						text: "text",
@@ -827,6 +827,7 @@ $().ready( () => {
 							});
 						});
 
+						//Log("============no group tr", tr);
 						thead += tr.tag("tr", {} );
 					}
 
@@ -835,7 +836,7 @@ $().ready( () => {
 						const
 							{heads,keys,spans} = cols.Spanner();
 
-						//Log(cols,{h:heads,k:keys,s:spans});
+						//Log("===grp", cols,{h:heads,k:keys,s:spans});
 						Object.keys(heads).forEach( idx => {
 							tr = "";							
 							heads[idx].forEach( spec => {
@@ -858,6 +859,7 @@ $().ready( () => {
 									colspan: spec.colspan
 								});
 							});
+							//Log("============grp tr", tr);
 							thead += tr.tag("tr",{});
 						});
 					}

@@ -180,7 +180,7 @@ append base_body
 					if ( opts.debug>1 ) alert( JSON.stringify(xy) );
 
 					const
-						isEq = (x,y) => x+"" == y+"",
+						isEq = (x,y) => (x+"") == (y+""),
 						xDomain = isEq(xmin,xmax) ? d3.extent(xy, d => d.x) : [xmin, xmax],
 						yDomain = isEq(ymin,ymax) ? d3.extent(xy, d => d.y) : [ymin, ymax],
 						xSame = isEq(xDomain[0], xPrev[0]) && isEq(xDomain[1], xPrev[1]),
@@ -202,16 +202,16 @@ append base_body
 						[style,ssize] = sUse = s || [styles[0],2],
 						[title,tsize] = tUse = t || [name,16];
 
-					//console.log(">>>picks", plots, name, [tUse,mUse,sUse] );
+					console.log(">>>picks", plots, name, [tUse,mUse,sUse] );
 
 					//d3.select("svg").remove();
 
 					if ( !xSame || !plots ) {
-						//console.log("xscale", xDate, xDomain);
 						xScale = xDate 
 							? d3.scaleTime().domain( xDomain ).range( xRange )
 							: d3.scaleLinear().domain( xDomain ).range( xRange );
 
+						console.log("xscale", xScale, xDate, xDomain, style, xGrid);
 						xAxis = d3.axisBottom(xScale);
 
 						if ( xDate ) xAxis.tickFormat(d3.timeFormat( dateFormat ));
@@ -219,7 +219,7 @@ append base_body
 						var axis = svg.append("g")
 								.attr("class", "xaxis")
 								.attr('stroke', style )
-								.attr("transform", `translate(0,${xGrid})`)
+								//.attr("transform", `translate(0,${xGrid})`)
 								.call(xAxis);
 
 						// d3.time.months, 1).tickFormat(d3.timeFormat('%b');  		// v3
@@ -251,14 +251,16 @@ append base_body
 							? d3.scaleTime().domain( yDomain ).range( yRange )
 							: d3.scaleLinear().domain( yDomain ).range( yRange );
 
+						console.log("yscale", yScale, yDate, yDomain, style, yGrid);
 						yAxis = d3.axisLeft(yScale);
 
 						if ( yDate ) yAxis.tickFormat(d3.timeFormat( dateFormat ));
 
+						//yGrid = 0;
 						var axis = svg.append("g")
 								.attr("class", "yaxis")
 								.attr('stroke', style )
-								.attr("transform", `translate(${yGrid},0)` )
+								//.attr("transform", `translate(${yGrid},0)` )
 								.call(yAxis);
 
 						if ( yDate ) 
@@ -282,7 +284,7 @@ append base_body
 						yGrid -= 0.05*width;
 					}
 
-					//console.log(">>>mark", plots, markers, stash);
+					console.log(">>>mark", plots, marker, msize, style, ssize);
 
 					if ( marker ) {  // add markers
 						svg.append("g")
@@ -334,6 +336,7 @@ append base_body
 									.attr("fill", "red"); 
 					}
 
+					console.log(tUse,mUse,sUse);
 					cb( [tUse,mUse,sUse] );
 					plots++;
 				}
@@ -348,7 +351,7 @@ append base_body
 				xDate = isDate( xmin ) || isDate( xmax );
 				yDate = isDate( ymin ) || isDate( ymax );
 
-				//console.log(">>>dates?", {x:xDate, y: yDate} );
+				console.log(">>>dates?", {x:xDate, y: yDate} );
 
 				data.forEach( (rec,idx) => {
 					if ( rec.forEach ) {
@@ -368,8 +371,10 @@ append base_body
 								plotData( it[key], name+"/"+key ); 
 							});
 
-						else
+						else {
+								alert("plot(x,y)");
 							XY.push( {x:x, y:y} );
+						}
 					}
 				});
 
@@ -469,7 +474,7 @@ append base_body
 				yRange = [height, 0];	//largest first as y value of zero is at the top of chart and increases as you go down.
 
 			//console.log(">>>domain", dom, [xDate,yDate], [xMin,xMax] );
-			// console.log(">>>range", [xRange,yRange]);
+			//console.log(">>>range", [xRange,yRange]);
 
 			color.domain( d3.range(0,10) );					
 

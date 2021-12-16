@@ -243,10 +243,7 @@ Copy({  // array prototypes
 		const 
 			{ sql, flags, client, profile, table, type, host } = req,
 			{ site, licenseCode } = DEBE,
-			//{ master } = site,
-			book = ds;
-
-		var 
+			book = ds,
 			product = table+".html",
 			recs = this,
 			ctx = {
@@ -254,13 +251,8 @@ Copy({  // array prototypes
 				table: table,
 				client: client,
 				type: type
-			};
-
-
-		//Log(">>>blog", ctx);
-		var
+			},
 			fetchBlog = ( rec, cb ) => {
-				Log(rec);
 				const 
 					isEnum = !isString(rec.Pipe||""),	// is client doing an enumerated pipe ?
 					src = (ds+".json").tag("?", { 		// define default src key
@@ -965,7 +957,7 @@ as described in the [api](/api.view).  `,
 		Description: `
 Document your notebook's usecase using [markdown](/api.view):
 	$VIEW{ SRC ? w=WIDTH & h=HEIGHT & x=KEY$INDEX & y=KEY$INDEX ... }
-	\${ JS }
+	$ { KEY }
 	[ LINK ] ( URL )
 	$$ inline TeX $$ || n$$ break TeX $$ || a$$ AsciiMath $$ || m$$ MathML $$
 	TeX := TeX || #VAR || VAR#KEY#KEY...
@@ -6518,7 +6510,7 @@ function publishPlugin(req,res) {
 					`cd ./artifacts/${name}`,
 					`curl localhost:8080/${name}.tou > README.md`,
 					`curl localhost:8080/${name}.status >> README.md` ,
-					`curl "localhost:8080/${name}.html?\\$drop:=Save*&_blog=Description" >> README.md`,
+					`curl "localhost:8080/${name}.html?_blog=Description" >> README.md`,
 					`cd ./artifacts`,
 					`git commit -am "update readme"`,
 					`git push agent master`
