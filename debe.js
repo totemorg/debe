@@ -1437,10 +1437,10 @@ as described in the [Notebooks api](/api.view). `,
 																if ( err ) 
 																	Log(err);
 
-																else {
-																	const ctx = recs[0];
+																else
+																if ( ctx = recs[0] ) {
 																	ctx[store] = JSON.parse(ctx[store]);
-																	cb(ctx, vm );
+																	cb( ctx, vm );
 																}
 
 															});
@@ -1449,13 +1449,14 @@ as described in the [Notebooks api](/api.view). `,
 														sql.query(
 															`SELECT ${store.split('&').join(',')} FROM ?? WHERE ? LIMIT 1`,
 															[ $ds, $usecase ], (err,recs) => {
-
+																
 																if ( err ) 
 																	Log(err);
 
 																else
-																	cb( recs.get(store), vm );
-
+																if ( ctx = recs[0] )
+																	cb( ctx, vm );
+																
 															}); 
 												});
 
@@ -4153,8 +4154,13 @@ save = CLIENT.HOST.CASE to save
 
 						if ( evs = JSON.parse(agent.script) )
 							sql.getContext("app."+host, {Name: usecase}, ctx => {
-								ctx.Save = evs;
-								res( sql.saveContext( ctx ) );
+								if ( ctx ) {
+									ctx.Save = evs;
+									res( sql.saveContext( ctx ) );
+								}
+								
+								else
+									res( new Error("No such notebook") );
 							});
 
 						else
