@@ -63,7 +63,7 @@ function Fetch(opts, cb) {
 						alert( err+"" );
 
 					else {					
-						if (opts.debug>1) alert("recs"+JSON.stringify(recs));
+						if (opts.debug>1) alert("data>>> "+JSON.stringify(recs));
 
 						if ( recs ) cb( isArray(recs) ? recs : [recs] , svg );
 					}
@@ -71,7 +71,7 @@ function Fetch(opts, cb) {
 
 			else // newer v4+
 				d3.json( path ).then( recs => {
-					if (opts.debug>1) alert("recs"+JSON.stringify(recs));
+					if (opts.debug>1) alert("data>>> "+JSON.stringify(recs));
 
 					if ( recs ) cb( isArray(recs) ? recs : [recs] , svg );
 				});
@@ -81,15 +81,13 @@ function Fetch(opts, cb) {
 			//Ajax("GET", true, path, data => {
 			//console.log("##########d3 fetch", path);
 			Ajax( {}, "GET", path, data => {
-				//if (opts.debug>1) alert("d3fetch>> "+data);
-
+				if ( opts.debug>1 ) alert("data>>> "+data);
 				try {
-					if ( data = JSON.parse(data) ) cb( data );
+					cb( JSON.parse(data) );
 				}
 				catch (err) {
-					//cb( data );
-					if ( opts.debug > 1 ) alert("bad json");
-				}
+					if ( opts.debug>3 ) alert(err+">>> "+data);
+				} 
 				//cb( isArray(recs) ? recs : [recs] );
 			});
 	}
@@ -98,7 +96,7 @@ function Fetch(opts, cb) {
 		fetchData( opts, {}, res => cb(res,null) );
 
 	else {
-		if (opts.debug) alert( "fetch>> "+JSON.stringify(opts) ); 
+		if (opts.debug) alert( "fetch>>> "+JSON.stringify(opts) ); 
 		//if (opts.debug) console.log(opts);
 
 		d3.select("svg").remove();

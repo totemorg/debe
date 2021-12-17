@@ -254,7 +254,7 @@ Copy({  // array prototypes
 			},
 			fetchBlog = ( rec, cb ) => {
 				const 
-					isEnum = !isString(rec.Pipe||""),	// is client doing an enumerated pipe ?
+					isEnum = (rec.Pipe||"").startsWith("{"),	// is client doing an enumerated pipe ?
 					src = (ds+".json").tag("?", { 		// define default src key
 						name: isEnum
 							? rec.Name + "-*"	// request all children cases
@@ -1524,7 +1524,7 @@ Usage:
 	${$book}.help( )
 
 Keys:
-	${keys}
+	${Field.join(",")}
 ` );
 									});
 								});
@@ -6055,7 +6055,7 @@ function blogPlugin(req,res) {
 		{ master } = site,
 		//key = query.key || "Description",
 		//name = query.name || "nocase",
-		src = table.tag("?", {Name: subs ? name+"-%" : name}),
+		src = table.tag("?", {Name: subs ? name+"-*" : name}),
 		head = [
 			site.nick.tag( master ),
 			"notebook".tag( `/${table}.view?name=${name}` ),

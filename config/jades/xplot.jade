@@ -121,6 +121,7 @@ append base_head
 					width: parseInt("#{query.w}") || 1200,
 					height: parseInt("#{query.h}") || 500
 				},
+				sort: "#{query.sort}",
 				debug: parseInt("#{query.debug}") || 0,
 				markers: "#{query.markers}".eval( "CIrcle,SQuare,CRoss,Diamond,Triangle-Up,Triangle-Down,STar,WYE", stash ),
 				styles: "#{query.styles}".eval( "blacK,Red,Green,Yellow,Blue,Orange,Pink,HotPink,DeepPink,IndianRed,DarkRed,Violet,Purple,SlateBlue,DarkBlue,skYBlue,ForestGreen,PerU", stash ),
@@ -174,8 +175,6 @@ append base_head
 				} 
 			};
 
-		//Log("config",opts,stash );
-
 append base_body
 	script.
 		Fetch( opts, (data,svg) => {
@@ -183,7 +182,7 @@ append base_body
 				function plotXY(xy, name, cb) {
 					//console.log(">>>plot", name);
 					
-					if ( opts.debug>1 ) alert( JSON.stringify(xy) );
+					if ( opts.debug>2 ) alert( "plot>>> "+JSON.stringify(xy) );
 
 					const
 						isEq = (x,y) => (x+"") == (y+""),
@@ -206,7 +205,7 @@ append base_body
 					);
 
 					const 
-						[m,s,t] = name.pick(stash),
+						[m,s,t] = (name||"circle4:blue2").pick(stash),
 						[marker,msize] = mUse = m || [markers[0],4],
 						[style,ssize] = sUse = s || [styles[0],2],
 						[title,tsize] = tUse = t || [name,16];
@@ -292,9 +291,6 @@ append base_body
 						yGrid -= 0.05*width;
 					}
 
-					//console.log(">>>mark", plots, [marker, msize], [style, ssize]);
-					//console.log(">>>xy", xy);
-
 					if ( marker ) {  // add markers
 						svg.append("g")
 							.selectAll( marker )
@@ -363,6 +359,7 @@ append base_body
 			
 				const 
 					XY = [],
+					sorts = [],
 					data0 = data[0] || [];
 
 				[xmin,xmax] = [xMin[plots] || xmin, xMax[plots] || xmax];
@@ -371,51 +368,64 @@ append base_body
 				xDate = isDate( xmin ) || isDate( xmax );
 				yDate = isDate( ymin ) || isDate( ymax );
 
-				console.log(">>>dates?", {x:xDate, y: yDate} );
-
-				data.forEach( (rec,idx) => {
-					if ( rec.forEach ) {
-						const [x,y,f,d] = rec;
-						XY.push( {x: xDate ? new Date(x) : x||0, y:y||0, f:f||"", d:d||"" } );
-					}
-
-					else {
-						var {x,y,xy,it} = rec;
-
-						if (it) 
-							Object.keys(it).forEach( key => {
-								plotData( it[key], name+"/"+key ); 
-							});
-
-						else
-						if ( xy ) {
-							const
-								{xGet,yGet} = opts;
-								
-							//console.log(">>>get", {x:xGet, y:yGet}, stash);
-							
-							xGet.forEach( (xKey,xIdx) => {
-							yGet.forEach( (yKey,yIdx) => {
-								var
-									XY = [];
-								
-								xy.forEach( rec => {
-									XY.push({x: rec[xKey], y: rec[yKey]});
-								});
-									
-								//console.log(">>>dump", XY, name, `/${xKey} vs ${yKey}`);
-										 
-								plotXY( XY, `${markers[xIdx]}4:${styles[yIdx]}2:${xKey} vs ${yKey}`, addLegend );
-							});
-							});
+				// console.log(">>>dates?", {x:xDate, y: yDate} );
+				
+				if ( opts.sort ) {
+					data.forEach( (rec,idx) => {
+						sorts.push( {x: rec.x, y: rec.y, sort: rec.sort} );
+					});
+					
+					sorts.sort( (u,v) => (u.sort > v.sort) ? u : v );
+					
+					sorts.forEach( rec => {
+						XY.push( {x:rec.x, y:rec.y} );
+					});
+				}
+				
+				else
+					data.forEach( (rec,idx) => {
+						if ( rec.forEach ) {
+							const [x,y,f,d] = rec;
+							XY.push( {x: xDate ? new Date(x) : x||0, y:y||0, f:f||"", d:d||"" } );
 						}
 
-						else
-							x.forEach( (x,i) => 
-								XY.push( {x:x, y:y[i]} ) 
-							);
-					}
-				});
+						else {
+							var {x,y,xy,it} = rec;
+
+							if (it) 
+								Object.keys(it).forEach( key => {
+									plotData( it[key], name+"/"+key ); 
+								});
+
+							else
+							if ( xy ) {
+								const
+									{xGet,yGet} = opts;
+
+								//console.log(">>>get", {x:xGet, y:yGet}, stash);
+
+								xGet.forEach( (xKey,xIdx) => {
+								yGet.forEach( (yKey,yIdx) => {
+									var
+										XY = [];
+
+									xy.forEach( rec => {
+										XY.push({x: rec[xKey], y: rec[yKey]});
+									});
+
+									//console.log(">>>dump", XY, name, `/${xKey} vs ${yKey}`);
+
+									plotXY( XY, `${markers[xIdx]}4:${styles[yIdx]}2:${xKey} vs ${yKey}`, addLegend );
+								});
+								});
+							}
+
+							else
+								x.forEach( (x,i) => 
+									XY.push( {x:x, y:y[i]} ) 
+								);
+						}
+					});
 
 				if ( extra = opts.extra )	// append extra xy data
 					for (var N=extra.length, n=0; n<N; n++)
