@@ -98,15 +98,15 @@ append base_head
 				ds: "!{query.src}"
 					? [].concat( 
 						"!{query.it}"
-						? "!{query.it}".split(",").map( it => "!{query.src}".tag("&", {"it:": it, "sort:": "#{query.sort}"}) )
+						? "!{query.it}".list( it => "!{query.src}".tag("&", {"it:": it, "sort:": "#{query.sort}"}) )
 						: [],
 
 						"#{query.xy}"
-						? "#{query.xy}".split(",").map( xy => "!{query.src}".tag("&", {"xy:": xy, "sort:": "#{query.sort}"}) )
+						? "#{query.xy}".list( xy => "!{query.src}".tag("&", {"xy:": xy, "sort:": "#{query.sort}"}) )
 						: [],
 
 						"#{query.y}"
-						? "#{query.y}".split(",").map( y => "!{query.src}".tag("&", {"y:":y, "x:":"#{query.x}", "sort:" : "#{query.sort}"}) )
+						? "#{query.y}".list( y => "!{query.src}".tag("&", {"y:":y, "x:":"#{query.x}", "sort:" : "#{query.sort}"}) )
 						: []
 					)
 
@@ -124,10 +124,12 @@ append base_head
 				styles: "#{query.styles}".eval( "blacK,Red,Green,Yellow,Blue,Orange,Pink,HotPink,DeepPink,IndianRed,DarkRed,Violet,Purple,SlateBlue,DarkBlue,skYBlue,ForestGreen,PerU", stash ),
 				xLabel: "#{query.xlabel}" || "x",
 				yLabel: "#{query.ylabel}" || "y",
-				yMax: "#{query.ymax}".split(",").map( a => (a.indexOf("-")>=0) ? new Date(a) : parseFloat(a) ), 
-				yMin: "#{query.ymin}".split(",").map( a => (a.indexOf("-")>=0) ? new Date(a) : parseFloat(a) ), 
-				xMax: "#{query.xmax}".split(",").map( a => (a.indexOf("-")>=0) ? new Date(a) : parseFloat(a) ), 
-				xMin: "#{query.xmin}".split(",").map( a => (a.indexOf("-")>=0) ? new Date(a) : parseFloat(a) ), 
+				yMax: "#{query.ymax}".list( a => (a.indexOf("-")>=0) ? new Date(a) : parseFloat(a) ), 
+				yMin: "#{query.ymin}".list( a => (a.indexOf("-")>=0) ? new Date(a) : parseFloat(a) ), 
+				xMax: "#{query.xmax}".list( a => (a.indexOf("-")>=0) ? new Date(a) : parseFloat(a) ), 
+				xMin: "#{query.xmin}".list( a => (a.indexOf("-")>=0) ? new Date(a) : parseFloat(a) ), 
+				xGet: ("#{query.xget}" || "x").split(","), 
+				yGet: ("#{query.yget}" || "y").split(","), 
 				details: "#{query.details}",
 				
 				// legacy
@@ -170,13 +172,15 @@ append base_head
 				} 
 			};
 
-		//Log("config",opts,stash);
+		//Log("config",opts,stash );
 
 append base_body
 	script.
 		Fetch( opts, (data,svg) => {
-			function plotData(data,name) {
+			function plotData(data, name) {
 				function plotXY(xy, name, cb) {
+					//console.log(">>>plot", name);
+					
 					if ( opts.debug>1 ) alert( JSON.stringify(xy) );
 
 					const
@@ -191,18 +195,21 @@ append base_body
 
 					console.log(">>>extent", 
 						{xDom: xDomain, yDom: yDomain}, 
+						{xLim: [xmin,xmax], yLim: [ymin,ymax]},
+						{xMin: xMin, yMin: yMin},
+						{xMax: xMax, yMax: yMax}
 						//{xPre: xPrev, yPre: yPrev},
 						//{xSame: xSame, ySame: ySame},
 						//{xEq: isEq(xmin,xmax), yEq: isEq(ymin,ymax) },
 					);
 
 					const 
-						[t,m,s] = name.pick(stash),
+						[m,s,t] = name.pick(stash),
 						[marker,msize] = mUse = m || [markers[0],4],
 						[style,ssize] = sUse = s || [styles[0],2],
 						[title,tsize] = tUse = t || [name,16];
 
-					console.log(">>>picks", plots, name, [tUse,mUse,sUse] );
+					console.log(">>>mark", plots, name, [tUse,mUse,sUse] );
 
 					//d3.select("svg").remove();
 
@@ -211,7 +218,7 @@ append base_body
 							? d3.scaleTime().domain( xDomain ).range( xRange )
 							: d3.scaleLinear().domain( xDomain ).range( xRange );
 
-						console.log("xscale", xScale, xDate, xDomain, style, xGrid);
+						//console.log(">>>xscale", xScale, xDate, xDomain, xRange, xGrid);
 						xAxis = d3.axisBottom(xScale);
 
 						if ( xDate ) xAxis.tickFormat(d3.timeFormat( dateFormat ));
@@ -219,7 +226,7 @@ append base_body
 						var axis = svg.append("g")
 								.attr("class", "xaxis")
 								.attr('stroke', style )
-								//.attr("transform", `translate(0,${xGrid})`)
+								.attr("transform", `translate(0,${xGrid})`)
 								.call(xAxis);
 
 						// d3.time.months, 1).tickFormat(d3.timeFormat('%b');  		// v3
@@ -251,16 +258,15 @@ append base_body
 							? d3.scaleTime().domain( yDomain ).range( yRange )
 							: d3.scaleLinear().domain( yDomain ).range( yRange );
 
-						console.log("yscale", yScale, yDate, yDomain, style, yGrid);
+						//console.log(">>>yscale", yScale, yDate, yDomain, yRange, yGrid);
 						yAxis = d3.axisLeft(yScale);
 
 						if ( yDate ) yAxis.tickFormat(d3.timeFormat( dateFormat ));
 
-						//yGrid = 0;
 						var axis = svg.append("g")
 								.attr("class", "yaxis")
 								.attr('stroke', style )
-								//.attr("transform", `translate(${yGrid},0)` )
+								.attr("transform", `translate(${yGrid},0)` )
 								.call(yAxis);
 
 						if ( yDate ) 
@@ -273,7 +279,7 @@ append base_body
 						svg.append("text")
 							//.attr("class", "yaxis")
 							.attr("transform", "rotate(-90)")
-							.attr("x", 0)
+							.attr("x", 10)
 							.attr("y", width)
 							.attr("dy", "1em")
 							.style("fill","black")
@@ -284,7 +290,8 @@ append base_body
 						yGrid -= 0.05*width;
 					}
 
-					console.log(">>>mark", plots, marker, msize, style, ssize);
+					//console.log(">>>mark", plots, [marker, msize], [style, ssize]);
+					//console.log(">>>xy", xy);
 
 					if ( marker ) {  // add markers
 						svg.append("g")
@@ -336,11 +343,22 @@ append base_body
 									.attr("fill", "red"); 
 					}
 
-					console.log(tUse,mUse,sUse);
-					cb( [tUse,mUse,sUse] );
+					if (cb) cb( [tUse,mUse,sUse] );
 					plots++;
 				}
 
+				function addLegend([t,m,s]) {		// add legend
+					const 
+						x0 = 30,
+						y0 = 20+20*(plots-1),
+						r0 = 5;
+
+					//console.log(">>>picks", plots, t,m,s);
+
+					svg.append(m[0]).attr("cx",x0).attr("cy",y0).attr("r", m[1]).style("fill", "black");
+					svg.append("text").attr("x", x0+10).attr("y", y0).text(t[0]).style("fill",s[0]).style("font-size", "15px").attr("alignment-baseline","middle");
+				}
+			
 				const 
 					XY = [],
 					data0 = data[0] || [];
@@ -360,21 +378,40 @@ append base_body
 					}
 
 					else {
-						const {x,y,xy,it} = rec;
+						var {x,y,xy,it} = rec;
 
-						if ( xy )
-							XY.push( {x: xy[0] || 0, y:xy[1] || 0, f:xy[2] || "", d:xy[3]||"" } );
-
-						else
 						if (it) 
 							Object.keys(it).forEach( key => {
 								plotData( it[key], name+"/"+key ); 
 							});
 
-						else {
-								alert("plot(x,y)");
-							XY.push( {x:x, y:y} );
+						else
+						if ( xy ) {
+							const
+								{xGet,yGet} = opts;
+								
+							//console.log(">>>get", {x:xGet, y:yGet}, stash);
+							
+							xGet.forEach( (xKey,xIdx) => {
+							yGet.forEach( (yKey,yIdx) => {
+								var
+									XY = [];
+								
+								xy.forEach( rec => {
+									XY.push({x: rec[xKey], y: rec[yKey]});
+								});
+									
+								//console.log(">>>dump", XY, name, `/${xKey} vs ${yKey}`);
+										 
+								plotXY( XY, `${markers[xIdx]}4:${styles[yIdx]}2:${xKey} vs ${yKey}` );
+							});
+							});
 						}
+
+						else
+							x.forEach( (x,i) => 
+								XY.push( {x:x, y:y[i]} ) 
+							);
 					}
 				});
 
@@ -385,17 +422,7 @@ append base_body
 				//console.log(">>>xy", XY);
 
 				if ( XY.length ) 
-					plotXY( XY, name, ([t,m,s]) => {		// add legend
-						const 
-							x0 = 30,
-							y0 = 20+20*(plots-1),
-							r0 = 5;
-
-						//console.log(">>>picks", plots, t,m,s);
-
-						svg.append(m[0]).attr("cx",x0).attr("cy",y0).attr("r", m[1]).style("fill", "black");
-						svg.append("text").attr("x", x0+10).attr("y", y0).text(t[0]).style("fill",s[0]).style("font-size", "15px").attr("alignment-baseline","middle");
-					}); 
+					plotXY( XY, name, addLegend); 
 			} 
 
 			const
@@ -479,7 +506,7 @@ append base_body
 			color.domain( d3.range(0,10) );					
 
 			styles.forEach( (style,i) => cats[i] = style );
-			console.log(">>>categories", cats);
+			//console.log(">>>categories", cats);
 
 			svg.append("g").attr("transform", `translate(${left},${top})` );
 
@@ -487,6 +514,7 @@ append base_body
 				plotData( data, "" );
 
 			else
-			if ( opts.debug ) alert("json must be a list");
+			if ( opts.debug ) 
+				alert("src must return a list");
 
 		});

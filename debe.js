@@ -761,7 +761,7 @@ const
 		$each: Each,
 		/**
 		*/
-		$api: () => CP.exec( `firefox ${site.master}/quickapi.view` )
+		$api: () => CP.exec( `firefox ${site.master}/labapi.view` )
 	},
 	
 	/**
@@ -7357,6 +7357,7 @@ clients, users, system health, etc).`
 		});
 		break;
 		
+	case "admin":
 	case "lab":
 		
 		config({}, sql => {

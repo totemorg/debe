@@ -212,10 +212,9 @@ Array.prototype.Extend = function (con) {
 		const args = this;
 		args.forEach( (arg,i) => cb( i, args )  );
 		return args;
-	},
+	}
 	
-	/**
-	*/
+	/*
 	function select(keys) {
 		const rtn = [];
 		this.forEach( rec => {
@@ -225,7 +224,8 @@ Array.prototype.Extend = function (con) {
 		});
 		//Log("select=", rtn, keys);
 		return rtn;
-	}	
+	}*/
+	
 ].Extend(Array);
 
 [
@@ -410,9 +410,10 @@ Array.prototype.Extend = function (con) {
 				case "9":
 				case ".":
 					size += char; break;
+					break;
 					
 				case ":":
-					opts.push( [stash[key] || arg, parseFloat(size||"2")] );
+					opts.push( [stash[key] || key, parseFloat(size||"2")] );
 					size = "";
 					key = "";
 					arg = "";
@@ -422,8 +423,19 @@ Array.prototype.Extend = function (con) {
 					key += char; break;
 			}
 		
+		opts.push([key, parseFloat(size||"2")] );
 		return opts;
 	},
 	
+	/**
+	*/
+	function list (cb) {
+		const args = [];
+		
+		this.split(",").forEach ( arg => args.push( cb(arg) ) );
+		return args;
+	}	
+	
 ].Extend(String);
+
 // UNCLASSIFIED
