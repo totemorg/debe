@@ -396,7 +396,7 @@ Array.prototype.Extend = function (con) {
 		// CI4:SB10:baseline(+) 0.95
 		for (var size="", key="", arg="", n=0, N=str.length; n<N; n++, arg += char)
 			switch (char = str.charAt(n) ) {
-				case " ": break;
+				//case " ": break;
 					
 				case "0":
 				case "1":

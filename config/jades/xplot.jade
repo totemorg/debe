@@ -21,6 +21,8 @@ append base_help
 			- xmax = max,max,... (#{query.xmax})
 			- ymin = min,min,... (#{query.ymin})
 			- ymax = max,max,... (#{query.ymax})
+			- xget = key,... for indexing xy src (#{qyery.xget})
+			- yget = key,... for indexing xy src (#{query.yget})
 			- details = show xy locations (#{query.degtails})
 			- ref = beta || cost || ... reference curve (#{query.ref})
 			- chan = override ^chan widget (#{query.chan})
@@ -403,7 +405,7 @@ append base_body
 									
 								//console.log(">>>dump", XY, name, `/${xKey} vs ${yKey}`);
 										 
-								plotXY( XY, `${markers[xIdx]}4:${styles[yIdx]}2:${xKey} vs ${yKey}` );
+								plotXY( XY, `${markers[xIdx]}4:${styles[yIdx]}2:${xKey} vs ${yKey}`, addLegend );
 							});
 							});
 						}
