@@ -724,6 +724,16 @@ const
 	*/
 	$libs: {   // share these modules with engines
 		/**
+		*/
+		$get: (src,index,cb) => {
+			if ( src.forEach )
+				return ENUMS.getList(src,index,cb);
+			
+			else
+				ENUMS.getURL(src,index);
+		},
+		
+		/**
 		See [man]{@link https://github.com/totemstan/man/}
 		*/
 		$: $,
@@ -7366,12 +7376,13 @@ clients, users, system health, etc).`
 			const 
 				{$api} = $libs,
 				ctx = REPL.start({
-					/*eval: (cmd, ctx, filename, cb) => {
+					eval: (cmd, ctx, filename, cb) => {
 						if ( cmd ) {
 							DEBE.replCmd = cmd;
+							ctx.$ = $;
 							cb( null, VM.runInContext(cmd,VM.createContext(ctx)));
 						}
-					}, */
+					}, 
 					prompt: "$> ", 
 					useGlobal: true
 				}).context;
