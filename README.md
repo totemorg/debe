@@ -375,6 +375,7 @@ config({
         * [.$neo](#module_DEBE..$libs.$neo)
         * [.$copy](#module_DEBE..$libs.$copy)
         * [.$each](#module_DEBE..$libs.$each)
+        * [.$lab()](#module_DEBE..$libs.$lab)
         * [.$get()](#module_DEBE..$libs.$get)
         * [.$ran()](#module_DEBE..$libs.$ran)
         * [.$api()](#module_DEBE..$libs.$api)
@@ -487,6 +488,7 @@ config({
     * [.$neo](#module_DEBE..$libs.$neo)
     * [.$copy](#module_DEBE..$libs.$copy)
     * [.$each](#module_DEBE..$libs.$each)
+    * [.$lab()](#module_DEBE..$libs.$lab)
     * [.$get()](#module_DEBE..$libs.$get)
     * [.$ran()](#module_DEBE..$libs.$ran)
     * [.$api()](#module_DEBE..$libs.$api)
@@ -539,6 +541,10 @@ See [enums](https://github.com/totemstan/enums/)
 See [enums](https://github.com/totemstan/enums/)
 
 **Kind**: static property of [<code>$libs</code>](#module_DEBE..$libs)  
+<a name="module_DEBE..$libs.$lab"></a>
+
+#### $libs.$lab()
+**Kind**: static method of [<code>$libs</code>](#module_DEBE..$libs)  
 <a name="module_DEBE..$libs.$get"></a>
 
 #### $libs.$get()

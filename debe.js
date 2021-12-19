@@ -725,6 +725,14 @@ const
 	$libs: {   // share these modules with engines
 		/**
 		*/
+		$lab: (ctx,cb) => {
+			//Log(">>>lab", ctx,cb+"");
+			ctx.$ctx = ctx;
+			VM.runInContext( `(${cb})($ctx)` , VM.createContext(Copy($libs,ctx)));
+		},
+		
+		/**
+		*/
 		$get: (src,index,cb) => {
 			if ( src.forEach )
 				return ENUMS.getList(src,index,cb);
@@ -1345,22 +1353,24 @@ as described in the [Notebooks api](/api.view). `,
 							
 							blog: (pat,sub) => {
 								const 
-									key = "Description",
+									index = foci[book],
+									[usecase,key] = index.split("?"),
+									Key = key || "Description",
 									fix = {},
 									Pat = new RegExp( pat
 											.replace("$","\\$")
 											.replace("*","\\{.*\\}") );
 								
-								if ( index = foci[book] )
-									$me( index, ctx => {
-										console.log(key, ":", Pat, "=>", sub);
+								if ( usecase )
+									$me( usecase, ctx => {
+										console.log(Key, ":", Pat, "=>", sub);
 
-										fix[key] = ctx[key].replace(Pat,sub);
-										$me( index, fix );
+										fix[Key] = ctx[Key].replace(Pat,sub);
+										$me( usecase, fix );
 									});
 
 								else
-									console.log( `Use ${$book}.focus("USECASE") to set focus` );
+									console.log( `Use ${$book}.focus("USECASE?KEY") to set the focus` );
 							},
 							
 							plot: ( ...args) => {
@@ -6572,7 +6582,7 @@ function publishPlugin(req,res) {
 		function primeArtifacts( name, uid ) {
 			const 
 				remote = "164.187.33.219",
-				gitsite = "git@github.com:totemartifacts",
+				gitsite = "git@github.com:totemstan/artifacts",
 					//"https://sc.appdev.proj.coe/acmesds",
 				short = {
 					pub: "publish",
@@ -6636,9 +6646,10 @@ kdcproxyname:s:
 `,
 						sh = [
 								`cp -r ./artifacts/temp/* ./artifacts/${name}`,
-								`cd ./artifacts/${name}`,
-								"git init",
-								`git remote add origin ${gitsite}/${name}`
+								`git add ./artifacts/${name}`
+								//`cd ./artifacts/${name}`
+								//"git init",
+								//`git remote add origin ${gitsite}/${name}`
 							].join(";");
 
 					CP.exec( sh, err => {
@@ -6666,22 +6677,23 @@ IDList=
 		}
 
 		try {	// prime and process the plugin's script
-			procScript( sql, name, require(`./notebooks/${book}`) );	
+			procScript( sql, name, require( `./notebooks/${book}` ) );	
 			genReadme( name );
 			cb(null);
 		}
 
 		catch (err) {	// module at path does not yet exists so prime
-			Log(">>>>>>>>>>>>>>>>>>>>>>prime !!!", err);
-			if ( false )  { // careful!!
+			if ( true )  { // careful!!
 				CP.exec( `cp ./notebooks/temp.js ./notebooks/${name}.js --no-clobber`, err => {
 					if (err) 
 						cb(err);
 
 					else {
 						try {	// prime and process the plugin's script
-							var mod = require(path);
-							procScript( sql, name, path, mod );
+							const mod = require( `./notebooks/${name}` );
+							Log(">>>prime", name);
+							//Log(">>>mod req", name, mod);
+							procScript( sql, name, mod );
 							primeArtifacts( name, "mylogin" );
 							cb(null);
 						}
@@ -6691,7 +6703,7 @@ IDList=
 						}
 					}
 				});
-				primeArtifacts( name, "mylogin" );
+				//primeArtifacts( name, "mylogin" );
 			}
 
 			else
