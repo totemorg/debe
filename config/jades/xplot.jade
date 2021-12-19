@@ -121,7 +121,7 @@ append base_head
 					width: parseInt("#{query.w}") || 1200,
 					height: parseInt("#{query.h}") || 500
 				},
-				sort: "#{query.sort}",
+				sort: "#{query.sort}" ? true : false,
 				debug: parseInt("#{query.debug}") || 0,
 				markers: "#{query.markers}".eval( "CIrcle,SQuare,CRoss,Diamond,Triangle-Up,Triangle-Down,STar,WYE", stash ),
 				styles: "#{query.styles}".eval( "blacK,Red,Green,Yellow,Blue,Orange,Pink,HotPink,DeepPink,IndianRed,DarkRed,Violet,Purple,SlateBlue,DarkBlue,skYBlue,ForestGreen,PerU", stash ),

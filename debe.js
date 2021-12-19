@@ -1308,12 +1308,12 @@ as described in the [Notebooks api](/api.view). `,
 					
 					function openBrowser(type,query) {
 						CP.exec( `firefox ${site.master}/${book}.${type}`.tag("?",query||{})+"", err => logRun(err||"ok") );
-						if (toggle.chain) return $me;
+						return toggle.chain ? $me : null;
 					}
 					
 					function runCommand( cmd, log ) {
 						CP.exec( cmd, log );
-						if (toggle.chain) return $me;
+						return toggle.chain ? $me : null;
 					}
 
 					const 
@@ -1325,16 +1325,43 @@ as described in the [Notebooks api](/api.view). `,
 							
 							insert: vals => sqlThread( sql => 
 								sql.query( isString(vals) 
-									? `INSERT INTO ? SET ${vals}`
-									: "INSERT INTO ? SET ?",
+									? `INSERT INTO ?? SET ${vals}`
+									: "INSERT INTO ?? SET ?",
 									[ $ds, vals ], err => logRun( err || "ok" ) )),
 							
 							delete: usecase => sqlThread( sql => 
 								sql.query(
 									isString(usecase)
-									? `DELETE FROM ? WHERE ${usecase}`
-									: "DELETE FROM ? WHERE ?",
+									? `DELETE FROM ?? WHERE ${usecase}`
+									: "DELETE FROM ?? WHERE ?",
 									[$ds, {Name:usecase}], err => logRun( err || "ok" ) )),
+							
+							update: (usecase,vals) => sqlThread( sql => 
+								sql.query(
+									isString(usecase)
+									? `UPDATE ?? SET ? WHERE ${usecase}`
+									: "UPDATE ?? SET ? WHERE ?",
+									[$ds, vals, {Name:usecase}], err => logRun( err || "ok" ) )),
+							
+							blog: (pat,sub) => {
+								const 
+									key = "Description",
+									fix = {},
+									Pat = new RegExp( pat
+											.replace("$","\\$")
+											.replace("*","\\{.*\\}") );
+								
+								if ( index = foci[book] )
+									$me( index, ctx => {
+										console.log(key, ":", Pat, "=>", sub);
+
+										fix[key] = ctx[key].replace(Pat,sub);
+										$me( index, fix );
+									});
+
+								else
+									console.log( `Use ${$book}.focus("USECASE") to set focus` );
+							},
 							
 							plot: ( ...args) => {
 								const 
@@ -1358,11 +1385,11 @@ as described in the [Notebooks api](/api.view). `,
 								//return $me;
 							},
 							chain: query => toggle.chain = !toggle.chain,
-							blog: data => $me( "?Description", data ),
+							//blog: data => $me( "?Description", data ),
 							edit: query => runCommand( `code ./notebooks/${book}.js`, logRun ),
-							focus: usecase => {
-								if (usecase) 
-									return foci[book] = usecase;
+							focus: index => {
+								if (index) 
+									return foci[book] = index;
 								
 								else
 									return foci[book];
@@ -1421,8 +1448,8 @@ as described in the [Notebooks api](/api.view). `,
 							if ( index )
 								if ( isString(index) ) {
 									const
-										[usecase,query] = index.split("?"),
-										$usecase = {Name: usecase || foci[book] || "noFocus"};
+										[usecase,query] = (index || foci[book]).split("?"),
+										$usecase = {Name: usecase || "noFocus"};
 
 									if ( query ) 
 										if ( cb )
@@ -1482,23 +1509,34 @@ as described in the [Notebooks api](/api.view). `,
 												});
 
 										else
-											Log( "no callback||data provided" );
+											Log( "no callback and no data provided" );
 
 									else
-										sqlThread( sql => {
-											sql.getKeys( $ds, "Field NOT LIKE 'Save%'", ({Field,Type}) => {
-												sql.query( `SELECT ${Field.join(',')} FROM ?? WHERE ?`, [$ds,$usecase], (err,recs) => {
-													var ctx = recs[0] || {};
-													
-													Field.forEach( (key,i) => {
-														if ( Type[i] == "json" )
-															ctx[key] = JSON.parse( ctx[key] );
+									if ( cb )
+										if ( isFunction(cb) )
+											sqlThread( sql => {
+												sql.getContext( $ds, $usecase, cb );
+												/*sql.getKeys( $ds, "Field NOT LIKE 'Save%'", ({Field,Type}) => {
+													sql.query( `SELECT ${Field.join(',')} FROM ?? WHERE ?`, [$ds,$usecase], (err,recs) => {
+														var ctx = recs[0] || {};
+
+														Field.forEach( (key,i) => {
+															if ( Type[i] == "json" )
+																ctx[key] = JSON.parse( ctx[key] );
+														});
+
+														cb( err ? null : ctx, vm);
 													});
-													
-													cb( err ? null : ctx, vm);
-												});
+												});*/
 											});
-										});
+									
+										else
+											sqlThread( sql => {
+												sql.query(
+													"UPDATE ?? SET ? WHERE ?",
+													[ $ds, cb, $usecase ],
+													err => logRun(err || "ok") );												
+											});
 								}
 
 								else
