@@ -725,14 +725,6 @@ const
 	$libs: {   // share these modules with engines
 		/**
 		*/
-		$lab: (ctx,cb) => {
-			//Log(">>>lab", ctx,cb+"");
-			ctx.$ctx = ctx;
-			VM.runInContext( `(${cb})($ctx)` , VM.createContext(Copy($libs,ctx)));
-		},
-		
-		/**
-		*/
 		$get: (src,index,cb) => {
 			if ( src.forEach )
 				return ENUMS.getList(src,index,cb);
@@ -1417,44 +1409,19 @@ as described in the [Notebooks api](/api.view). `,
 							publish: query => openBrowser("pub",query),
 							stores: query => openBrowser("stores",query)
 						}, (index, cb) => {
-							function runNotebook(sql, ctx, cb) {
-								const
-									req = {
+							function runNotebook(ctx) {
+								console.log( `Running ${book}` );
+								
+								sqlThread( sql => {
+									runPlugin({
 										sql: sql,
 										table: book,
 										query: ctx,
 										type: "exe"
-									};
-
-								runPlugin(req, err => cb || logRun );
+									}, stat => logRun(stat) );
+								});
 							}
 							
-							function vm(ctx) {
-								sqlThread( sql => runNotebook(sql, ctx, logRun) );
-							}
-													
-							/*
-							function run(ctx) {
-								sqlThread( sql => {
-									sql.getKeys( $ds, "FIELD NOT LIKE Save*", keys => { 
-										sql.query( `SELECT ${keys} FROM ?? WHERE ?`, [$ds,$usecase], (err,recs) => {
-											sql.query( "SELECT Code FROM app.engines WHERE ??", [$ds,$engine], (err,recs) => {
-												const														
-													ctx = VM.createContext(recs[0] || {});
-
-												Log("ctx", ctx);
-
-											index({ 
-												ctx: ctx, 
-												vm: args => {
-													Log("exec", 
-												}
-											});
-										});
-									});
-								});
-							} */
-
 							if ( index )
 								if ( isString(index) ) {
 									const
@@ -1462,91 +1429,87 @@ as described in the [Notebooks api](/api.view). `,
 										$usecase = {Name: usecase || "noFocus"};
 
 									if ( query ) 
-										if ( cb )
-											if ( isFunction(cb) )
-												sqlThread( sql => {
-													const
-														[store,key] = query.split("$");
+										if ( isFunction(cb || runNotebook) )
+											sqlThread( sql => {		// run notebook in requested context
+												const
+													[store,key] = query.split("$");
 
-													if ( query.indexOf("$") >= 0 )
-														sql.query(
-															`SELECT json_extract(${store}, '$${key}') AS ${store} FROM ?? WHERE ? LIMIT 1`,
-															[ $ds, $usecase ], (err,recs) => {
+												if ( query.indexOf("$") >= 0 )
+													sql.query(
+														`SELECT json_extract(${store}, '$${key}') AS ${store} FROM ?? WHERE ? LIMIT 1`,
+														[ $ds, $usecase ], (err,recs) => {
 
-																if ( err ) 
-																	Log(err);
+															if ( err ) 
+																Log(err);
 
-																else
-																if ( ctx = recs[0] ) {
-																	ctx[store] = JSON.parse(ctx[store]);
-																	cb( ctx, vm );
-																}
+															else
+															if ( ctx = recs[0] ) {
+																ctx[store] = JSON.parse(ctx[store]);
+																(cb||runNotebook)( ctx );
+															}
 
-															});
-
-													else
-														sql.query(
-															`SELECT ${store.split('&').join(',')} FROM ?? WHERE ? LIMIT 1`,
-															[ $ds, $usecase ], (err,recs) => {
-																
-																if ( err ) 
-																	Log(err);
-
-																else
-																if ( ctx = recs[0] )
-																	cb( ctx, vm );
-																
-															}); 
-												});
-
-											else 
-												sqlThread( sql => {
-													const
-														[store,key] = query.split("$"),
-														val = JSON.stringify(cb);
-
-													if ( query.indexOf("$") >= 0 )
-														sql.query(
-															`UPDATE ?? SET ${store} = json_set(${store}, '$${key}', cast(? AS JSON)) WHERE ?`, 
-															[ $ds, val, $usecase ],
-															err => logRun(err || "ok") );
-
-													else
-														sql.query(
-															`UPDATE ?? SET ${store} = ? WHERE ?`,
-															[ $ds, val, $usecase ],
-															err => logRun(err || "ok") );
-												});
-
-										else
-											Log( "no callback and no data provided" );
-
-									else
-									if ( cb )
-										if ( isFunction(cb) )
-											sqlThread( sql => {
-												sql.getContext( $ds, $usecase, cb );
-												/*sql.getKeys( $ds, "Field NOT LIKE 'Save%'", ({Field,Type}) => {
-													sql.query( `SELECT ${Field.join(',')} FROM ?? WHERE ?`, [$ds,$usecase], (err,recs) => {
-														var ctx = recs[0] || {};
-
-														Field.forEach( (key,i) => {
-															if ( Type[i] == "json" )
-																ctx[key] = JSON.parse( ctx[key] );
 														});
 
-														cb( err ? null : ctx, vm);
+												else
+													sql.query(
+														`SELECT ${store.split('&').join(',')} FROM ?? WHERE ? LIMIT 1`,
+														[ $ds, $usecase ], (err,recs) => {
+
+															if ( err ) 
+																Log(err);
+
+															else
+															if ( ctx = recs[0] )
+																(cb||runNotebook)( ctx );
+
+														}); 
+											});
+
+										else 
+											sqlThread( sql => {		// update notebook context with specifed hash
+												const
+													[store,key] = query.split("$"),
+													val = JSON.stringify(cb);
+
+												if ( query.indexOf("$") >= 0 )
+													sql.query(
+														`UPDATE ?? SET ${store} = json_set(${store}, '$${key}', cast(? AS JSON)) WHERE ?`, 
+														[ $ds, val, $usecase ],
+														err => logRun(err || "ok") );
+
+												else
+													sql.query(
+														`UPDATE ?? SET ${store} = ? WHERE ?`,
+														[ $ds, val, $usecase ],
+														err => logRun(err || "ok") );
+											});
+
+									else
+									if ( isFunction(cb || runNotebook) )
+										sqlThread( sql => {		// run notebook
+											sql.getContext( $ds, $usecase, cb || runNotebook );
+											/*sql.getKeys( $ds, "Field NOT LIKE 'Save%'", ({Field,Type}) => {
+												sql.query( `SELECT ${Field.join(',')} FROM ?? WHERE ?`, [$ds,$usecase], (err,recs) => {
+													var ctx = recs[0] || {};
+
+													Field.forEach( (key,i) => {
+														if ( Type[i] == "json" )
+															ctx[key] = JSON.parse( ctx[key] );
 													});
-												});*/
-											});
-									
-										else
-											sqlThread( sql => {
-												sql.query(
-													"UPDATE ?? SET ? WHERE ?",
-													[ $ds, cb, $usecase ],
-													err => logRun(err || "ok") );												
-											});
+
+													cb( err ? null : ctx, vm);
+												});
+											});*/
+										});
+
+									else
+										sqlThread( sql => {	// update notebook context
+											sql.query(
+												"UPDATE ?? SET ? WHERE ?",
+												[ $ds, cb, $usecase ],
+												err => logRun(err || "ok") );												
+										});
+
 								}
 
 								else
@@ -1557,13 +1520,13 @@ as described in the [Notebooks api](/api.view). `,
 												index({ 
 													keys: Field,
 													cases: err ? null : recs.get("Name").Name
-												}, vm);
+												});
 											});
 										});
 									});
-								
+
 								else
-									sqlThread( sql => runNotebook(sql, Copy( index, $engine )) );
+									runNotebook(Copy( index, $engine ));
 
 							else
 								sqlThread( sql => {
@@ -1587,7 +1550,7 @@ Keys:
 									});
 								});
 							
-							if (toggle.chain) return $me;
+							return toggle.chain ? $me : null;
 						});
 				});
 				cb();
