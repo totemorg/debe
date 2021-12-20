@@ -756,7 +756,60 @@ const
 		/**
 		See [jsdb]{@link https://github.com/totemstan/jsdb/}
 		*/
-		$sql: sqlThread,
+		$sql: cb => {
+			const sql = this;
+			
+			if ( cb )
+				sqlThread( sql => {
+					switch ( cb.name ) {
+						case "books":
+						case "notebooks":
+							return sql.getTables( "app", tables => cb(tables) );
+
+						default:
+							const 
+								[book, info] = cb.name.split("_");
+
+							switch (info) {
+								case "allkeys":
+								case "keys":
+									return sql.getKeys( "app."+book, "", keys => cb(keys) );
+
+								case "jsonkeys":
+									return sql.getJsons( "app."+book, keys => cb(keys) );
+
+								case "textkeys":
+									return sql.getTexts( "app."+book, keys => cb(keys) );
+
+								case "searchkeys":
+									return sql.getSearchables( "app."+book, keys => cb(keys) );
+
+								case "geokeys":
+									return sql.getGeometries( "app."+book, keys => cb(keys) );
+
+								case "savekeys":
+									return sql.getKeys( "app."+book, "Field LIKE 'Save%'", keys => cb(keys) );
+
+								case "contextkeys":
+								case "ctxkeys":
+									return sql.getKeys( "app."+book, "Field NOT LIKE 'Save%'", keys => cb(keys) );
+
+								default:
+									cb( sql );
+							}
+					}
+				});
+			
+			else
+				console.log(`
+Usage:
+	$sql( function notebooks(info) { } )
+	$sql( function help() { } )
+	$sql( function NOTEBOOK_[all||json|test|search|geo|save|context]keys() { } )
+	$sql( sql => { } )
+`);
+				
+		},
 		/**
 		See [jsdb]{@link https://github.com/totemstan/jsdb/}
 		*/
@@ -771,7 +824,10 @@ const
 		$each: Each,
 		/**
 		*/
-		$api: () => CP.exec( `firefox ${site.master}/labapi.view` )
+		$api: () => {
+			CP.exec( `firefox ${site.master}/labapi.view` );
+			return null;
+		}
 	},
 	
 	/**
@@ -1362,7 +1418,7 @@ as described in the [Notebooks api](/api.view). `,
 									});
 
 								else
-									console.log( `Use ${$book}.focus("USECASE?KEY") to set the focus` );
+									console.log( '${$book}.blog("LEAD$KEY*END", "UPDATE")' );
 							},
 							
 							plot: ( ...args) => {
@@ -1540,7 +1596,7 @@ Usage:
 	${$book}.brief( { KEY: VALUE, ... } ) 
 	${$book}.blog( { KEY: VALUE, ... } ) 
 	${$book}.plot( DATA || "STORE", ... )
-	${$book}.focus( "USECASE" )
+	${$book}.focus( "USECASE" || "USECASE?KEY" )
 	${$book}.edit( ) 
 	${$book}.help( )
 
