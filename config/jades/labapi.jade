@@ -15,8 +15,9 @@
 	[$](https://www.github.com/totemstan/man).FUNCTION( ARG, ... )  
 
 	# Notebook execution
-	[$NOTEBOOK](https://www.github.com/totemstan/debe)( "USECASE?STORE$.KEY" || "USECASE", {KEY:VALUE, ... } )  
-	[$NOTEBOOK](https://www.github.com/totemstan/debe)( "USECASE?STORE$.KEY" || "USECASE" || {...}, CTX => { ... } )  
+	[$NOTEBOOK](https://www.github.com/totemstan/debe)( "USECASE?STORE$.KEY" || "USECASE?KEY" || "USECASE", {SETKEY:NEWVALUE, ... } )  
+	[$NOTEBOOK](https://www.github.com/totemstan/debe)( "USECASE?STORE$.KEY" || "USECASE?KEY" || "USECASE" || {...}, CTX => { ... } )  
+	[$NOTEBOOK](https://www.github.com/totemstan/debe)( "USECASE?STORE$.KEY" || "USECASE?KEY" || "USECASE" || {...} )  
 	[$NOTEBOOK](https://www.github.com/totemstan/debe)( {keys:[...], cases:[...]} => { ... } )  
 
 	# Notebook UIs
@@ -25,9 +26,9 @@
 	[$NOTEBOOK.plot](https://www.github.com/totemstan/debe)( DATA || "STORE", ... )  
 
 	# Notebook access
-	[$NOTEBOOK.focus](https://www.github.com/totemstan/debe)( "USECASE" || "USECASE?KEY" )  
+	[$NOTEBOOK.focus](https://www.github.com/totemstan/debe)( "USECASE?STORE$.KEY" || "USECASE?KEY" || "USECASE" )  
 	[$NOTEBOOK.edit](https://www.github.com/totemstan/debe)( )  
-	[$NOTEBOOK.blog](https://www.github.com/totemstan/debe)( {KEY:VALUE, ... } )  
+	[$NOTEBOOK.blog](https://www.github.com/totemstan/debe)( "PREFIX$KEY*POSTFIX", "UPDATE"  )  
 
 	# Notebook revisors
 	[$NOTEBOOK.insert](https://www.github.com/totemstan/debe)( {KEY: VALUE, ...} || "KEY=VALUE, ..." )  

@@ -1380,7 +1380,7 @@ as described in the [Notebooks api](/api.view). `,
 									});
 
 								else
-									console.log( '${$book}.blog("LEAD$KEY*END", "UPDATE")' );
+									console.log( '${$book}.blog("LEAD$KEY*POST", "UPDATE")' );
 							},
 							
 							plot: ( ...args) => {
@@ -1405,7 +1405,6 @@ as described in the [Notebooks api](/api.view). `,
 								//return $me;
 							},
 							chain: query => toggle.chain = !toggle.chain,
-							//blog: data => $me( "?Description", data ),
 							edit: query => runCommand( `code ./notebooks/${book}.js`, logRun ),
 							focus: index => {
 								if (index) 
@@ -1417,23 +1416,29 @@ as described in the [Notebooks api](/api.view). `,
 							keys: (query,cb) => {
 								sqlThread( sql => {
 									switch ( (query||"").toLowerCase()) {
+										case "cases": 
+											sql.query("SELECT Name FROM ??", [$ds], (err,recs) => (cb||$log)(recs.get("Name").Name));
+											break;
+													  
 										case "save":
-											sql.getKeys( $book, "Field LIKE 'Save%'", keys => cb(keys) );
+										case "!context":
+										case "!ctx":
+											sql.getKeys( $ds, "Field LIKE 'Save%'", keys => (cb||$log)(keys) );
 											break;
 										
 										case "!save":
 										case "context":
 										case "ctx":
-											sql.getKeys( $book, "Field NOT LIKE 'Save%'", keys => cb(keys) );
+											sql.getKeys( $ds, "Field NOT LIKE 'Save%'", keys => (cb||$log)(keys) );
 											break;
 											
 										case "all":
 										case "":
-											sql.getKeys( $book, "", keys => cb(keys) );
+											sql.getKeys( $ds, "", keys => (cb||$log)(keys) );
 											break;
 											
 										default:
-											sql.getKeys( $book, {Type:query}, keys => cb(keys) );
+											sql.getKeys( $ds, {Type:query}, ({Field}) => (cb||$log)(Field) );
 									}
 								});											
 							},
@@ -1528,18 +1533,6 @@ as described in the [Notebooks api](/api.view). `,
 									if ( isFunction(cb || runNotebook) )
 										sqlThread( sql => {		// run notebook
 											sql.getContext( $ds, $usecase, cb || runNotebook );
-											/*sql.getKeys( $ds, "Field NOT LIKE 'Save%'", ({Field,Type}) => {
-												sql.query( `SELECT ${Field.join(',')} FROM ?? WHERE ?`, [$ds,$usecase], (err,recs) => {
-													var ctx = recs[0] || {};
-
-													Field.forEach( (key,i) => {
-														if ( Type[i] == "json" )
-															ctx[key] = JSON.parse( ctx[key] );
-													});
-
-													cb( err ? null : ctx, vm);
-												});
-											});*/
 										});
 
 									else
@@ -1573,14 +1566,16 @@ as described in the [Notebooks api](/api.view). `,
 									sql.getKeys( $ds, "", ({Field}) => { 
 										console.log(`
 Usage:
-	${$book}( "USECASE?STORE$.KEY" || "USECASE?STORE$[KEY] || ...", PUTDATA || GETDATA => { ... } ) 
+	${$book}( "USECASE?STORE$KEY" || "USECASE?KEY || "USECASE" || || ...", {SETKEY:NEWVAUE, ...} )
+	${$book}( "USECASE?STORE$KEY" || "USECASE?KEY || "USECASE" || || ...", CTX => { ... } ) 
 	${$book}( "USECASE" || {...}, RESULTS => { ... } ) 
 	${$book}( {keys:[...], cases:[...]} => { ... } )  
 	${$book}.run( { KEY: VALUE, ... } ) 
 	${$book}.brief( { KEY: VALUE, ... } ) 
-	${$book}.blog( { KEY: VALUE, ... } ) 
+	${$book}.blog( "PREFIX$KEY*POSTFIX", "UPDATE" ) 
 	${$book}.plot( DATA || "STORE", ... )
-	${$book}.focus( "USECASE" || "USECASE?KEY" )
+	${$book}.keys( "TYPE", keys => { ... } )
+	${$book}.focus( "USECASE?STORE$.KEY" || "USECASE?KEY" || "USECASE" )
 	${$book}.edit( ) 
 	${$book}.help( )
 
