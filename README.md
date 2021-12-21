@@ -371,12 +371,12 @@ config({
         * [.$log](#module_DEBE..$libs.$log)
         * [.$task](#module_DEBE..$libs.$task)
         * [.$jimp](#module_DEBE..$libs.$jimp)
+        * [.$sql](#module_DEBE..$libs.$sql)
         * [.$neo](#module_DEBE..$libs.$neo)
         * [.$copy](#module_DEBE..$libs.$copy)
         * [.$each](#module_DEBE..$libs.$each)
         * [.$get()](#module_DEBE..$libs.$get)
         * [.$ran()](#module_DEBE..$libs.$ran)
-        * [.$sql()](#module_DEBE..$libs.$sql)
         * [.$api()](#module_DEBE..$libs.$api)
     * [~tableRoutes.](#module_DEBE..tableRoutes.)
     * [~defaultDocs](#module_DEBE..defaultDocs)
@@ -483,12 +483,12 @@ config({
     * [.$log](#module_DEBE..$libs.$log)
     * [.$task](#module_DEBE..$libs.$task)
     * [.$jimp](#module_DEBE..$libs.$jimp)
+    * [.$sql](#module_DEBE..$libs.$sql)
     * [.$neo](#module_DEBE..$libs.$neo)
     * [.$copy](#module_DEBE..$libs.$copy)
     * [.$each](#module_DEBE..$libs.$each)
     * [.$get()](#module_DEBE..$libs.$get)
     * [.$ran()](#module_DEBE..$libs.$ran)
-    * [.$sql()](#module_DEBE..$libs.$sql)
     * [.$api()](#module_DEBE..$libs.$api)
 
 <a name="module_DEBE..$libs.$"></a>
@@ -513,6 +513,12 @@ See [debe](https://github.com/totemstan/debe/)
 
 #### $libs.$jimp
 See [man](https://github.com/totemstan/man/)
+
+**Kind**: static property of [<code>$libs</code>](#module_DEBE..$libs)  
+<a name="module_DEBE..$libs.$sql"></a>
+
+#### $libs.$sql
+See [jsdb](https://github.com/totemstan/jsdb/)
 
 **Kind**: static property of [<code>$libs</code>](#module_DEBE..$libs)  
 <a name="module_DEBE..$libs.$neo"></a>
@@ -541,12 +547,6 @@ See [enums](https://github.com/totemstan/enums/)
 
 #### $libs.$ran()
 See [man](https://github.com/totemstan/man/)
-
-**Kind**: static method of [<code>$libs</code>](#module_DEBE..$libs)  
-<a name="module_DEBE..$libs.$sql"></a>
-
-#### $libs.$sql()
-See [jsdb](https://github.com/totemstan/jsdb/)
 
 **Kind**: static method of [<code>$libs</code>](#module_DEBE..$libs)  
 <a name="module_DEBE..$libs.$api"></a>

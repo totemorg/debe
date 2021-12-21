@@ -1,5 +1,5 @@
 :markdown
-	# Data enumerators, generators, and extractors
+	# Data processing
 	[$log](https://www.github.com/totemstan/enums)( ... )  
 	[$trace](https://www.github.com/totemstan/enums)( "MESSAGE" )  
 	[$pipe](https://www.github.com/totemstan/pipe)( BATCH => { if (BATCH) { do whatever } else { stream ended } )  
@@ -9,8 +9,8 @@
 	[$copy](https://www.github.com/totemstan/enums)( SRC, TAR, "DEEP" )  
 	[$each](https://www.github.com/totemstan/enums)( OBJ, (KEY, VAL) => {...} )  
 	[$get](https://www.github.com/totemstan/man)( [...], "KEY=EVAL & ..." || (i,A) => { ... } )  
-	[$get](https://www.github.com/totemstan/man)( "FILE ? _OPTION=VALUE & ... & KEY=EVAL & ..." , BATCH => { ... } )  
-	[$sql](https://www.github.com/totemstan/jsdb)( function OPTION( info => { } ) || sql => { ... } )  	
+	[$get](https://www.github.com/totemstan/man)( "FILE ? \_OPTION=VALUE & KEY=VALUE & KEY:=STORE$QUERY ..." , BATCH => { ... } )  
+	[$sql](https://www.github.com/totemstan/jsdb)( sql => { ... } )  
 	[$](https://www.github.com/totemstan/man)( "[MATHJS](https://mathjs.org/)", CTX )  
 	[$](https://www.github.com/totemstan/man).FUNCTION( ARG, ... )  
 
@@ -29,7 +29,7 @@
 	[$NOTEBOOK.edit](https://www.github.com/totemstan/debe)( )  
 	[$NOTEBOOK.blog](https://www.github.com/totemstan/debe)( {KEY:VALUE, ... } )  
 
-	# Notebook UI revisors
+	# Notebook revisors
 	[$NOTEBOOK.insert](https://www.github.com/totemstan/debe)( {KEY: VALUE, ...} || "KEY=VALUE, ..." )  
 	[$NOTEBOOK.delete](https://www.github.com/totemstan/debe)( {KEY: VALUE, ...} || "KEY=VALUE AND ..." )  
 	[$NOTEBOOK.update](https://www.github.com/totemstan/debe)( {KEY: VALUE, ...} || "KEY=VALUE AND ..." )  

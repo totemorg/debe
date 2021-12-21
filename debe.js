@@ -49,6 +49,7 @@ const
 	{ exec } = CP,
 	{ Copy,Each,
 	 isKeyed,isString,isFunction,isError,isArray,isObject,isEmpty,
+	 getList, getURL,
 	 typeOf,Stream, Fetch } = ENUMS,
 	{ readers, scanner } = READ,
 	{ skinContext, renderSkin, renderJade } = SKIN,
@@ -723,14 +724,25 @@ const
 	/**
 	*/
 	$libs: {   // share these modules with engines
+		$notebooks: [],
+		
 		/**
 		*/
 		$get: (src,index,cb) => {
-			if ( src.forEach )
-				return ENUMS.getList(src,index,cb);
+			switch (src.constructor.name) {
+				case "Array":
+					return getList(src,index,cb);
 			
-			else
-				ENUMS.getURL(src,index);
+				case "String":
+					return getURL(src,index);
+			
+				default: 
+					console.log(`
+Usage:
+	$get( [...], "KEY=EVAL & ..." || (i,A) => { ... } )
+	$get( "FILE ? _OPTION=VALUE & ... & KEY=EVAL & ..." , BATCH => { ... } )
+`);
+			}
 		},
 		
 		/**
@@ -756,60 +768,7 @@ const
 		/**
 		See [jsdb]{@link https://github.com/totemstan/jsdb/}
 		*/
-		$sql: cb => {
-			const sql = this;
-			
-			if ( cb )
-				sqlThread( sql => {
-					switch ( cb.name ) {
-						case "books":
-						case "notebooks":
-							return sql.getTables( "app", tables => cb(tables) );
-
-						default:
-							const 
-								[book, info] = cb.name.split("_");
-
-							switch (info) {
-								case "allkeys":
-								case "keys":
-									return sql.getKeys( "app."+book, "", keys => cb(keys) );
-
-								case "jsonkeys":
-									return sql.getJsons( "app."+book, keys => cb(keys) );
-
-								case "textkeys":
-									return sql.getTexts( "app."+book, keys => cb(keys) );
-
-								case "searchkeys":
-									return sql.getSearchables( "app."+book, keys => cb(keys) );
-
-								case "geokeys":
-									return sql.getGeometries( "app."+book, keys => cb(keys) );
-
-								case "savekeys":
-									return sql.getKeys( "app."+book, "Field LIKE 'Save%'", keys => cb(keys) );
-
-								case "contextkeys":
-								case "ctxkeys":
-									return sql.getKeys( "app."+book, "Field NOT LIKE 'Save%'", keys => cb(keys) );
-
-								default:
-									cb( sql );
-							}
-					}
-				});
-			
-			else
-				console.log(`
-Usage:
-	$sql( function notebooks(info) { } )
-	$sql( function help() { } )
-	$sql( function NOTEBOOK_[all||json|test|search|geo|save|context]keys() { } )
-	$sql( sql => { } )
-`);
-				
-		},
+		$sql: sqlThread,
 		/**
 		See [jsdb]{@link https://github.com/totemstan/jsdb/}
 		*/
@@ -1340,9 +1299,10 @@ as described in the [Notebooks api](/api.view). `,
 			if (cb) cb();
 		}
 
-		function initNIF(cb) {
+		function initLAB(cb) {
 			const 
 				foci = {},
+				{ $notebooks } = $libs,
 				repo = "https://github.com/totemstan",
 				toggle = {
 					chain: false
@@ -1372,6 +1332,8 @@ as described in the [Notebooks api](/api.view). `,
 						return toggle.chain ? $me : null;
 					}
 
+					$notebooks.push(book);
+					
 					const 
 						$book = "$"+book,
 						$ds = "app."+book,
@@ -1452,7 +1414,29 @@ as described in the [Notebooks api](/api.view). `,
 								else
 									return foci[book];
 							},
-							
+							keys: (query,cb) => {
+								sqlThread( sql => {
+									switch ( (query||"").toLowerCase()) {
+										case "save":
+											sql.getKeys( $book, "Field LIKE 'Save%'", keys => cb(keys) );
+											break;
+										
+										case "!save":
+										case "context":
+										case "ctx":
+											sql.getKeys( $book, "Field NOT LIKE 'Save%'", keys => cb(keys) );
+											break;
+											
+										case "all":
+										case "":
+											sql.getKeys( $book, "", keys => cb(keys) );
+											break;
+											
+										default:
+											sql.getKeys( $book, {Type:query}, keys => cb(keys) );
+									}
+								});											
+							},
 							run: query => openBrowser("run",query),
 							open: query => openBrowser("run",query),
 							xpdf: query => openBrowser("xpdf",query),
@@ -1631,7 +1615,7 @@ Keys:
 			});
 		});
 		
-		initNIF( () => {  // init nootbook i/f
+		initLAB( () => {  // init nootbook i/f
 		initENV( () => {  // init environment
 		initSES( () => {  // init sessions
 			
