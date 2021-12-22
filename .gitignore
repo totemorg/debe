@@ -9,3 +9,6 @@ _*
 /captcha/
 /tmp/**
 /pubmin/**
+/config/notebooks/**
+/config/stores/**
+/uploads/**
