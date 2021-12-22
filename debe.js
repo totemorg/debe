@@ -1238,44 +1238,44 @@ as described in the [Notebooks api](/api.view). `,
 				.default('spawn',DEBE.isSpawned)
 				.boolean('spawn')
 				.describe('spawn','internal hyper-threading option')
-				.check(function (argv) {
+				.check( argv => {
 					DEBE.isSpawned = argv.spawn;
 				})
 
 				.default('blind',DEBE.blindTesting)
 				.boolean('blind')
 				.describe('blind','internal testing flag')  
-				.check(function (argv) {
+				.check( argv => {
 					DEBE.blindTesting = argv.blind;
 				})
 
 				.default('dump',false)
 				.boolean('dump')
 				.describe('dump','display derived site parameters')  
-				.check(function (argv) {
+				.check( argv => {
 					//Log(site);
 				})
 
 				/*
 				.default('start',DEBE.site.Name)
 				.describe('start','service to start')  
-				.check(function (argv) {
-					DEBE.site.Name = argv.start;
+				.check( argv => {
+					site.Name = argv.start;
 				})
 				* */
 
 				.boolean('version')
 				.describe('version','display current version')
-				.check(function(argv) {
+				.check( argv => {
 					if (argv.version) 
-						Log(DEBE.site);
+						Log(site);
 				})
 
 				/*
 				.default('echo',DEBE.FLAGS.DEBUG)
 				.boolean('echo')
 				.describe('echo','echo adjusted http request parameters')
-				.check(function(argv) {
+				.check( argv => {
 					DEBE.FLAGS.DEBUG = argv.echo;
 				})*/
 
@@ -1570,14 +1570,6 @@ Usage:
 	${$book}( "USECASE?STORE$KEY" || "USECASE?KEY || "USECASE" || || ...", CTX => { ... } ) 
 	${$book}( "USECASE" || {...}, RESULTS => { ... } ) 
 	${$book}( {keys:[...], cases:[...]} => { ... } )  
-	${$book}.run( { KEY: VALUE, ... } ) 
-	${$book}.brief( { KEY: VALUE, ... } ) 
-	${$book}.blog( "PREFIX$KEY*POSTFIX", "UPDATE" ) 
-	${$book}.plot( DATA || "STORE", ... )
-	${$book}.keys( "TYPE", keys => { ... } )
-	${$book}.focus( "USECASE?STORE$.KEY" || "USECASE?KEY" || "USECASE" )
-	${$book}.edit( ) 
-	${$book}.help( )
 
 Keys:
 	${Field.join(",")}
@@ -4865,7 +4857,7 @@ size, pixels, scale, step, range, detects, infile, outfile, channel.  This endpo
 		note: renderSkin,
 		run: renderSkin,
 		plugin: renderSkin,
-		site: renderSkin,
+		//site: renderSkin,
 		brief: renderSkin,
 		pivot: renderSkin,
 		exam: renderSkin,
@@ -4896,6 +4888,7 @@ size, pixels, scale, step, range, detects, infile, outfile, channel.  This endpo
 		exe: exePlugin,
 		pub: publishPlugin,
 		publish: publishPlugin,
+		wiki: wikiPlugin,
 		
 		js: getPlugin,
 		py: getPlugin,
@@ -4970,7 +4963,7 @@ size, pixels, scale, step, range, detects, infile, outfile, channel.  This endpo
 		
 		tag: (src,el,tags) => src.tag(el,tags),
 
-		map: [
+		sitemap: [
 			{a: "[Terms](http://totem.hopto.org/terms.view)" ,	
 			 b: "[Issues](http://totem.hopto.org/issues.view)", 
 			 c: "[Employee Portal](http://totem.hopto.org/portal.view)",
@@ -5638,6 +5631,10 @@ function savePage(req,res) {
 	switch (Type) {
 		case "pdf":
 		case "jpg":
+		case "jpeg":
+		case "png":
+		case "ppm":
+		case "bmp":
 		case "gif":
 			/*
 			CP.execFile( "node", ["phantomjs", "rasterize.js", url, docf, res], function (err,stdout) { 
@@ -6241,6 +6238,93 @@ float: left;
 	});
 }, */
 	
+function wikiPlugin(req,res) {
+	const 
+		{ query, sql, table, type, host, client } = req,
+		book = table,
+		ds = "app."+book,
+		inputs = {},
+		outputs = [],
+		keys = [];
+	
+	function genWikiPage( {keys,inputs,outputs,stats}, cb ) {
+		const
+			{ctime} = stats;
+		
+		renderJade( jade = `extends base
+append base_parms
+	- tech = "layout"
+append base_body
+	:markdown
+		The interface for TOTEM's **#{Name}** notebook is shown below<br><br> !{interface()}
+
+		And here is a ConOps picture:
+
+		model(inputs='#{inputs}',outputs='#{outputs}')
+
+	:markdown
+		Creation date: #{created}
+
+	p!= sitemap
+`, Copy( site, {
+			name: book,
+			Name: book.toUpperCase(),
+			filename: "./jades/ref.jade",
+			interface: () => keys.map(f => {
+				return {
+					Key: f.key, 
+					Type: f.type, 
+					Details: f.doc
+				}; 
+			}).gridify({}),
+			inputs: inputs,
+			outputs: outputs,
+			created: ctime
+		}), html => {
+			//Log(">>>html", html.length);
+			cb(html);
+		});
+		
+		//Log(jade);
+	}
+	
+	res( "Retrieve your WIKI page "+"here".link(`./uploads/${book}.html`) );
+	
+	sql.getKeysFull( ds, "", ({Field,Type,Comment}) => {
+		sql.Select(ds, {Pipe:"Pipe$"}, {}, {}, (err,recs) => {
+			recs.forEach( rec => {
+				if ( pipe = rec.Pipe ) 
+					inputs[ isString(pipe) ? pipe : pipe.Pipe || "" ] = "input";
+			});
+			
+			Field.map( (key,i) => {
+				if ( key.startsWith("Save") ) 
+					outputs.push(key);
+				
+				else
+					keys.push({
+						key: key,
+						type: Type[i],
+						doc: unescape(Comment[i])
+					});
+			});
+			
+			genWikiPage({
+				name: book,
+				keys: keys, 
+				inputs: Object.keys(inputs),
+				outputs: outputs,
+				stats: FS.statSync( `./notebooks/${book}.js` )
+			} , html => {
+				
+				FS.writeFile( `./uploads/${book}.html`, html, err => Log(err||"saved") );
+				
+			});
+		});
+	});
+	
+}
+
 function publishPlugin(req,res) {
 
 	function publishNotebook(sql, name, cb) {  // publish plugin at path = .../type/name

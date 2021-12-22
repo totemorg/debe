@@ -34,11 +34,11 @@ append site_body
 	- dsDims = [1200,800]
 	- tasks = []
 	- more = parseInt(query.more) || 0
-	- dsPath = query.src.replace(".run",".db?!Save_*")
+	- dsPath = query.src.replace(".run",".db?!Save*")
 	- links = {}
 	- addBrief = false
 	- addToU = false
-	
+
 	each val, key in {Export:"bool",Ingest:"bool",Pipe:"doc",Description:"doc",Entry:"json",Exit:"json",Save:"json"}
 		- links[key] = link("+", `/${ds}.mod?${val}=${key}`) + " / " + link("-", `/${ds}.mod?drop=${key}`) + " " + tag(key,"code",{}) + " = "
 

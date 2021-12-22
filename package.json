@@ -12,8 +12,8 @@
     "redoc": "jsdoc2md --template README.hbs --files debe.js >README.md; git commit -am 'redoc'; git  push agent master",
     "genio": "node debe.js blog http://localhost:8080/totemblog.view ./stash/index.html; cd stash; git commit -am 'reblog'; git push agent master",
     "raster": "node debe.js blog ${npm_config_in} ${npm_config_out}",
-	"lab": "node debe.js lab ",
-	"admin": "node debe.js admin "
+	"lab": "node debe.js lab",
+	"admin": "node debe.js admin"
   },
   "repository": {
     "type": "git",
