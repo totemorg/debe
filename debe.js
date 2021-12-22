@@ -1323,7 +1323,7 @@ as described in the [Notebooks api](/api.view). `,
 					}
 					
 					function openBrowser(type,query) {
-						CP.exec( `firefox ${site.master}/${book}.${type}`.tag("?",query||{})+"", err => logRun(err||"ok") );
+						CP.exec( `firefox ${site.master}/${book}.${type}`.tag("?",query||{})+"", err => logRun(err||errors.ok) );
 						return toggle.chain ? $me : null;
 					}
 					
@@ -1345,21 +1345,21 @@ as described in the [Notebooks api](/api.view). `,
 								sql.query( isString(vals) 
 									? `INSERT INTO ?? SET ${vals}`
 									: "INSERT INTO ?? SET ?",
-									[ $ds, vals ], err => logRun( err || "ok" ) )),
+									[ $ds, vals ], err => logRun( err || errors.ok ) )),
 							
 							delete: usecase => sqlThread( sql => 
 								sql.query(
 									isString(usecase)
 									? `DELETE FROM ?? WHERE ${usecase}`
 									: "DELETE FROM ?? WHERE ?",
-									[$ds, {Name:usecase}], err => logRun( err || "ok" ) )),
+									[$ds, {Name:usecase}], err => logRun( err || errors.ok ) )),
 							
 							update: (usecase,vals) => sqlThread( sql => 
 								sql.query(
 									isString(usecase)
 									? `UPDATE ?? SET ? WHERE ${usecase}`
 									: "UPDATE ?? SET ? WHERE ?",
-									[$ds, vals, {Name:usecase}], err => logRun( err || "ok" ) )),
+									[$ds, vals, {Name:usecase}], err => logRun( err || errors.ok ) )),
 							
 							blog: (pat,sub) => {
 								const 
@@ -1520,13 +1520,13 @@ as described in the [Notebooks api](/api.view). `,
 													sql.query(
 														`UPDATE ?? SET ${store} = json_set(${store}, '$${key}', cast(? AS JSON)) WHERE ?`, 
 														[ $ds, val, $usecase ],
-														err => logRun(err || "ok") );
+														err => logRun(err || errors.ok) );
 
 												else
 													sql.query(
 														`UPDATE ?? SET ${store} = ? WHERE ?`,
 														[ $ds, val, $usecase ],
-														err => logRun(err || "ok") );
+														err => logRun(err || errors.ok) );
 											});
 
 									else
@@ -1540,7 +1540,7 @@ as described in the [Notebooks api](/api.view). `,
 											sql.query(
 												"UPDATE ?? SET ? WHERE ?",
 												[ $ds, cb, $usecase ],
-												err => logRun(err || "ok") );												
+												err => logRun(err || errors.ok) );												
 										});
 
 								}
@@ -1996,7 +1996,7 @@ Keys:
 		db: (recs, req, res) => {	
 			res({ 
 				success: true,
-				msg: "ok",
+				msg: errors.ok,
 				count: recs.found || recs.length,
 				data: recs
 			});
@@ -2006,7 +2006,7 @@ Keys:
 				Log(">>>>>>", stat);
 				res({ 
 					success: true,
-					msg: "ok",
+					msg: errors.ok,
 					count: stat["found_rows()"] || 0,
 					data: recs
 				});
@@ -2515,7 +2515,7 @@ at the specified keys = KEY,...
 			if ( type == "help" ) 
 			return res("Provided image catalog service for src = dglobe | omar | ess.");
 
-			res("ok");
+			res(errors.ok);
 			switch (src) {
 				case "dglobe":
 				case "omar":
@@ -2743,7 +2743,7 @@ desired ring = [ [lat,lon], ....]
 			if ( type == "help" ) 
 			return res("Track client's link selections.");
 
-			res("ok");
+			res(errors.ok);
 
 			sql.query("INSERT INTO openv.follows SET ? ON DUPLICATE KEY UPDATE Count=Count+1,Event=now()", {
 				Goto: query.goto.split("?")[0], 
@@ -3316,6 +3316,7 @@ desired ring = [ [lat,lon], ....]
 								const
 									name = parent.split("/").pop(),
 									get = "http:"+src.tag("&",{name: name.substr(0,name.length-1), "json:":path.substr(1,path.length-2)});
+								
 								Log("fetch", get );
 								Fetch( get, txt => {
 
@@ -4091,21 +4092,22 @@ desired ring = [ [lat,lon], ....]
 		*/
 		restart: (req,res) => {
 			const
-				{sql,query,type} = req,
+				{sql,query,type,client,profile} = req,
 				{ delay, msg } = query;
 
 			if ( type == "help" )
 			return res("Restart system after a delay = SECONDS and notify all clients with the specifed msg = MESSAGE.");
 
-			if ( site.pocs.overlord.indexOf( req.client ) >= 0 ) {
-				res( "ok" );
+			//Log(client,profile);
+			if ( profile.Admin ) {
+				res( errors.ok );
 
 				query.msg = msg || `System restarting in ${delay} seconds`;
 
-				sysAlert(req, msg => Log( msg ) );
+				byTable.alert(req, msg => Log( msg ) );
 
 				setTimeout( () => {
-					Trace( "RESTART", new Date(), req );
+					Trace( "RESTART", req );
 					process.exit();
 				}, (delay||10)*1e3);
 			}
@@ -4238,7 +4240,7 @@ save = CLIENT.HOST.CASE to save
 					IO.sockets.emit("alert",{msg: msg || "hello", to: "all", from: client});
 
 				//Trace(msg, req);
-				res("ok");
+				res(errors.ok);
 			}
 
 			else 
@@ -5095,10 +5097,6 @@ size, pixels, scale, step, range, detects, infile, outfile, channel.  This endpo
 	/**
 	*/
 	"errors.": {  //< error messages
-		ok: "ok",
-		noMarkdown: new Error("no markdown"),
-		noRecord: new Error("no record"),
-		noParameter: new Error("missing required parameter"),
 		pretty: err => {
 			return "".tag("img",{src:"/stash/reject.jpg",width:40,height:60})
 				+ (err+"").replace(/\n/g,"<br>").replace(process.cwd(),"").replace("Error:","")
@@ -5109,36 +5107,38 @@ size, pixels, scale, step, range, detects, infile, outfile, channel.  This endpo
 					"API".link( "/api" )
 				].join(" || ");
 		},
-		//noWorker: new Error("service busy"),
-		noPermission: new Error( "You do not have permission to restart the service" ),
-		//badType: new Error("bad type"),
-		//lostContext: new Error("pipe lost context"),
+		ok: "ok",
+		noMarkdown: new Error("no markdown"),
+		noRecord: new Error("no record"),
+		noParameter: new Error("missing required parameter"),
+		noPermission: new Error( "You do not have permission" ),
 		noPartner: new Error( "missing endservice=DOMAIN/ENDPOINT option or ENDPOINT did not confirm partner" ),
-		//noAttribute: new Error( "undefined notebook attribute" ),
 		noLicense: new Error("unpublished notebook, invalid endservice, unconfirmed endpartner, or no license available"),
-		//badEngine: new Error( "notebook improper" ),
-		//noGraph: new Error( "graph db unavailable" ),
 		badAgent: new Error("bad agent request"),
-		noIngest: new Error("invalid/missing ingest dataset"),
-		//badDataset: new Error("dataset does not exist"),
-		//noCode: new Error("notebook has no code file"),
-		//badFeature: new Error("unsupported feature"),
 		noOffice: new Error("office docs not enabled"),
-		//noExe: new Error("no execute interface"),
 		noContext: new Error("no notebook context") ,
 		cantRun: new Error("cant run unregulated notebook"),
 		noName: new Error("missing notebook Name parameter"), 
 		noNotebook: new Error("No such notebook"),
 		certFailed: new Error("could not create pki cert"),
-		badEntry: new Error("sim engines must be accessed at master url"),
-		
-		badRequest: new Error("bad/missing request parameter(s)"),
-		noBody: new Error("no body keys"),
-		badBaseline: new Error("baseline could not reset change journal"),
-		disableEngine: new Error("requested engine must be disabled to prime"),
-		missingEngine: new Error("missing engine query"),
-		protectedQueue: new Error("action not allowed on this job queues"),
-		noCase: new Error("plugin case not found"),
+		//noIngest: new Error("invalid/missing ingest dataset"),
+		//badEntry: new Error("sim engines must be accessed at master url"),		
+		//badRequest: new Error("bad/missing request parameter(s)"),
+		//badBaseline: new Error("baseline could not reset change journal"),
+		//disableEngine: new Error("requested engine must be disabled to prime"),
+		//missingEngine: new Error("missing engine query"),
+		//protectedQueue: new Error("action not allowed on this job queues"),
+		//noCase: new Error("plugin case not found")
+		//noWorker: new Error("service busy"),
+		//badType: new Error("bad type"),
+		//lostContext: new Error("pipe lost context"),
+		//noAttribute: new Error( "undefined notebook attribute" ),
+		//badEngine: new Error( "notebook improper" ),
+		//noGraph: new Error( "graph db unavailable" ),
+		//badDataset: new Error("dataset does not exist"),
+		//noCode: new Error("notebook has no code file"),
+		//badFeature: new Error("unsupported feature"),
+		//noExe: new Error("no execute interface"),
 		//badDS: new Error("dataset could not be modified"),
 		//badLogin: new Error("invalid login name/password"),
 		//failedLogin: new Error("login failed - admin notified"),
@@ -5311,7 +5311,7 @@ Convert records to requested req.type office file.
 function genDoc(recs,req,res) {
 	
 	if (!ODOC) 
-		return res(DEBE.errors.noOffice);
+		return res(errors.noOffice);
 	
 	var 
 		types = {
@@ -6089,7 +6089,7 @@ function simPlugin(req,res) {
 	};
 
 	if ( route = crud[type] )
-		ATOM[route](req, ctx =>	res( ctx ? "ok" : "failed") );
+		ATOM[route](req, ctx =>	res( ctx ? errors.ok : "failed") );
 
 	else
 		res( new Error("bad sim spec") );
@@ -6176,7 +6176,7 @@ function exportPlugin(req,res) {
 	res( "exporting" );
 	CP.exec(
 		`mysqldump -u$MYSQL_USER -p$MYSQL_PASS -h$MYSQL_HOST --add-drop-table app ${name} >./notebooks/${name}.nb`,
-		(err,out) => Trace( `EXPORTED ${name} `, err||"ok" ) );	
+		(err,out) => Trace( `EXPORTED ${name} `, err||errors.ok ) );	
 }
 
 /**
@@ -6196,7 +6196,7 @@ function importPlugin(req,res) {
 	res( "importing" );
 	CP.exec(
 		`mysql -u$MYSQL_USER -p$MYSQL_PASS -h$MYSQL_HOST --force app < ./notebooks/${name}.nb`,
-		(err,out) => Trace( `IMPORTED ${name} `, err||"ok" ) );							
+		(err,out) => Trace( `IMPORTED ${name} `, err||errors.ok ) );							
 }
 
 /*
@@ -6347,7 +6347,7 @@ function publishPlugin(req,res) {
 
 						FS.writeFile(e6Tmp, code, "utf8", err => {
 							CP.exec( `babel ${e6Tmp} -o ${e5Tmp} --presets /local/nodejs/lib/node_modules/@babel/preset-env`, (err,log) => {
-								Trace("PUBLISH BABEL", err?"failed":"ok" );
+								Trace("PUBLISH BABEL", err?"failed":errors.ok );
 								try {
 									FS.readFile(e5Tmp, "utf8", (err,e5code) => {
 										if ( err ) 
@@ -6765,7 +6765,7 @@ IDList=
 		}
 
 		catch (err) {	// module at path does not yet exists so prime
-			if ( true )  { // careful!!
+			if ( profile.Admin )  { 
 				CP.exec( `cp ./notebooks/temp.js ./notebooks/${name}.js --no-clobber`, err => {
 					if (err) 
 						cb(err);
@@ -6789,13 +6789,13 @@ IDList=
 			}
 
 			else
-				cb( new Error("Notebook does not exist or invalid") );
+				cb( errors.noPermission );
 		}
 
 	}
 
 	const 
-		{ query, sql, table, type, host, client } = req,
+		{ query, sql, table, type, host, client, profile } = req,
 		book = table;
 		/*
 		ctx = { 
@@ -7151,7 +7151,7 @@ function runPlugin(req, res) {  //< callback res(ctx) with resulting ctx or cb(n
 		// Log(">>>notebook ctx", ctx);
 
 		if (ctx) {
-			res("ok");
+			res(errors.ok);
 
 			const { Pipe } = ctx;
 
