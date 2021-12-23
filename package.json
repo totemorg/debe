@@ -1,13 +1,14 @@
 {
   "name": "debe",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "built on totem - does everything but eat",
   "main": "debe.js",
   "scripts": {
     "setpass": "vi .config/_pass.sh; source ./config/_pass.sh",
-    "debug": "source ./maint.sh debug",
-    "oper": "source ./maint.sh oper",
-    "config": "source ./maint.sh config",
+    "debug": "source ./maint.sh config debug",
+    "oper": "source ./maint.sh config oper",
+    "prot": "source ./maint.sh config prot",
+    "prod": "source ./maint.sh config prod",
     "relink": "cd node_modules; for f in doc atomic enums totem blog skin dogs randpr pipe geohack reader jsdb man; do ln -s ../../$f $f; done",
     "redoc": "jsdoc2md --template README.hbs --files debe.js >README.md; git commit -am 'redoc'; git  push agent master",
     "genio": "node debe.js blog http://localhost:8080/totemblog.view ./stash/index.html; cd stash; git commit -am 'reblog'; git push agent master",
