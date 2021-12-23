@@ -1,4 +1,4 @@
-function nets(ctx,res,{$log,$trace,$pipe}) {	// define notebook engine
+function nets(ctx,res,{$log,$pipe,$trace}) {	// define notebook engine
 
 		const 
 			Snap = {
@@ -22,45 +22,51 @@ function nets(ctx,res,{$log,$trace,$pipe}) {	// define notebook engine
 		var
 			{ actors,bhats,whats } = Snap;
 
-		$log(">>>nets actors", actors);
+		$log("actors", actors);
 
 		$pipe( recs => {
 			if ( recs ) {	// have a batch so extend assoc net
-				$log(">>>nets records", recs.length, actors );
+				$log("records", recs.length, actors );
 
-				recs.forEach( rec => {	// make black-white hat assoc net
-					const 
-						{bhat,what,topic,cap} = rec;
+				if (recs.forEach)
+					recs.forEach( rec => {	// make black-white hat assoc net
+						const 
+							{bhat,what,topic,cap} = rec;
 
-					if (bhat && what && topic ) {
-						const
-							src = nodes[bhat] || ( nodes[bhat] = {
-								type: black,
-								index: actors++,
-								hat: black+(bhats++),
-								created: now,
-								size: 0
-							}),
-							tar = nodes[what] || ( nodes[what] = {
-								type: white,
-								index: actors++,
-								hat: white+(whats++),
-								created: now,
-								size: 0
-							}),
-							link = bhat + ":" + what,
-							edge = edges[link] || ( edges[link] = {
-								src: bhat,
-								tar: what,
-								capacity: 1,
-								type: topic,
-								created: now
-							});
+						if (bhat && what && topic ) {
+							const
+								src = nodes[bhat] || ( nodes[bhat] = {
+									type: black,
+									index: actors++,
+									hat: black+(bhats++),
+									created: now,
+									size: 0
+								}),
+								tar = nodes[what] || ( nodes[what] = {
+									type: white,
+									index: actors++,
+									hat: white+(whats++),
+									created: now,
+									size: 0
+								}),
+								link = bhat + ":" + what,
+								edge = edges[link] || ( edges[link] = {
+									src: bhat,
+									tar: what,
+									capacity: 1,
+									type: topic,
+									created: now
+								});
 
-						//$log(edge);
-					}
+							//$log(edge);
+						}
 
-				});
+					});
+				
+				else {
+					trace("invalid pipe parameters");
+					res(null);
+				}
 
 				Snap.actors = actors;
 				Snap.bhats = bhats;
@@ -68,7 +74,7 @@ function nets(ctx,res,{$log,$trace,$pipe}) {	// define notebook engine
 			}
 
 			else {	// no more batches so make connection net
-				$log(">>>nets capacity matrix NxN", [actors,actors]);
+				$log("Capacity matrix NxN", [actors,actors]);
 
 				if ( actors<=400 ) {
 					const 
@@ -117,7 +123,7 @@ function nets(ctx,res,{$log,$trace,$pipe}) {	// define notebook engine
 
 					$each(cuts, (cutsize,cut) => {	// create connection net
 						if ( cutsize != "0" ) {
-							$log(">>>nets cut", cutsize );
+							$log("cutsie", cutsize );
 
 							cut.forEach( (lam,idx) => {
 								const 
@@ -139,12 +145,12 @@ function nets(ctx,res,{$log,$trace,$pipe}) {	// define notebook engine
 										cutsize: cutsize
 									});
 
-								$log(">>>nets", cutsize, s,t);
+								$log("cuts", cutsize, s,t);
 							});
 						}
 					});
 
-					$log(">>>nets save NxE", [Object.keys(nodes).length,Object.keys(edges).length]);
+					$log("save NxE", [Object.keys(nodes).length,Object.keys(edges).length]);
 
 					ctx._net = [{
 						name: "anet",
@@ -158,7 +164,7 @@ function nets(ctx,res,{$log,$trace,$pipe}) {	// define notebook engine
 				}
 
 				else
-					$log(">>>nets TOO BIG to make connections !");
+					$trace("Too big to make connections !");
 				
 				res(ctx);		
 			}

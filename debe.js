@@ -54,7 +54,7 @@ const
 	{ readers, scanner } = READ,
 	{ skinContext, renderSkin, renderJade } = SKIN,
 	{ runTask, queues, 
-		sqlThread, errors, paths, cache, site, byTable, 
+		sqlThread, errors, paths, cache, site, byTable, userID,
 		watchFile, timeIntervals, neoThread, startJob, $master } = TOTEM,
 	{ JIMP } = $,
 	{ 
@@ -2718,6 +2718,7 @@ desired ring = [ [lat,lon], ....]
 
 					if (err)
 						Log("tips",[err,q.sql]);
+					
 					else
 						recs.forEach( (rec,id) => {
 							rec.ID = id;
@@ -5111,7 +5112,7 @@ size, pixels, scale, step, range, detects, infile, outfile, channel.  This endpo
 		noMarkdown: new Error("no markdown"),
 		noRecord: new Error("no record"),
 		noParameter: new Error("missing required parameter"),
-		noPermission: new Error( "You do not have permission" ),
+		noPermission: new Error( "you are not authorized for this function" ),
 		noPartner: new Error( "missing endservice=DOMAIN/ENDPOINT option or ENDPOINT did not confirm partner" ),
 		noLicense: new Error("unpublished notebook, invalid endservice, unconfirmed endpartner, or no license available"),
 		badAgent: new Error("bad agent request"),
@@ -5119,8 +5120,10 @@ size, pixels, scale, step, range, detects, infile, outfile, channel.  This endpo
 		noContext: new Error("no notebook context") ,
 		cantRun: new Error("cant run unregulated notebook"),
 		noName: new Error("missing notebook Name parameter"), 
-		noNotebook: new Error("No such notebook"),
+		noNotebook: new Error("no such notebook"),
 		certFailed: new Error("could not create pki cert"),
+		bookExists: new Error("notebook already exists"),
+		bookFailed: new Error("notebook could not be created"),
 		//noIngest: new Error("invalid/missing ingest dataset"),
 		//badEntry: new Error("sim engines must be accessed at master url"),		
 		//badRequest: new Error("bad/missing request parameter(s)"),
@@ -6327,356 +6330,369 @@ append base_body
 
 function publishPlugin(req,res) {
 
-	function publishNotebook(sql, name, cb) {  // publish plugin at path = .../type/name
+	function getModule( path ) {
+		try {
+			return require( path );
+		}
 
-		function procScript( sql, name, mod ) {
-			function minifyCode( code, cb ) {  //< callback cb(minifiedCode)
-				//Log(">>>>min", code.length, type, name);
+		catch (err) {
+			return null;
+		}
+	}	
 
-				switch (type) {
-					case "html":
-						cb( HMIN.minify(code.replace(/<br>/g,""), {
-							removeAttributeQuotes: true
-						}) );
-						break;
+	function genTable( sql, name, mod ) {
+		function minifyCode( code, cb ) {  //< callback cb(minifiedCode)
+			//Log(">>>>min", code.length, type, name);
 
-					case "js":
-						var
-							e6Tmp = "./pubmin/e6/" + product,
-							e5Tmp = "./pubmin/e5/" + product;
+			switch (type) {
+				case "html":
+					cb( HMIN.minify(code.replace(/<br>/g,""), {
+						removeAttributeQuotes: true
+					}) );
+					break;
 
-						FS.writeFile(e6Tmp, code, "utf8", err => {
-							CP.exec( `babel ${e6Tmp} -o ${e5Tmp} --presets /local/nodejs/lib/node_modules/@babel/preset-env`, (err,log) => {
-								Trace("PUBLISH BABEL", err?"failed":errors.ok );
-								try {
-									FS.readFile(e5Tmp, "utf8", (err,e5code) => {
-										if ( err ) 
+				case "js":
+					var
+						e6Tmp = "./pubmin/e6/" + product,
+						e5Tmp = "./pubmin/e5/" + product;
+
+					FS.writeFile(e6Tmp, code, "utf8", err => {
+						CP.exec( `babel ${e6Tmp} -o ${e5Tmp} --presets /local/nodejs/lib/node_modules/@babel/preset-env`, (err,log) => {
+							Trace("PUBLISH BABEL", err?"failed":errors.ok );
+							try {
+								FS.readFile(e5Tmp, "utf8", (err,e5code) => {
+									if ( err ) 
+										cb( null );
+
+									else {
+										var min = JSMIN.minify( e5code );
+
+										if ( min.error ) 
 											cb( null );
 
-										else {
-											var min = JSMIN.minify( e5code );
-
-											if ( min.error ) 
-												cb( null );
-
-											else   
-												cb( min.code );
-										}
-									});
-								}
-								catch (err) {
-									cb( null );
-								}
-							});
-						});
-						break;						
-
-					case "py":
-						/*
-						minifying python is problematic as the pyminifier obvuscator has no option
-						to reseed; thus the pyminifier was modified to reseed its rv generator (see install
-						notes).
-						*/
-
-						var pyTmp = "./temps/py/" + product;
-
-						FS.writeFile(pyTmp, code.replace(/\t/g,"  ").replace(/^\n/gm,""), "utf8", err => {
-							CP.exec(`pyminifier -O ${pyTmp}`, (err,minCode) => {
-								//Log("pymin>>>>", err);
-
-								if (err)
-									cb(err);
-
-								else
-									cb( minCode );
-							});
-						});
-						break;
-
-					case "m":
-					case "mj":
-						/*
-						Could use Matlab's pcode generator - but only avail within matlab
-								cd to MATLABROOT (avail w matlabroot cmd)
-								matlab -nosplash -r script.m
-								start matlab -nospash -nodesktop -minimize -r script.m -logfile tmp.log
-
-						but, if not on a matlab machine, we need to enqueue this matlab script from another machine via curl to totem
-
-						From a matlab machine, use mcc source, then use gcc (gcc -fpreprocessed -dD -E  -P source_code.c > source_code_comments_removed.c)
-						to remove comments - but you're back to enqueue.
-
-						Better option to use smop to convert matlab to python, then pyminify that.
-						*/
-
-						var 
-							mTmp = "./temps/matsrc/" + product,
-							pyTmp = "./temps/matout/" + product;
-
-						FS.writeFile(mTmp, code.replace(/\t/g,"  "), "utf8", err => {
-							CP.execFile("python", ["matlabtopython.py", "smop", mTmp, "-o", pyTmp], err => {	
-								//Log("matmin>>>>", err);
-
-								if (err)
-									cb( err );
-
-								else
-									FS.readFile( pyTmp, "utf8", (err,pyCode) => {
-										if (err) 
-											cb( err );
-
-										else
-											CP.exec(`pyminifier -O ${pyTmp}`, (err,minCode) => {
-												if (err)
-													cb(err);
-
-												else
-													cb( minCode, mod );
-											});										
-									});									
-							});
-						});
-						break;
-
-					case "jade":
-						cb( 
-							code
-								.replace(/\n/g," ")
-								.replace(/\t/g," ")
-								.replace(/  /g,"")
-								.replace(/, /g,",")
-								.replace(/\. /g,".")  );
-						break;
-
-					case "":
-					case "R":
-					default:
-						cb( code );
-				}
-			}
-
-			function getResource( file ) {	
-				try {
-					return FS.readFileSync( `./notebooks/resource/${file}`, "utf8").replace( /\r\n/g, "\n");
-				}
-				catch (err) {
-					return null;
-				}
-			}
-
-			function getComment( sql, cb ) {
-				var com = sql.replace( /(.*) comment '((.|\n|\t)*)'/, (str,spec,doc) => { 
-					//Log(">>>>>>>>>>>>>>spec", spec, doc);
-					cb( spec, doc );
-					return "#";
-				});
-
-				if ( !com.startsWith("#") ) cb( sql, "" );			
-			}
-
-			const
-				path = `./notebooks/${name}`,
-				type = ("js" in mod) ? "js" : ("py" in mod) ? "py" : ("R" in mod) ? "R" : ("cv" in mod) ? "cv" : ("m" in mod) ? "m" : ("mj" in mod) ? "mj" : "js",
-				code = ((mod[type] || mod.code || mod.engine)+"") || getResource( `${name}.${type}` ),
-				tou = mod.tou || mod.doc || getResource( `${name}.tou` ) || getResource( `${name}.doc` ) || getResource( "default.tou" ),
-				modkeys = mod.mods || mod.modkeys || mod.MODs,
-				addkeys = mod.adds || mod.addkeys || mod.keys,
-				prokeys = modkeys || addkeys || {},
-				product = name + "." + type;
-
-			Log(">>>>>>publish", path, name, type);
-
-			skinContext( req, ctx => {	// get a skinning ctx to generate the ToU
-				const 
-					{ dockeys, speckeys } = Copy({
-						speckeys: {},
-						dockeys: {},
-						defaultDocs: defaultDocs
-					}, ctx);
-
-				Stream( prokeys, {}, (def,key,cb) => {	// expand product key comments
-
-					if ( cb )	// still streaming keys
-						getComment( def, (spec, doc) => {	// extract key's comment
-							var
-								comment = (defaultDocs[key] || "") + (doc || "");
-
-							comment.blog( ctx, html => { 	// blogify the comment
-								function makeSkinable( com ) {
-									return escape(com).replace(/[\.|\*|_|']/g,arg=>"%"+arg.charCodeAt(0).toString(16) );
-								}
-
-								//Log("gen", key,spec,html.substr(0,100));
-								speckeys[key] = spec;
-								dockeys[key] = makeSkinable(html);
-								cb();
-							});
-						});
-
-					else {		// all keys expanded so ...
-						// renderJade(tou, ctx, tou => {	// generate ToU in this blogctx
-						// });
-						Trace( `PUBLISH ${name} tou=${tou.length}` );
-
-						if ( mod.clear || mod.reset )
-							sql.query("DROP TABLE app.??", name);
-
-						sql.query(
-							"INSERT INTO OPENV.projects SET ?", {
-								Name: name,
-								Title: `Notebook ${name}`,
-								Lead: "tbd",
-								Status: "started",
-								JIRA: "tbd"
-						});
-
-						sql.query( 
-							`CREATE TABLE app.${name} (ID float unique auto_increment, Name varchar(32) unique key )` , 
-							[], err => {
-
-							if ( modkeys )
-								Each( modkeys, key => {
-									var 
-										keyId = sql.escapeId(key),
-										spec = speckeys[key],
-										doc = dockeys[key];
-
-									sql.query( `ALTER TABLE app.${name} MODIFY ${keyId} ${spec} comment '${doc}'`, [], err => {
-										if ( err ) Log("PUBLISH NOMOD:"+key);
-									});
-								});
-
-							else
-							if ( addkeys )
-								Each( addkeys, key => {
-									var 
-										keyId = sql.escapeId(key),
-										spec = speckeys[key],
-										doc = dockeys[key];
-
-									//Log("add", keyId, spec);
-									sql.query( `ALTER TABLE app.${name} ADD ${keyId} ${spec} comment '${doc}'`, [], err => {
-										if ( err ) Log("PUBLISH NOADD:"+key);
-									});
-								});
-
-							else
-								Trace( `PUBLISH ${name} NO mods||adds KEY` );
-
-							if ( inits = mod.inits || mod.initial || mod.initialize )
-								inits.forEach( init => {
-									sql.query("INSERT INTO app.?? SET ?", init);
-								});
-
-							/*
-							if  ( readme = mod.readme )
-								FS.writeFile( path+".md", readme, "utf8" );
-							*/
-
-							if ( code ) 
-								minifyCode( code, minCode => {	// get minified code for license tracking
-									const 
-										from = type,
-										to = mod.to || from,
-										fromFile = path + `.${from}`,
-										toFile = path + `.${to}`,
-										imports = {},
-										rec = {
-											Code: code,
-											Minified: minCode,
-											Wrap: mod.wrap || "",
-											ToU: tou,
-											State: JSON.stringify(mod.state || mod.context || mod.ctx || {})
-										};
-
-									Trace( `PUBLISH ${name} CONVERT ${from}=>${to}` );
-									// Log(">>>save ",name, type, code);
-
-									if ( from == to )  { // use code as-is
-										sql.query( 
-											"INSERT INTO openv.engines SET ? ON DUPLICATE KEY UPDATE ?", [ 
-												Copy(rec, {
-													Name: name,
-													Type: type,
-													Enabled: 1
-												}), 
-												rec 
-											]);
-
-										// if (from == "js") FLEX.import(name,code);
+										else   
+											cb( min.code );
 									}
-
-									else  // convert code to requested type
-										//CP.execFile("python", ["matlabtopython.py", "smop", fromFile, "-o", toFile], err => {
-										FS.writeFile( fromFile, code, "utf8", err => {
-											CP.exec( `sh ${from}to${to}.sh ${fromFile} ${toFile}`, (err, out) => {
-												if (!err) 
-													FS.readFile( toFile, "utf8", (err,code) => {
-														rec.Code = code;
-														if (!err)
-															sql.query( 
-																"INSERT INTO openv.engines SET ? ON DUPLICATE KEY UPDATE ?", [ Copy(rec, {
-																	Name: name,
-																	Type: type,
-																	Enabled: 1
-																}), rec ] );
-													});									
-											});
-										});	
 								});
+							}
+							catch (err) {
+								cb( null );
+							}
+						});
+					});
+					break;						
+
+				case "py":
+					/*
+					minifying python is problematic as the pyminifier obvuscator has no option
+					to reseed; thus the pyminifier was modified to reseed its rv generator (see install
+					notes).
+					*/
+
+					var pyTmp = "./temps/py/" + product;
+
+					FS.writeFile(pyTmp, code.replace(/\t/g,"  ").replace(/^\n/gm,""), "utf8", err => {
+						CP.exec(`pyminifier -O ${pyTmp}`, (err,minCode) => {
+							//Log("pymin>>>>", err);
+
+							if (err)
+								cb(err);
 
 							else
-								Trace( `PUBLISH ${name} NO ENGINE KEY` );
+								cb( minCode );
 						});
+					});
+					break;
+
+				case "m":
+				case "mj":
+					/*
+					Could use Matlab's pcode generator - but only avail within matlab
+							cd to MATLABROOT (avail w matlabroot cmd)
+							matlab -nosplash -r script.m
+							start matlab -nospash -nodesktop -minimize -r script.m -logfile tmp.log
+
+					but, if not on a matlab machine, we need to enqueue this matlab script from another machine via curl to totem
+
+					From a matlab machine, use mcc source, then use gcc (gcc -fpreprocessed -dD -E  -P source_code.c > source_code_comments_removed.c)
+					to remove comments - but you're back to enqueue.
+
+					Better option to use smop to convert matlab to python, then pyminify that.
+					*/
+
+					var 
+						mTmp = "./temps/matsrc/" + product,
+						pyTmp = "./temps/matout/" + product;
+
+					FS.writeFile(mTmp, code.replace(/\t/g,"  "), "utf8", err => {
+						CP.execFile("python", ["matlabtopython.py", "smop", mTmp, "-o", pyTmp], err => {	
+							//Log("matmin>>>>", err);
+
+							if (err)
+								cb( err );
+
+							else
+								FS.readFile( pyTmp, "utf8", (err,pyCode) => {
+									if (err) 
+										cb( err );
+
+									else
+										CP.exec(`pyminifier -O ${pyTmp}`, (err,minCode) => {
+											if (err)
+												cb(err);
+
+											else
+												cb( minCode, mod );
+										});										
+								});									
+						});
+					});
+					break;
+
+				case "jade":
+					cb( 
+						code
+							.replace(/\n/g," ")
+							.replace(/\t/g," ")
+							.replace(/  /g,"")
+							.replace(/, /g,",")
+							.replace(/\. /g,".")  );
+					break;
+
+				case "":
+				case "R":
+				default:
+					cb( code );
+			}
+		}
+
+		function getResource( file ) {	
+			try {
+				return FS.readFileSync( `./notebooks/resource/${file}`, "utf8").replace( /\r\n/g, "\n");
+			}
+			catch (err) {
+				return null;
+			}
+		}
+
+		function getComment( sql, cb ) {
+			var com = sql.replace( /(.*) comment '((.|\n|\t)*)'/, (str,spec,doc) => { 
+				//Log(">>>>>>>>>>>>>>spec", spec, doc);
+				cb( spec, doc );
+				return "#";
+			});
+
+			if ( !com.startsWith("#") ) cb( sql, "" );			
+		}
+
+		const
+			path = `./notebooks/${name}`,
+			type = ("js" in mod) ? "js" : ("py" in mod) ? "py" : ("R" in mod) ? "R" : ("cv" in mod) ? "cv" : ("m" in mod) ? "m" : ("mj" in mod) ? "mj" : "js",
+			code = ((mod[type] || mod.code || mod.engine)+"") || getResource( `${name}.${type}` ),
+			tou = mod.tou || mod.doc || getResource( `${name}.tou` ) || getResource( `${name}.doc` ) || getResource( "default.tou" ),
+			modkeys = mod.mods || mod.modkeys || mod.MODs,
+			addkeys = mod.adds || mod.addkeys || mod.keys,
+			prokeys = modkeys || addkeys || {},
+			product = name + "." + type;
+
+		Log(">>>>>>publish", path, name, type);
+
+		skinContext( req, ctx => {	// get a skinning ctx to generate the ToU
+			const 
+				{ dockeys, speckeys } = Copy({
+					speckeys: {},
+					dockeys: {},
+					defaultDocs: defaultDocs
+				}, ctx);
+
+			Stream( prokeys, {}, (def,key,cb) => {	// expand product key comments
+
+				if ( cb )	// still streaming keys
+					getComment( def, (spec, doc) => {	// extract key's comment
+						var
+							comment = (defaultDocs[key] || "") + (doc || "");
+
+						comment.blog( ctx, html => { 	// blogify the comment
+							function makeSkinable( com ) {
+								return escape(com).replace(/[\.|\*|_|']/g,arg=>"%"+arg.charCodeAt(0).toString(16) );
+							}
+
+							//Log("gen", key,spec,html.substr(0,100));
+							speckeys[key] = spec;
+							dockeys[key] = makeSkinable(html);
+							cb();
+						});
+					});
+
+				else {		// all keys expanded so ...
+					// renderJade(tou, ctx, tou => {	// generate ToU in this blogctx
+					// });
+					Trace( `PUBLISH ${name} tou=${tou.length}` );
+
+					if ( mod.clear || mod.reset )
+						sql.query("DROP TABLE app.??", name);
+
+					sql.query(
+						"INSERT INTO OPENV.projects SET ?", {
+							Name: name,
+							Title: `Notebook ${name}`,
+							Lead: "tbd",
+							Status: "started",
+							JIRA: "tbd"
+					});
+
+					sql.query( 
+						`CREATE TABLE app.${name} (ID float unique auto_increment, Name varchar(32) unique key )` , 
+						[], err => {
+
+						if ( modkeys )
+							Each( modkeys, key => {
+								var 
+									keyId = sql.escapeId(key),
+									spec = speckeys[key],
+									doc = dockeys[key];
+
+								sql.query( `ALTER TABLE app.${name} MODIFY ${keyId} ${spec} comment '${doc}'`, [], err => {
+									if ( err ) Log("PUBLISH NOMOD:"+key);
+								});
+							});
+
+						else
+						if ( addkeys )
+							Each( addkeys, key => {
+								var 
+									keyId = sql.escapeId(key),
+									spec = speckeys[key],
+									doc = dockeys[key];
+
+								//Log("add", keyId, spec);
+								sql.query( `ALTER TABLE app.${name} ADD ${keyId} ${spec} comment '${doc}'`, [], err => {
+									if ( err ) Log("PUBLISH NOADD:"+key);
+								});
+							});
+
+						else
+							Trace( `PUBLISH ${name} NO mods||adds KEY` );
+
+						if ( inits = mod.inits || mod.initial || mod.initialize )
+							inits.forEach( init => {
+								sql.query("INSERT INTO app.?? SET ?", init);
+							});
 
 						/*
-						sql.query(
-							"UPDATE app.?? SET ? WHERE least(?,1)", [
-								name, 
-								{Code: code, ToU: tou}}, 
-								{Name: name, Type: type}
-							], err => Trace( err || `PUBLISHED ${name}` ) );
+						if  ( readme = mod.readme )
+							FS.writeFile( path+".md", readme, "utf8" );
 						*/
 
-						// CP.exec(`cd ${name}.d; sh publish.sh`);
-					}
-				});
+						if ( code ) 
+							minifyCode( code, minCode => {	// get minified code for license tracking
+								const 
+									from = type,
+									to = mod.to || from,
+									fromFile = path + `.${from}`,
+									toFile = path + `.${to}`,
+									imports = {},
+									rec = {
+										Code: code,
+										Minified: minCode,
+										Wrap: mod.wrap || "",
+										ToU: tou,
+										State: JSON.stringify(mod.state || mod.context || mod.ctx || {})
+									};
+
+								Trace( `PUBLISH ${name} CONVERT ${from}=>${to}` );
+								// Log(">>>save ",name, type, code);
+
+								if ( from == to )  { // use code as-is
+									sql.query( 
+										"INSERT INTO openv.engines SET ? ON DUPLICATE KEY UPDATE ?", [ 
+											Copy(rec, {
+												Name: name,
+												Type: type,
+												Enabled: 1
+											}), 
+											rec 
+										]);
+
+									// if (from == "js") FLEX.import(name,code);
+								}
+
+								else  // convert code to requested type
+									//CP.execFile("python", ["matlabtopython.py", "smop", fromFile, "-o", toFile], err => {
+									FS.writeFile( fromFile, code, "utf8", err => {
+										CP.exec( `sh ${from}to${to}.sh ${fromFile} ${toFile}`, (err, out) => {
+											if (!err) 
+												FS.readFile( toFile, "utf8", (err,code) => {
+													rec.Code = code;
+													if (!err)
+														sql.query( 
+															"INSERT INTO openv.engines SET ? ON DUPLICATE KEY UPDATE ?", [ Copy(rec, {
+																Name: name,
+																Type: type,
+																Enabled: 1
+															}), rec ] );
+												});									
+										});
+									});	
+							});
+
+						else
+							Trace( `PUBLISH ${name} NO ENGINE KEY` );
+					});
+
+					/*
+					sql.query(
+						"UPDATE app.?? SET ? WHERE least(?,1)", [
+							name, 
+							{Code: code, ToU: tou}}, 
+							{Name: name, Type: type}
+						], err => Trace( err || `PUBLISHED ${name}` ) );
+					*/
+
+					// CP.exec(`cd ${name}.d; sh publish.sh`);
+				}
 			});
-		}
+		});
+	}
 
-		function genReadme( name ) {
-			const
-				sh = [
-					`cd ./artifacts/${name}`,
-					`curl localhost:8080/${name}.tou > README.md`,
-					`curl localhost:8080/${name}.status >> README.md` ,
-					`curl "localhost:8080/${name}.html?_blog=Description" >> README.md`,
-					`cd ./artifacts`,
-					`git commit -am "update readme"`,
-					`git push agent master`
-				].join(";");
+	function genReadme( name ) {
+		const
+			sh = [
+				`cd ./artifacts/${name}`,
+				`curl localhost:8080/${name}.tou > README.md`,
+				`curl localhost:8080/${name}.status >> README.md` ,
+				`curl "localhost:8080/${name}.html?_blog=Description" >> README.md`,
+				`cd ./artifacts`,
+				`git commit -am "update readme"`,
+				`git push agent master`
+			].join(";");
 
-			CP.exec(sh, (err,log) => {
-				Log("gen readme", err,log);					
-			});
-		}
+		CP.exec(sh, (err,log) => {
+			Log("gen readme", err,log);					
+		});
+	}
 
-		function primeArtifacts( name, uid ) {
-			const 
-				remote = "164.187.33.219",
-				gitsite = "git@github.com:totemstan/artifacts",
-					//"https://sc.appdev.proj.coe/acmesds",
-				short = {
-					pub: "publish",
-					run: "run",
-					view: "view" ,
-					brief: "brief"
-				};
+	function genArtifacts( name, uid ) {
+		const 
+			remote = "164.187.33.219",
+			gitsite = "git@github.com:totemstan/artifacts",
+				//"https://sc.appdev.proj.coe/acmesds",
+			short = {
+				pub: "publish",
+				run: "run",
+				view: "view" ,
+				brief: "brief"
+			};
 
-			FS.mkdir( `./artifacts/${name}`, err => {
-				if ( !err ) { // prime the notebook
-					const 
-						rdp = `screen mode id:i:2
+		FS.mkdir( `./artifacts/${name}`, err => {
+			if ( err ) 
+				Log(err);
+			
+			else { // prime the notebook
+				// make a login link
+				
+				FS.writeFile( `./artifacts/${name}/login.rdp`, 
+`screen mode id:i:2
 desktopwidth:i:1366
 desktopheight:i:768
 session bpp:i:32
@@ -6725,94 +6741,76 @@ enableworkspacereconnect:i:0
 gatewaybrokeringtype:i:0
 rdgiskdcproxy:i:0
 kdcproxyname:s:
-`,
-						sh = [
-								`cp -r ./artifacts/temp/* ./artifacts/${name}`,
-								`git add ./artifacts/${name}`
-								//`cd ./artifacts/${name}`
-								//"git init",
-								//`git remote add origin ${gitsite}/${name}`
-							].join(";");
+`, 
+							 "utf8", err => {} );
 
-					CP.exec( sh, err => {
+				CP.exec( [
+							`cp -r ./artifacts/temp/* ./artifacts/${name}`,
+							`git add ./artifacts/${name}`
+							//`cd ./artifacts/${name}`
+							//"git init",
+							//`git remote add origin ${gitsite}/${name}`
+						].join(";"), err => {
 
-						["pub","run","exam","brief"].forEach( type => {	// make nb shortcuts
-							FS.writeFile( // make the shortcut
-								`./artifacts/${name}/${short[type]}.url`, 
+					["pub","run","exam","brief"].forEach( type => {	// make nb shortcuts
+						
+						// make the shortcut
+						
+						FS.writeFile( `./artifacts/${name}/${short[type]}.url`, 
+
 `[{000214A0-0000-0000-C000-000000000046}]
 Prop3=19,11
 [InternetShortcut]
 URL=https://totem.west.ile.nga.ic.gov/${name}.${type}
 IDList=
 `,
-								"utf8",
-								err => {} );
-						});	
+							"utf8",
+							err => {} );
+					});	
 
-						if (uid)
-							FS.writeFile( `./artifacts/${name}/login.rdp`, rdp, "utf8", err => {} );
-
-					});
-
-			}
-			});
-		}
-
-		try {	// prime and process the plugin's script
-			procScript( sql, name, require( `./notebooks/${book}` ) );	
-			genReadme( name );
-			cb(null);
-		}
-
-		catch (err) {	// module at path does not yet exists so prime
-			if ( profile.Admin )  { 
-				CP.exec( `cp ./notebooks/temp.js ./notebooks/${name}.js --no-clobber`, err => {
-					if (err) 
-						cb(err);
-
-					else {
-						try {	// prime and process the plugin's script
-							const mod = require( `./notebooks/${name}` );
-							Log(">>>prime", name);
-							//Log(">>>mod req", name, mod);
-							procScript( sql, name, mod );
-							primeArtifacts( name, "mylogin" );
-							cb(null);
-						}
-
-						catch (err) {
-							cb(err);
-						}
-					}
 				});
-				//primeArtifacts( name, "mylogin" );
+
 			}
-
-			else
-				cb( errors.noPermission );
-		}
-
+		});
 	}
 
 	const 
 		{ query, sql, table, type, host, client, profile } = req,
-		book = table;
-		/*
-		ctx = { 
-			name:table, host:host, client:client,query:query,
-			speckeys: {},
-			dockeys: {},
-			defaultDocs: defaultDocs
-		}; */
-
+		book = table,
+		modPath = `./notebooks/${book}`;
+	
 	if (type == "help")
 	return res("Publish notebook");
 
-	publishNotebook(sql, book , err => {
-		res( err 
-				? new Error( `PUBLISH ${book} FAILED `+err) 
-				: `PUBLISHING ${book}` );
-	});									
+	//Log(flags, profile);
+	
+	if ( mod = getModule( modPath ) ) {
+		res( errors.ok );
+		genTable( sql, book, mod );
+		genReadme( book );
+	}
+	
+	else
+	if ( profile.Creator )
+		CP.exec( `cp ./notebooks/temp.js ${modPath}.js --no-clobber`, err => {
+			if (err) 
+				res( errors.bookFailed );
+
+			else 
+			if ( mod = getModule( modPath ) ) {
+				res( errors.ok );
+
+				genArtifacts( book, "T"+profile.ID );
+				genTable( sql, book, mod );
+				genReadme( book );
+			}
+
+			else
+				res( errors.bookFailed );
+		})
+
+	else
+		res( errors.noPermission );	
 }
 	
 function storesPlugin(req,res) {

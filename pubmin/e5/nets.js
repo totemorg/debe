@@ -2,8 +2,8 @@
 
 function nets(ctx, res, _ref) {
   var $log = _ref.$log,
-      $trace = _ref.$trace,
-      $pipe = _ref.$pipe;
+      $pipe = _ref.$pipe,
+      $trace = _ref.$trace;
   // define notebook engine
   var Snap = {
     aNet: {
@@ -28,12 +28,12 @@ function nets(ctx, res, _ref) {
   var actors = Snap.actors,
       bhats = Snap.bhats,
       whats = Snap.whats;
-  $log(">>>nets actors", actors);
+  $log("actors", actors);
   $pipe(function (recs) {
     if (recs) {
       // have a batch so extend assoc net
-      $log(">>>nets records", recs.length, actors);
-      recs.forEach(function (rec) {
+      $log("records", recs.length, actors);
+      if (recs.forEach) recs.forEach(function (rec) {
         // make black-white hat assoc net
         var bhat = rec.bhat,
             what = rec.what,
@@ -64,13 +64,16 @@ function nets(ctx, res, _ref) {
             created: now
           }); //$log(edge);
         }
-      });
+      });else {
+        trace("invalid pipe parameters");
+        res(null);
+      }
       Snap.actors = actors;
       Snap.bhats = bhats;
       Snap.whats = whats;
     } else {
       // no more batches so make connection net
-      $log(">>>nets capacity matrix NxN", [actors, actors]);
+      $log("Capacity matrix NxN", [actors, actors]);
 
       if (actors <= 400) {
         var N = actors,
@@ -126,7 +129,7 @@ function nets(ctx, res, _ref) {
         $each(cuts, function (cutsize, cut) {
           // create connection net
           if (cutsize != "0") {
-            $log(">>>nets cut", cutsize);
+            $log("cutsie", cutsize);
             cut.forEach(function (lam, idx) {
               var s = lam.s,
                   t = lam.t,
@@ -147,11 +150,11 @@ function nets(ctx, res, _ref) {
                 maxflow: maxflow,
                 cutsize: cutsize
               });
-              $log(">>>nets", cutsize, s, t);
+              $log("cuts", cutsize, s, t);
             });
           }
         });
-        $log(">>>nets save NxE", [Object.keys(nodes).length, Object.keys(edges).length]);
+        $log("save NxE", [Object.keys(nodes).length, Object.keys(edges).length]);
         ctx._net = [{
           name: "anet",
           nodes: nodes,
@@ -161,7 +164,7 @@ function nets(ctx, res, _ref) {
           nodes: cNodes,
           edges: cEdges
         }];
-      } else $log(">>>nets TOO BIG to make connections !");
+      } else $trace("Too big to make connections !");
 
       res(ctx);
     }
