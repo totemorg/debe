@@ -981,7 +981,7 @@ as described in the [api](/api.view).  `,
 
 		Description: `
 Document your notebook's usecase using [markdown](/api.view):
-	$VIEW{ SRC ? w=WIDTH & h=HEIGHT & x=KEY$INDEX & y=KEY$INDEX ... }
+	$PLOT{ SRC ? w=WIDTH & h=HEIGHT & x=KEY||STORE$KEY & y=KEY||STORE$KEY ... }
 	$ { KEY }
 	[ LINK ] ( URL )
 	$$ inline TeX $$ || n$$ break TeX $$ || a$$ AsciiMath $$ || m$$ MathML $$
