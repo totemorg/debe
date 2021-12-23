@@ -430,9 +430,6 @@ append site_body
 				each val, key in {Export:"bool",Ingest:"bool",Pipe:"doc",Description:"doc",Entry:"json",Exit:"json",Save:"json"}
 					- links[key] = link("+", `/${ds}.mod?${val}=${key}`) + " / " + link("-", `/${ds}.mod?drop=${key}`) + " " + tag(key,"code",{}) + " = "
 
-				each val, key in {backlog:"int",load:"float",budget:"float",cost:"float",batch:"int",limit:"int",start:"date",end:"date",every:"varchar(8)",on:"int",off:"int",rekey:"doc",watch:"int",propose:"bool",baseline:"varchar(64)",agent:"varchar(16)"}
-					- links[key] = link("+", `/${ds}.mod?${val}=Pipe_${key}`) + " / " + link("-", `/${ds}.mod?drop=Pipe_${key}`) + " " + tag("&"+key+"||Pipe_"+key,"code",{}) + " = "
-			
 				:markdown
 					A NOTEBOOK -- a **dataset**-**engine** pair -- is accessed from the following endpoints:
 
@@ -444,130 +441,12 @@ append site_body
 					You may include the following context keys in your NOTEBOOK:  
 					> !{links.Export} SWITCH results into a file  
 					> !{links.Ingest} SWITCH results into the database  
-					> !{links.Pipe} "PATH?OPTIONS" usecase in supervised workflow  
-					> !{links.Description} "MARKDOWN" document usecase  
+					> !{links.Pipe} JSON [source specifier](/pipeapi.view) for this usecase  
+					> !{links.Description} [MARKDOWN to document](/mdapi.view) this usecase    
 					> !{links.Entry} JSON prime context on entry  
 					> !{links.Exit} JSON save context on exit  
-					> !{links.Save} {at:"AT",...} events to in Save_AT stores   
+					> !{links.Save} JSON store of {at:"AT",...}-events to Save_AT  
 					
-					//
-						as well as the following PIPE keys:
-						> !{links.batch} NUMBER of records in each batch  
-						> !{links.limit} maximum NUMBER of records to feed  
-						> !{links.start} starting DATE  
-						> !{links.end} ending DATE  
-						> !{links.every} batching INTERVAL  
-						> !{links.backlog} NUMBER of records at start of baseline phase  
-						> !{links.budget} NUMBER of $/cycle budgeted during baseline phase  
-						> !{links.cost} NUMBER of $/record valued during baseline phase  
-						> !{links.load} NUMBER of records/cycle loading during baseline phase  					
-						> !{links.on} NUMBER of active-state steps (0=continious)  
-						> !{links.off} NUMBER of rest-state steps  
-						> !{links.rekey} [ FROM || REGEXP || (JS) || !rem ] => [ TO || !test ] || KEY || INDEX , ...   
-						> !{links.watch} NUMBER interval to monitor queue  
-						> !{links.propose} SWITCH make this pipe a proposal  
-						> !{links.baseline} NUMBER,.... baselines/training/validation phases   
-						> !{links.agent} NAME of agent to out-source task
-					
-					When executed, your **notebook** places its **FILE.TYPE** source into a buffered, 
-					regulated, enumerated, event or named `Pipe`:
-
-						"PROTOCOL://HOST/ENDPOINT ? QUERY"
-						"/FILE.TYPE ? KEY=EVAL & KEY=KEY & KEY ..."
-						{ "KEY" :  [N, ...] || "MATHJS" , noClobber:N, noRun:N } || { "$" : "MATHJS" }
-						[ EVENT, ... ]
-						".CASE.NOTEBOOK"
-
-					where
-					+ FILE.TYPE may contain both `regular` and `${context key}` expressions 
-					+ MATHJS is a [mathjs](https://mathjs.org/) script (use ";" for "," when needed)  
-					+ NAMED references a [named pipe](/lookups.view?Ref=pipe)
-					+ TYPE = csv || txt || db streams records
-					+ TYPE = jpg || png || nitf streams [images](https://www.npmjs.com/package/jimp)
-					+ TYPE = jpgx || pngx streams [ocr-ed images](https://www.npmjs.com/package/node-tesseract-ocr)  
-					+ TYPE = xls || xlsx || pdf || odt || odp || ods streams [office documents](https://www.npmjs.com/search?q=openoffice)
-					+ TYPE = html || xml streams [scraped documents](https://www.npmjs.com/package/jsdom)
-					+ TYPE = list streams a file of files
-					+ TYPE = json || export || stream streams json files
-					+ TYPE = aoi streams image-chips and meta datasets
-
-					A FILE.aoi stream extends its context with the following keys:
-					> `File` aoi file information  
-					> `Voxel` aoi voxel information  
-					> `Sensor` aoi sensor information  
-					> `Chip` aoi image chip information  
-					> `Flux` aoi solar flux at earth''s surface under current voxel  
-					> `Events` aoi events linked to current voxel  
-					> `Stats` aoi global notebooks information
-					> `Flow` aoi workflow information  
-					>> `F` where F[k] = frequency of count k  
-					>> `T`  observation time [1/Hz]  
-					>> `J` where J[n] = number of jumps taken by n''th process at time T  
-					>> `N ensemble size  
-					>> `trP`	 where trP[n,m] = estimated state transition (from,to) probs at time T  
-					>> `store` event store at time T
-
-					The following PROTOCOLs on buffered `Pipes` are provided: 
-					> http || https to fetch text from the endpoint  
-					> wget || wgets to fetch images from the endpoint   
-					> curl || curls to fetch text from the endpoint  
-					> mask || masks to fetch data via rotated proxies  
-					> lexis || ... to fetch via the [oauth 2.0](https://oauth.net/2/) authorization-authentication protocol  
-			
-					An enumeration `Pipe` will generate and run sub-**usecases** by cross-enumerating the
-					specified context KEYs (or KEY.SUBKEY if KEY is a json store).  Each sub-**usecase** can 
-					adjust its context using a MATHJS script.  Recursive enumeration `Pipes` 
-					are created when a `Pipe.Pipe` is provided.
-
-					Use the `Description` key to document your **usecases**:
-
-						$ VIEW { SRC ? w=WIDTH & h=HEIGHT & x=KEY$INDEX & y=KEY$INDEX ... }  
-						$ { JS }   
-						[ LINK ] ( URL )  
-						$ $ inline TeX $ $ || n$ $ break TeX $ $ || a$ $ AsciiMath $ $ || m$ $ MathML $ $
-						TeX := TeX || #VAR || VAR#KEY#KEY...  
-						| GRID | ... |  
-						# SECTION  
-						ESCAPE || $with || $for || $if:\\n \\t BLOCK \\n
-
-					Available viewers include: 
-					[line plot](/xplot.view?help), 
-					[circle pack](/xpack.view?help), 
-					[nodal tree](/xtree.view?help), 
-					[c force graph](/xcforce.view?help), 
-					[force graph](/xforce.view?help), 
-					[chordal plot](/xchords.view?help), 
-					[bar plot](/xbarplot.view?help), 
-					[bouncy balls](/xbounce.view?help), 
-					[burst chart](/xburst.view?help), 
-					[c tree fan](/xctree.view?help), 
-					[tree fan](/xtree.view?help), 
-					[delvoi](/xdelvoi.view?help),
-					[dendro](/xdendro?help), 
-					[fan](/xfan.view?help), 
-					[gears](/xgears.view?help),
-					[sankey diagram](/xsankey.view?help),
-					[tidy chart](/xtidy.view?help),
-					[us map](/xusmap.view?help), 
-					[world map](/xworldmap.view?help), 
-					[wordcloud](/xwordcloud.view?help), 
-					[anaglyph](/xanaglyph.view?help)
-					[tipsheet](/tipsheet.view?help), 
-					[nodal graph](/xgraph.view?help) and
-					[polygon](/xpoly.view?help).
-
-					An example `Descripton`:
-
-						$plot{src=regress&name=test1&w=600&h=400&x=Save_train$.x[$chan]&y=Save_train$.y[$chan]&min=0,0&max=255,255}
-						[go home](home.view?w=500&h=100)
-						[go here grasshopper](https://here.gov/test.txt)
-						$force{w=100&h=100&src=/queues?_pivots=class}
-						$$ \alpha = 1 + \beta $$ impressive ''eh
-
-					will embed: (1) a [d3 plot](/plot.view) of the x,y data from regress **usecase** "test1" using the chan widget, (2) 
-					a link to the [home.view](/home.view), (3) a link to [the url](https://here.gov/test.txt), (4) the [image](/shares/a1.jpg), 
-					(5) a [d3 force](/force.view) of the queues **dataset** pivoted by class, (6) an inline TeX equation.  
-						
 					#{nick} will [group keys](/skinguide.view) according to the "_" key-divider.  For example,
 					the g1_a, g1_b, g1_g2_x, g1_g2_y, _X, _Y keys will be displayed in groups as (g1,a,b,g2(x,y)),readonly(X,Y).
 
