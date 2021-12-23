@@ -700,7 +700,7 @@ const
 	/**
 	Inspect doc - kludge i/f to support nlp project
 	*/
-	inspector: (doc,to,cb) => {
+	linkInspect: (doc,to,cb) => {
 		
 		Log("sendmail", doc,to);
 		
@@ -7311,7 +7311,7 @@ switch ( process.argv[2] ) { // unit tests
 			{ ingestFile } = require("geohack");
 		
 		config({
-			riddles: 10,
+			"secureLink.challenge.extend": 10,
 			onFile: {
 				"./uploads/": (sql, name, path) => {  // watch changes to a file				
 
@@ -7390,7 +7390,7 @@ clients, users, system health, etc).`
 	*/
 	case "D2":
 		config({
-			riddles: 10,
+			"secureLink.challenge.extend": 10,
 			"byTable.": {
 				wfs: function (req,res) {
 					res("here i go again");

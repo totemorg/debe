@@ -446,7 +446,7 @@ config({
     * [~isSpawned](#module_DEBE..isSpawned) : <code>Boolean</code>
     * [~bySOAP](#module_DEBE..bySOAP) : <code>Object</code>
     * [~blindTesting](#module_DEBE..blindTesting) : <code>Boolean</code>
-    * [~inspector()](#module_DEBE..inspector)
+    * [~linkInspect()](#module_DEBE..linkInspect)
     * [~licenseCode()](#module_DEBE..licenseCode)
     * [~sendMail()](#module_DEBE..sendMail)
     * [~onUpdate()](#module_DEBE..onUpdate)
@@ -1223,9 +1223,9 @@ Reserved for soap interfaces
 Enable for double-blind testing
 
 **Kind**: inner property of [<code>DEBE</code>](#module_DEBE)  
-<a name="module_DEBE..inspector"></a>
+<a name="module_DEBE..linkInspect"></a>
 
-### DEBE~inspector()
+### DEBE~linkInspect()
 Inspect doc - kludge i/f to support nlp project
 
 **Kind**: inner method of [<code>DEBE</code>](#module_DEBE)  
