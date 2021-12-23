@@ -7306,10 +7306,7 @@ switch ( process.argv[2] ) { // unit tests
 	@memberof UnitTest
 	*/
 
-	case "debug": 
-	case "oper":
-	case "prod":
-	case "prot":
+	case "admin":
 		const
 			{ ingestFile } = require("geohack");
 		
@@ -7497,7 +7494,6 @@ clients, users, system health, etc).`
 		});
 		break;
 		
-	case "admin":
 	case "lab":
 		
 		config({}, sql => {
