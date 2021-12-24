@@ -101,17 +101,27 @@ Simply install and start its federated docker image (
 
 ## Manage 
 
-	npm test [ ? || D1 || D2 || ... ]	# Unit test
-	npm run redoc						# Update repo
-	npm run startdb						# Start the database servers
-	npm run prot						# Configure for protected mode
-	npm run debug						# Configure for debugging mode
-	npm run oper						# Configure for operational mode
-	npm run prod						# Configure for production mode
-	npm run updateio					# Update totemstan.github.io from jades/totemblog
+### Defining operating mode
+
+	npm run setprot						# Configure for protected mode
+	npm run setdebug					# Configure for debugging mode
+	npm run setoper						# Configure for operational mode
+	npm run setprod						# Configure for production mode
+
+### Starting
+
+	npm run genio						# Generate totemstan.github.io from jades/totemblog
 	npm run raster --in=src --out=tar	# Rasterize source url into a target file 
 	npm run lab							# Start debe with matrix lab workshop
 	npm run admin						# Start debe 
+
+### Testing and maintenance 
+	npm test [ ? || D1 || D2 || ... ]	# Unit test
+	npm run	startdbs					# Start required database servers
+	npm run redoc						# Update repo
+	npm run verminor					# Roll version
+	npm run vermajor					# Roll version
+	rpm run	relink						# Relink dependent TOTEM modules
 
 ## Usage
 
