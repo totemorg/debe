@@ -54,27 +54,7 @@ Clone **TOTEM** from one of its repos:
 	git clone https://sc.appdev.proj.coe/acmesds/totem
 	git clone https://gitlab.west.nga.ic.gov/acmesds/totem
 
-and define its env vars:
-
-	MYSQL_HOST = domain name
-	MYSQL_USER = user name
-	MYSQL_PASS = user password
-	TXMAIL_HOST = DOMAIN:PORT
-	TXMAIL_USER = ACCOUNT:PASSWORD
-	RXMAIL_HOST = DOMAIN:PORT
-	RXMAIL_USER = ACCOUNT:PASSWORD
-	SERVICE_PASS = passphrase to server pki cert
-	SERVICE_WORKER_URL = http(s)://DOMAIN:PORT
-	SERVICE_MASTER_URL = http(s)://DOMAIN:PORT
-	HOSTNAME = name of host machine
-	REPO = http(s)://DOMAIN:ACCOUNT
-	JIRA = http://DOMAIN
-	RAS = http://DOMAIN
-	BY = https://DOMAIN
-
-Passwords are defined in **TOTEM**'s `_pass.sh` script.
-
-Dependent modules:
+then install its dependencies:
 
 + **ENUMS** [WWW](https://github.com/totemstan/enums)  [COE](https://sc.appdev.proj.coe/acmesds/enums)  [SBU](https://gitlab.west.nga.ic.gov/acmesds/enums)  
 + **SECLINK** [WWW](https://github.com/totemstan/securelink)  [COE](https://sc.appdev.proj.coe/acmesds/securelink)  [SBU](https://gitlab.west.nga.ic.gov/acmesds/securelink)  
@@ -107,6 +87,24 @@ Simply install and start its federated docker image (
 	npm run setdebug					# Configure for debugging mode
 	npm run setoper						# Configure for operational mode
 	npm run setprod						# Configure for production mode
+
+to establish the following env vars:
+
+	MYSQL_HOST = domain name
+	MYSQL_USER = user name
+	MYSQL_PASS = user password
+	TXMAIL_HOST = DOMAIN:PORT
+	TXMAIL_USER = ACCOUNT:PASSWORD
+	RXMAIL_HOST = DOMAIN:PORT
+	RXMAIL_USER = ACCOUNT:PASSWORD
+	SERVICE_PASS = passphrase to server pki cert
+	SERVICE_WORKER_URL = http(s)://DOMAIN:PORT
+	SERVICE_MASTER_URL = http(s)://DOMAIN:PORT
+	HOSTNAME = name of host machine
+	REPO = http(s)://DOMAIN:ACCOUNT
+	JIRA = http://DOMAIN
+	RAS = http://DOMAIN
+	BY = https://DOMAIN
 
 ### Starting
 
