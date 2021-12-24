@@ -970,17 +970,17 @@ Usage:
 		//Script: `Script to munge data: $.X(...) with X = resize || greyscale || sym || shuffle || get.`,
 		
 		Pipe: `
-Place data source into a buffered, regulated, enumerated, event or named *Pipe*:
+Place data source into a [buffered, regulated, enumerated, event or named *Pipe*](/pipeapi.view):
 	"PROTOCOL://HOST/ENDPOINT ? QUERY"
 	"/FILE.TYPE ? _batch=N & _limit=N & _start=DATE & _end=DATA & _every=sec||min||hr||... & _util=N & _on=N & _off=N & _watch=N & _propose=N & _basline=N,...N & _agent=X & REKEY=EVAL||KEY"
 	{ "KEY" :  [N, ...] || "MATHJS" , noClobber:N, noRun:N } || { "$" : "MATHJS" } 
 	[ EVENT, ... ]
 	".CASE.NOTEBOOK"
 
-as described in the [api](/api.view).  `,
+`,
 
 		Description: `
-Document your notebook's usecase using [markdown](/api.view):
+[Document your notebook's usecase](/mdapi.view):
 	$PLOT{ SRC ? w=WIDTH & h=HEIGHT & x=KEY||STORE$KEY & y=KEY||STORE$KEY ... }
 	$ { KEY }
 	[ LINK ] ( URL )
@@ -991,7 +991,7 @@ Document your notebook's usecase using [markdown](/api.view):
 	ESCAPE || $with || $for || $if:
 		BLOCK
 
-as described in the [Notebooks api](/api.view). `,
+`,
 
 		Entry: `
 Prime your notebook's context KEYs on entry:
@@ -4230,15 +4230,16 @@ save = CLIENT.HOST.CASE to save
 		*/
 		alert: (req,res) => {
 			const
-				{sql,query,type,client} = req,
-				{ msg } = query;
+				{sql,query,type,client,prog} = req,
+				{ msg } = query,
+				{ sio } = DEBE.secureIO;
 
 			if ( type == "help" )
 			return res("Send an alert msg = MESSAGE to all clients." );
 
-			if ( site.pocs.overlord.indexOf( req.client ) >= 0 ) {
-				if (IO = TOTEM.IO)
-					IO.sockets.emit("alert",{msg: msg || "hello", to: "all", from: client});
+			if ( prof.Admin ) {
+				if (sio)
+					sio.emit("alert",{msg: msg || "hello", to: "all", from: client});
 
 				//Trace(msg, req);
 				res(errors.ok);
@@ -4257,13 +4258,14 @@ save = CLIENT.HOST.CASE to save
 		stop: (req,res) => {
 
 			const
-				{type,query} = req;
+				{type,query} = req,
+				{sio} = DEBE.socketIO;
 
 			if (type == "help")
 			return res("Stop the service");
 
-			if (IO = TOTEM.IO)
-				IO.sockets.emit("alert",{msg: query.msg || "system halted", to: "all", from: site.nick});
+			if (sio)
+				sio.emit("alert",{msg: query.msg || "system halted", to: "all", from: site.nick});
 
 			res("Server stopped");
 			process.exit();

@@ -81,45 +81,23 @@ append site_body
 
 					:markdown
 						Run your *#{ds}* notebook by selecting the desired usecase context and clicking *Execute*.  
-						Other uses: !{uses}.  Notebook [status](/projects.view) reflected as: 
+						
+						Other uses: !{uses}.
+						
+						Notebook [status](/projects.view): 
 						<font color="green">unfunded</font>, 
 						<font color="yellow">policed</font>, <font color="orange">started</font>, 
 						<font color="red">broken</font>, <font color="pink">retired</font>,
 						<font color="yellow">policed</font>.  
 
-						Your notebook may add/remove the [following context keys](/api.view):
+						Your notebook may add (+) / remove (-) the following [context keys](/api.view):
 						> !{links.Export} SWITCH results into a file  
 						> !{links.Ingest} SWITCH results into the database  
-						> !{links.Pipe} "PATH?OPTIONS" usecase in supervised workflow  
-						> !{links.Description} "MARKDOWN" document usecase  
+						> !{links.Pipe} JSON [source data](/pipeapi.view)  
+						> !{links.Description} MARKDOWN [document usecase](/mdapi.view)  
 						> !{links.Entry} JSON prime context on entry  
 						> !{links.Exit} JSON save context on exit  
-						> !{links.Save} {at:"AT",...} events to in Save_AT stores   
-						> !{links.batch} NUMBER of records in each batch  
-						> !{links.limit} maximum NUMBER of records to feed  
-						> !{links.start} starting DATE  
-						> !{links.end} ending DATE  
-						> !{links.every} batching INTERVAL  
-						> !{links.backlog} NUMBER of records at start of baseline phase  
-						> !{links.budget} NUMBER of $/cycle budgeted during baseline phase  
-						> !{links.cost} NUMBER of $/record valued during baseline phase  
-						> !{links.load} NUMBER of records/cycle loading during baseline phase  
-						> !{links.on} NUMBER of active-state steps (0=continious)  
-						> !{links.off} NUMBER of rest-state steps  
-						> !{links.rekey} [ FROM || REGEXP || (JS) || !rem ] => [ TO || !test ] || INDEX , ...   
-						> !{links.watch} NUMBER interval to monitor queue  
-						> !{links.propose} SWITCH make this pipe a proposal  
-						> !{links.baseline} NUMBER,.... baselines/training/validation phases   
-						> !{links.agent} NAME of agent to out-source task
-
-						Place a data source into a buffered, regulated, enumerated or event *Pipe*:
-
-							"PROTOCOL://HOST/ENDPOINT ? QUERY"  
-							"/FILE.TYPE ? OPTION = VALUE & ..."
-							{ "KEY" :  [N, ...] || "MATHJS" , noClobber:N, noRun:N } || {"$" : "MATHJS" } || {"$named" : "NAMED"}  
-							[ EVENT, ... ]
-
-						as described in the [notebook api](/api.view).
+						> !{links.Save} JSON store of {at:"AT",...}-events to Save_AT  
 						
 			tab.Jobs
 				grid#Jobs(
@@ -175,7 +153,7 @@ append site_body
 					cols="ID.n..hide,Mod.t,Made.d" )
 
 					:markdown
-						Any modifications that were made by the service administrator are shown here.
+						Any activity by notebook administrators are shown here.
 
 		when "exam"
 		when "view"
