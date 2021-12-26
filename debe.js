@@ -53,8 +53,8 @@ const
 	 typeOf,Stream, Fetch } = ENUMS,
 	{ readers, scanner } = READ,
 	{ skinContext, renderSkin, renderJade } = SKIN,
-	{ runTask, queues, 
-		sqlThread, errors, paths, cache, site, byTable, userID,
+	{ runTask, queues, byAction,
+		sqlThread, errors, paths, cache, site, byTable, userID, dsThread,
 		watchFile, timeIntervals, neoThread, startJob, $master } = TOTEM,
 	{ JIMP } = $,
 	{ 
@@ -724,6 +724,9 @@ const
 	/**
 	*/
 	$libs: {   // share these modules with engines
+			
+		$site: site,
+		
 		$notebooks: [],
 		
 		/**
@@ -769,6 +772,28 @@ Usage:
 		See [jsdb]{@link https://github.com/totemstan/jsdb/}
 		*/
 		$sql: sqlThread,
+		
+		$select: (url,cb) => dsThread( {
+			url: "/"+url,
+			body: {},
+			client: "$lab"
+		}, req => byAction.select(req, cb||$log) ),
+		$update: (url,body,cb) => dsThread( {
+			url: "/"+url,
+			body: body||{},
+			client: "$lab"
+		}, req => byAction.update(req, cb||$log) ),
+		$insert: (url,body,cb) => dsThread( {
+			url: "/"+url,
+			body: body||{},
+			client: "$lab"
+		}, req => byAction.insert(req, cb||$log) ),
+		$delete: (url,cb) => dsThread( {
+			url: "/"+url,
+			body: {},
+			client: "$lab"
+		}, req => byAction.delete(req, cb||$log) ),
+		
 		/**
 		See [jsdb]{@link https://github.com/totemstan/jsdb/}
 		*/
@@ -1670,27 +1695,23 @@ Keys:
 				*/
 			}
 
-			site.mods.forEach( mod => site["$"+mod] = site.$repo+"/"+mod );
+			//site.mods.forEach( mod => site["$"+mod] = site.$repo+"/"+mod );
+			
+			if ( site.sitemap )
+				site.sitemap = site.sitemap.gridify({
+					a:"Site",
+					b:"Usage",
+					c:"Corporate",
+					d:"Follow Us",
+					e:"[Sponsorships](http://totem.hopto.org/likeus)".linkify(),
+					f:"Fork" 
+				});
 			
 			SKIN.config({
-				context: site,
-				route: routeTable
+				context: site
+				// route: routeTable
 			});
 			
-			/*
-			FLEX.config({ 		// table emulation
-				sqlThread: sqlThread,
-				//emitter: DEBE.IO ? DEBE.IO.sockets.emit : null,
-				//skinner: JADE,
-				// $libs: $libs,
-				sendMail: sendMail,
-				createCert: TOTEM.createCert,
-				//diag: TOTEM.diag,
-				getList: TOTEM.filterFile,
-				Fetch: TOTEM.Fetch,
-				site: TOTEM.site						// Site parameters
-			}); */
-
 			$.config({		// matrix manipulator
 				sqlThread: sqlThread,
 				runTask: runTask,
@@ -4968,6 +4989,7 @@ size, pixels, scale, step, range, detects, infile, outfile, channel.  This endpo
 		
 		tag: (src,el,tags) => src.tag(el,tags),
 
+		/*
 		sitemap: [
 			{a: "[Terms](http://totem.hopto.org/terms.view)" ,	
 			 b: "[Issues](http://totem.hopto.org/issues.view)", 
@@ -5009,7 +5031,8 @@ size, pixels, scale, step, range, detects, infile, outfile, channel.  This endpo
 			a:"Site",b:"Usage",c:"Corporate",d:"Follow Us",
 			e:"[Sponsorships](http://totem.hopto.org/likeus)".linkify(),
 			f:"Fork" }),
-						
+		*/
+		
 		/**
 		Title ti to fileName fn
 		@method hover
