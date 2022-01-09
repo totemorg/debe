@@ -6,9 +6,9 @@ append base_help
 
 			- etc = side bar links (!{etc})
 			- name = site name (!{query.name})
-			- dock = folder docking style left || right || top || bottom (!{dock})
+			- dock = folder docking style = left || right || top || bottom (!{dock})
 			- dims = width,height maximum widget dimensions (!{dims})
-			- view = site style Home | Kiss | Engr | Min | Basic | Simple, ... (!{view})
+			- view = site style = cesium || osm || nodered || neo4j || openlayers || home || kiss || min || basic || simple, ... (!{view})
 			- page = maximum grid rows (!{page})
 			- pulse = grid refresh rate [seconds] (!{pulse})
 			- secureLink = enable the secureLink (!{secureLink})
@@ -16,11 +16,11 @@ append base_help
 append base_parms
 	block site_parms
 		- etc = "links || status || pocs"
-		- dock = "top" // folder docking style left | right | top | bottom
-		- dims = "100%,100%" // width,height maximum widget dimensions 
-		- view = "tabbed" // site style Home | Kiss | Engr | Min | Basic | Simple, ..
-		- page = 50 // maximum grid rows
-		- pulse = 120 // refresh rate [seconds]
+		- dock = "top" 
+		- dims = "100%,100%"  
+		- view = "tabbed" 
+		- page = 50 
+		- pulse = 120 
 		- secureLink = true
 		- embeds = {cesium: "http://localhost:8083/Apps/totem_index.html", neo4j: "http://localhost:7474", osm: "http://localhost:3000", nodered: "http://localhost:5050"}
 	
