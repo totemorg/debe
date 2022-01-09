@@ -53,12 +53,12 @@ append base_body
 		- users = "".tag("select").tag("span",{id:"users"})
 		//- rooms = "".tag("select").tag("span",{id:"rooms"})
 		- tips = {save:"!!passphrase saves history",load:"!!passphrase loads history",delete:"clear history",lock:"privacy status",login:"!!reset||temp||logoff||account/password|| login"}
-		- scroll = "".tag("input",{id:"scroll",type:"number",value:1,min:0,max:0,onclick:"notice_scroll()"})
+		- scroll = "".tag("input",{id:"scroll",type:"number",value:1,min:0,max:0,onclick:"secure_scroll()"})
 		- upload = "".tag("input", {id:"upload",class:"inputfile",type:"file",size:10,value:"/myfiles"})+"upload".tag("label",{for:"upload"})
-		- but = name => "".tag("img",{src:`/clients/icons/actions/${name}.png`,width:15,height:15}).tag("button",{id:name,text:name,value:"on",class:"btn",onclick:`notice_${name}()`})
+		- but = name => "".tag("img",{src:`/clients/icons/actions/${name}.png`,width:15,height:15}).tag("button",{id:name,text:name,value:"on",class:"btn",onclick:`secure_${name}()`})
 		- ctrl = name => (but(name)+tips[name].tag("span",{class:"w3-text"})).tag("span",{class:"w3-tooltip"})
 		- ctrls = ctrl("save")+ctrl("load")+ctrl("login")+scroll
-		- notice = "".tag("input", {id:"notice",type:"text",autocomplete:"on",size:75,value:"hello",onchange:"notice_signal()"})
+		- notice = "".tag("input", {id:"notice",type:"text",autocomplete:"on",size:75,value:"hello",onchange:"secure_signal()"})
 		- tick = "".tag("input", {id:"tick",type:"text",size:1, class:"infoBox", value:timeout,	disabled: 1, style:"display:none"}),
 		- tries = "".tag("input", {id:"tries",	type:"text",size:1, class:"infoBox", value:retries,	disabled: 1, style:"display:none" }),
 		- toolbar += [users, tick + tries, users, notice, ctrls, upload].join(" || ")
