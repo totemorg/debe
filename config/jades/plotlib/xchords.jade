@@ -67,6 +67,10 @@ append base_head
 			debug: parseInt("#{query.debug}"),
 
 			keys: {
+				NODE: "#{query.node}" || "name",
+				CHILDREN: "#{query.children}" || "children",
+				VALUE: "#{query.value}" || "value",
+				DOC: "#{query.doc}" || "doc"
 			}
 		};
 

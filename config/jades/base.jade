@@ -4,7 +4,7 @@ append layout_help
 	:markdown
 		# base options:
 
-			- tech = skinning tech flow || cesium || d3 || wolrd || usa || voxel || three || reveal || scene || elFinder || isotope || apy || layout || dojo || extjs (!{tech})
+			- tech = skinning tech flow || d3 || world || usa || cubeland || forest || simple || three || reveal || scene || elFinder || isotope || apy || layout || dojo || extjs (!{tech})
 			- highlight = code highlighting tech (!{highlight})
 			- math = enable embedded math (!{math})
 			- capture = enable browser canvas capture (!{capture})
@@ -17,27 +17,15 @@ append layout_help
 			- ext_jsonEdit = true
 			- ext_theme = "crisp || ..." 
 
-		### layout options:
+		### tablayout options:
 
 			- layout_grid = "datatable || w2ui || easyui || jqgrid"
 			- layout_image = "darkroom || vide || fabric || camen" 
-			- layout_password = false
-			- layout_themer = ""
-			- layout_opens = false
-
-		### voxel options:
-
-			- voxel_game = "cubeland || ..." 
+			- layout_theme = "..."
 
 		### three options:
 
 			- three_effect = "AnaglyphEffect || ... "
-
-		### cesium options:
-
-			- source = query.source
-			- width = 750
-			- height = 500
 
 	block base_help
 
@@ -57,11 +45,7 @@ append layout_parms
 		// layout
 		- layout_grid = "datatable"
 		- layout_image = "darkroom" 
-		- layout_password = false
-		- layout_themer = ""
-		- layout_opens = false
-		// voxel
-		- voxel_game = "cubeland" 
+		- layout_theme = ""
 		// three
 		- three_effect = "AnaglyphEffect"
 
@@ -91,10 +75,6 @@ append layout_head
 			script(type="text/javascript",src="/clients/joint/joint.shapes.pn.min.js")
 			script(type="text/javascript",src="/clients/joint/joint.shapes.erd.min.js")
 
-		when "cesium"
-			// https://cesium.com/
-			iframe(src="http://localhost:8080/cesium.html?src=/test/this.json",width=750,height=500)
-
 		when "d3"
 		when "d3v3"
 		when "d3v4"
@@ -115,9 +95,11 @@ append layout_head
 			script(type="text/javascript",src="/clients/maps/datamaps.usa.min.js")
 			script(type="text/javascript",src="/uis/uidraw.js")
 
-		when "voxel"
+		when "cubeland"
+		when "forest"
+		when "simple"
 			// https://github.com/voxel/voxel-clientmc
-			//script(type="text/javascript",src="/clients/games/#{voxel_game}/bundle.js")
+			script(type="text/javascript",src="/clients/games/#{view}/bundle.js")
 
 		when "three"
 			// https://threejs.org/
@@ -193,6 +175,7 @@ append layout_head
 			//a(href="http://-apycom.com/")
 		
 		when "layout"
+		when "tablayout"
 			// load order is important: jquery, jqueryui, then grids etc
 
 			// link(href='/clients/jquery/ui/css/smoothness/jquery-ui.css',rel='stylesheet')
@@ -321,7 +304,7 @@ append layout_head
 					script(type="text/javascript",src="/clients/darkroom/lib/js/plugins/darkroom.remove.js")
 					script(type="text/javascript",src="/clients/darkroom/lib/js/plugins/darkroom_help.js")
 
-			case layout_themer
+			case layout_theme
 				when "switcher"
 					script(type="text/javascript",src='/clients/jquery/plugins/misc/themeswitchertool.js')
 
@@ -443,10 +426,6 @@ append layout_body
 			#content
 				block base_body
 
-		when "cesium"
-			block base_body
-			iframe(src="#{domain}/geonode/cesium.html?src=#{source}",width="#{width}",height="#{height}")
-
 		when "three"
 			block base_body
 			script(type="text/javascript",src="/clients/threejs/build/three.min.js")
@@ -510,21 +489,9 @@ append layout_body
 							.tab-label
 								| dude		
 				block base_body
-			script(type="text/javascript",src="/clients/games/#{voxel_game}/bundle.js")
 
 		when "layout"
-			if layout_opens
-				a(href="/"+table+".view?"+search) open
-				|  || 
-				a(href="/edit.view?name="+table) edit
-				|  || 
-				a(href="/send.view?name="+table) send
-			
-			if layout_password
-				input#text(type="password")
-				| Forceable in <span>less than one second</span>
-				//- $("#text").pwdstr("$info");
-
+		when "tablayout"
 			#content
 				block base_body
 

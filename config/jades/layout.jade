@@ -47,8 +47,9 @@ else
 				// script(type="text/javascript",src="/uis/follow.js")
 
 			//-
-				The socketio path is "/socket.io/socket.io-client.js" || "/socketio/socketio-client.js" to enable buggy||working 
-				client-to-client communications.  The socketio interface is established when the server does a 
+				The server provides a socketio = "/socket.io/socket.io-client.js" (when using the buggy socketio provided
+				by the npm community) or "/socketio/socketio-client.js" (when using the good sockeio provided my totem).
+				The socketio interface is established when the server does a 
 				require( "socketio" || "socket.io" ) to create its endpoints at "/socketio" || "/socket.io", and when the 
 				client imports its socketio via a <script src=socketio> tag.  When sockets are not being supported, 
 				the server provides socketio = "/socketio/nosockets.js". 

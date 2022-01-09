@@ -45,10 +45,17 @@ append base_head
 				height: parseInt("#{query.h}") || 500
 			},
 			debug: parseInt("#{query.debug}" || "0"),
+			
+			keys: {
+				NODE: "#{query.node}" || "name",
+				CHILDREN: "#{query.children}" || "children",
+				VALUE: "#{query.value}" || "value",
+				DOC: "#{query.doc}" || "doc"
+			}			
 		};
 
-		const {NODE, NODES, VALUE, SIZE, PARENT, DOC} = opts;
-		const {isString,isArray,Fetch,Log} = BASE;
+		const {NODE, NODES, VALUE, SIZE, PARENT, DOC} = opts.keys;
+		//const {isString,isArray,Fetch,Log} = BASE;
 
 append base_body
 	script.

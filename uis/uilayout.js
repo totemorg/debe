@@ -441,8 +441,19 @@ $().ready( () => {
 		},
 
 		/**
-		Render widgets in the dom per the [totem skinguide](/skinguide.view).  After the dom in renderer, 
-		use Activate to configure these widgets.
+		Render widgets in the dom per the [totem skinguide](/skinguide.view) starting from the $at element.  
+		Callbacks are made to the appropriate widget redendering agent cbs = {
+			:
+			:
+			post: ($els,tabs) => {...},
+			image: ($els,tabs) => {...},
+			folder: ($els,tabs) => {...},
+			accordion: ($els,tabs) => {...},
+			grid: ($els,tabs) => {...},
+			border: ($els,tabs) => {...},		// border must be last entry
+		}.  
+		
+		After the dom in renderer, use Activate to configure these widgets.
 		*/
 		Render: ( $at, cbs) => {
 			const
@@ -500,6 +511,8 @@ $().ready( () => {
 
 									$el.attr(pane,"");  // clear posting to prevent infinite recursion
 
+									//Log(">>>post", pane, post);
+									
 									if (post)
 										post.split(",").forEach( url => {
 											if (url)
@@ -515,7 +528,7 @@ $().ready( () => {
 									if (html) update += html.tag(Tab,{ id:pane } );
 								}
 
-								Log(">>>posting", update);
+								//Log(">>>posting", update);
 								$el.replaceWith( // replace widget with border-ed version
 									( update + el.outerHTML.tag(Tab,{id:"center"}) ).tag("border",{id:id+".help"})
 								);	
@@ -532,7 +545,17 @@ $().ready( () => {
 		},
 
 		/**
-		Configure and activate widgets that were rendered with Render.
+		Configure and activate widgets starting at $el that were previously Rendered.  Callbacks are made
+		to the appropriate widget activation agents cbs = {
+			:
+			:
+			post: $els => {...},
+			image: $els => {...},
+			folder: $els => {...},
+			accordion: $els => {...},
+			grid: $els => {...},
+			border: $els => {...}
+		}.
 		*/
 		Activate: ( $el, cbs) => {
 			//Log("activate", $el[0] );
@@ -556,7 +579,7 @@ $().ready( () => {
 	
 	const 
 		$start = $("#content"), 
-		widgets = Render( Uncomment($start), {		// 
+		widgets = Render( Uncomment($start), {
 			post: ($el,tabs) => {
 				const
 					path = $el.attr("path") || "",
@@ -740,11 +763,11 @@ $().ready( () => {
 						i: "text",
 						f: "text",
 
-						checkbox: "radio",	// radio, checkbox, boolean
-						boolean: "radio",
-						tinyint: "radio",
-						b: "radio",
-						c: "radio",
+						checkbox: "checkbox",	// radio, checkbox, boolean
+						boolean: "checkbox",
+						tinyint: "checkbox",
+						b: "checkbox",
+						c: "checkbox",
 
 						varchar: "text",
 						text: "text",
@@ -1568,7 +1591,7 @@ $().ready( () => {
 						dom: //bootstrap3
 "<'row'<'col-sm-6'RCZB><'col-sm-6'f>>" +
 "<'row'<'col-sm-12'tr>>" +
-"<'row'<'col-sm-5'il><'col-sm-7'p>>",
+"<'row'<'col-sm-5'l><'col-sm-7'p>>",
 							// '<"top"RCZBf<"clear">>rt<"bottom"ipl<"clear">>',
 							// 'RBlfrtip', //'RCZBlfrtip',
 							// '<"top"RCZBf<"clear">>rt<"bottom"ilp<"clear">>', //'Bfrtip',	//Zlfrtip
@@ -1782,9 +1805,9 @@ $().ready( () => {
 								action: ( e, dt, node, config ) => {
 									const 
 										data = dt.rows({selected:true}).data(),
-										sel = data[0] || {};
+										sel = data[0] || {Name:""};
 
-									sel.Name = "undefined";
+									sel.Name = "clone"+sel.Name;
 
 									//console.log( "sel", sel );
 									$.ajax({

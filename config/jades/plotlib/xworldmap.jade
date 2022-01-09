@@ -49,15 +49,17 @@ append base_head
 			},
 			debug: parseInt("#{query.debug}"),
 
-			NODE: "#{query.node}" || "name",
-			NODES: "#{query.nodes}" || "children",
-			VALUE: "#{query.value}" || "value",
-			PARENT: "#{query.parent}" || "parent",
-			SIZE: "#{query.size}" || "size",
-			DOC: "#{query.doc}" || "doc"
+			keys: {
+				NODE: "#{query.node}" || "name",
+				NODES: "#{query.nodes}" || "children",
+				VALUE: "#{query.value}" || "value",
+				PARENT: "#{query.parent}" || "parent",
+				SIZE: "#{query.size}" || "size",
+				DOC: "#{query.doc}" || "doc"
+			}
 		};
 		
-		const {NODE, NODES, VALUE, SIZE, PARENT, DOC} = opts;
+		const {NODE, NODES, VALUE, SIZE, PARENT, DOC} = opts.keys;
 
 append base_body
 	div(id="container")
