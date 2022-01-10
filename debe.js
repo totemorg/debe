@@ -1056,6 +1056,9 @@ as described in the [Notebooks api](/api.view). `,
 	
 		const {txMail} = DEBE;
 		
+		Log(">>>sendmail", opts);
+		
+		return;
 		if (opts.to) {
 			//opts.from = "totem@noreply.net"; 
 			/*opts.alternatives = [{
@@ -1064,7 +1067,7 @@ as described in the [Notebooks api](/api.view). `,
 			}]; */
 
 			//Log(">>>sendmail", opts);
-			txMail.sendMail(opts, (err,info) => {
+			txMail.sendMail( opts, (err,info) => {
 				//Log(">>>email", err,info);
 				if ( cb ) cb(info);
 			});
@@ -1188,6 +1191,8 @@ as described in the [Notebooks api](/api.view). `,
 						}
 					};
 
+				//Log(txHost+":"+txPort, txMail.sendMail);
+			
 			if (rxMail)					// Establish server's email inbox	
 				rxMail.connect( err => {  // login cb
 					if (err) Log(err);
@@ -1635,9 +1640,9 @@ Keys:
 				if ( false ) startNews(sql);
 
 				startMail( err => {
-					if (false)
+					if (true)
 					sendMail({		// notify admin service started
-						to: site.pocs.admin,
+						to: "brian.d.james@comcast.net", //site.pocs.admin,
 						subject: site.nick + " started", 
 						text: "Just FYI"
 					} );
