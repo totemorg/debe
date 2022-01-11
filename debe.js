@@ -1,11 +1,10 @@
 ﻿// UNCLASSIFIED 
 
+// NodeJS modules
 const 									
-	// globals
 	ENV = process.env,
-	READ = require("reader"),		// partial config of NLP (avoids string prototype collision)
+	//READ = require("reader"),		// partial config of NLP (avoids string prototype collision)
 	
-	// NodeJS modules
 	CLUSTER = require("cluster"),
 	STREAM = require("stream"), 		//< pipe streaming
 	CRYPTO = require("crypto"),
@@ -13,28 +12,28 @@ const
 	FS = require("fs"), 				//< filesystem and uploads
 	VM = require("vm"),					//< virtual machines
 	OS = require("os"),					//< os utilities
-	REPL = require("repl"),
-			
-	// 3rd party modules
-	  
+	REPL = require("repl");
+
+// 3rd party modules
+const	 
+	MAIL = require('nodemailer'),		// MAIL mail sender
 	JSMIN = require("uglify-js"), 		//< code minifier
 	HMIN = require("html-minifier"), 	//< html minifier
-	MAIL = require('nodemailer'),		// MAIL mail sender
 	IMAP = require('imap'),				// IMAP mail receiver
-	RSS = require('feed'),				// RSS / ATOM news feeder
 	//PDF = require('pdffiller'), 		// pdf form processing
-	//SMTP = require('nodemailer-smtp-transport'),
+	SMTP = require('nodemailer-smtp-transport'),
+	//RSS = require('feed'),				// RSS / ATOM news feeder
 	//RSS = require('feed-read'), 		// RSS / ATOM news reader
 			
 	ODOC = require("officegen"), 		//< office doc generator
 	LANG = require('i18n-abide'), 		//< I18 language translator
 	ARGP = require('optimist'),			//< Command line argument processor
-	TOKML = require("tokml"), 			//< geojson to kml convertor
-	
+	TOKML = require("tokml"); 			//< geojson to kml convertor
+
+// totem modules
+const
 	// include modules
-	EAT = require("./ingesters"),	
-	
-	// totem modules
+	//EAT = require("./ingesters"),	
 	TOTEM = require("totem"),
 	ATOM = require("atomic"), 
 	ENUMS = require("enums"),
@@ -51,7 +50,7 @@ const
 	 isKeyed,isString,isFunction,isError,isArray,isObject,isEmpty,
 	 getList, getURL,
 	 typeOf,Stream, Fetch } = ENUMS,
-	{ readers, scanner } = READ,
+	//{ readers, scanner } = READ,
 	{ skinContext, renderSkin, renderJade } = SKIN,
 	{ runTask, queues, byAction,
 		sqlThread, errors, paths, cache, site, byTable, userID, dsThread,
@@ -1058,7 +1057,7 @@ as described in the [Notebooks api](/api.view). `,
 		
 		Log(">>>sendmail", opts);
 		
-		return;
+		//return;
 		if (opts.to) {
 			//opts.from = "totem@noreply.net"; 
 			/*opts.alternatives = [{
@@ -1189,9 +1188,9 @@ as described in the [Notebooks api](/api.view). `,
 									//Log("MAIL "+ (err || opts.to) );
 								});
 						}
-					};
+					}; 
 
-				//Log(txHost+":"+txPort, txMail.sendMail);
+			//txMail.sendMail({to:"brian.d.james@comcast.net",text:"greetings!"});
 			
 			if (rxMail)					// Establish server's email inbox	
 				rxMail.connect( err => {  // login cb
@@ -1632,7 +1631,7 @@ Keys:
 			});
 		});
 		
-		initLAB( () => {  // init nootbook i/f
+		initLAB( () => {  // init $lab notebooks
 		initENV( () => {  // init environment
 		initSES( () => {  // init sessions
 			
@@ -1764,6 +1763,7 @@ Keys:
 				"$libs.": $libs
 			});
 
+			if (0)
 			READ.config({
 				jimp: JIMP,
 				sqlThread: sqlThread

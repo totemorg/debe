@@ -79,9 +79,7 @@ Simply install and start its federated docker image (
 [SBU](https://gitlab.west.nga.ic.gov/acmesds/dockify)
 ).
 
-## Manage 
-
-### Defining operating mode
+## Setup 
 
 	npm run setprot						# Configure for protected mode
 	npm run setdebug					# Configure for debugging mode
@@ -106,16 +104,15 @@ to establish the following env vars:
 	RAS = http://DOMAIN
 	BY = https://DOMAIN
 
-### Starting
+### Start
 
 	npm run genio						# Generate totemstan.github.io from jades/totemblog
 	npm run raster --in=src --out=tar	# Rasterize source url into a target file 
+	npm run	startdbs					# Start required database servers
 	npm run lab							# Start debe with matrix lab workshop
 	npm run admin						# Start debe 
 
-### Testing and maintenance 
-	npm test [ ? || D1 || D2 || ... ]	# Unit test
-	npm run	startdbs					# Start required database servers
+### Maintenance 
 	npm run redoc						# Update repo
 	npm run verminor					# Roll version
 	npm run vermajor					# Roll version
