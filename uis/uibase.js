@@ -229,6 +229,12 @@ Array.prototype.Extend = function (con) {
 ].Extend(Array);
 
 [
+	function replaceKeys(keys) {
+		var rtn = this;
+		for (var key in keys) rtn = rtn.replace(key,keys[key]);
+		return rtn;
+	},
+	
 	/**
 	*/
 	function parseJSON (def) {

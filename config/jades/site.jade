@@ -62,7 +62,7 @@ append base_body
 		- tick = "".tag("input", {id:"tick",type:"text",size:1, class:"infoBox", value:timeout,	disabled: 1, style:"display:none"}),
 		- tries = "".tag("input", {id:"tries",	type:"text",size:1, class:"infoBox", value:retries,	disabled: 1, style:"display:none" }),
 		- probe = "".tag("span",{id:"probe",class:"w3-text"})
-		- toolbar += [users, tick + tries + probe, notice, ctrls, upload].join(" || ")
+		- toolbar += [users, tick + tries + probe, ctrls, upload, notice].join(" || ")
 
 	p.ui-banner= banner
 	case view
