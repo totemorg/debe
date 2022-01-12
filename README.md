@@ -86,24 +86,6 @@ Simply install and start its federated docker image (
 	npm run setoper						# Configure for operational mode
 	npm run setprod						# Configure for production mode
 
-to establish the following env vars:
-
-	MYSQL_HOST = domain name
-	MYSQL_USER = user name
-	MYSQL_PASS = user password
-	TXMAIL_HOST = DOMAIN:PORT
-	TXMAIL_USER = ACCOUNT:PASSWORD
-	RXMAIL_HOST = DOMAIN:PORT
-	RXMAIL_USER = ACCOUNT:PASSWORD
-	SERVICE_PASS = passphrase to server pki cert
-	SERVICE_WORKER_URL = http(s)://DOMAIN:PORT
-	SERVICE_MASTER_URL = http(s)://DOMAIN:PORT
-	HOSTNAME = name of host machine
-	REPO = http(s)://DOMAIN:ACCOUNT
-	JIRA = http://DOMAIN
-	RAS = http://DOMAIN
-	BY = https://DOMAIN
-
 ### Start
 
 	npm run genio						# Generate totemstan.github.io from jades/totemblog
@@ -113,6 +95,7 @@ to establish the following env vars:
 	npm run admin						# Start debe 
 
 ### Maintenance 
+	
 	npm run redoc						# Update repo
 	npm run verminor					# Roll version
 	npm run vermajor					# Roll version
@@ -142,6 +125,24 @@ follow the **ENUMS** deep copy conventions (
 [COE](https://sc.appdev.proj.coe/acmesds/enum) 
 [SBU](https://gitlab.west.nga.ic.gov/acmesds/enum)
 ).
+
+## Env vars
+
+	MYSQL_HOST = domain name
+	MYSQL_USER = user name
+	MYSQL_PASS = user password
+	TXMAIL_HOST = DOMAIN:PORT
+	TXMAIL_USER = ACCOUNT:PASSWORD
+	RXMAIL_HOST = DOMAIN:PORT
+	RXMAIL_USER = ACCOUNT:PASSWORD
+	SERVICE_PASS = passphrase to server pki cert
+	SERVICE_WORKER_URL = http(s)://DOMAIN:PORT
+	SERVICE_MASTER_URL = http(s)://DOMAIN:PORT
+	HOSTNAME = name of host machine
+	REPO = http(s)://DOMAIN:ACCOUNT
+	JIRA = http://DOMAIN
+	RAS = http://DOMAIN
+	BY = https://DOMAIN
 
 ## Program Reference
 <details>

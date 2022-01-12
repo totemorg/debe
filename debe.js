@@ -1,9 +1,11 @@
 ﻿// UNCLASSIFIED 
 
+const
+	READ = require("reader");			// partial config of NLP (avoids string prototype collision)
+
 // NodeJS modules
 const 									
 	ENV = process.env,
-	//READ = require("reader"),		// partial config of NLP (avoids string prototype collision)
 	
 	CLUSTER = require("cluster"),
 	STREAM = require("stream"), 		//< pipe streaming
@@ -50,7 +52,7 @@ const
 	 isKeyed,isString,isFunction,isError,isArray,isObject,isEmpty,
 	 getList, getURL,
 	 typeOf,Stream, Fetch } = ENUMS,
-	//{ readers, scanner } = READ,
+	{ readers, scanner } = READ,
 	{ skinContext, renderSkin, renderJade } = SKIN,
 	{ runTask, queues, byAction,
 		sqlThread, errors, paths, cache, site, byTable, userID, dsThread,
@@ -1763,7 +1765,6 @@ Keys:
 				"$libs.": $libs
 			});
 
-			if (0)
 			READ.config({
 				jimp: JIMP,
 				sqlThread: sqlThread
