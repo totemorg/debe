@@ -1275,19 +1275,19 @@ as described in the [Notebooks api](/api.view). `,
 					DEBE.isSpawned = argv.spawn;
 				})
 
-				.default('blind',DEBE.blindTesting)
+				/*.default('blind',DEBE.blindTesting)
 				.boolean('blind')
 				.describe('blind','internal testing flag')  
 				.check( argv => {
 					DEBE.blindTesting = argv.blind;
-				})
+				}) */
 
-				.default('dump',false)
+				/*.default('dump',false)
 				.boolean('dump')
 				.describe('dump','display derived site parameters')  
 				.check( argv => {
 					//Log(site);
-				})
+				}) */
 
 				/*
 				.default('start',DEBE.site.Name)
@@ -1297,11 +1297,10 @@ as described in the [Notebooks api](/api.view). `,
 				})
 				* */
 
-				.boolean('version')
-				.describe('version','display current version')
+				.boolean('info')
+				.describe('info','display site info')
 				.check( argv => {
-					if (argv.version) 
-						Log(site);
+					Log(site);
 				})
 
 				/*
@@ -1316,14 +1315,15 @@ as described in the [Notebooks api](/api.view). `,
 				.describe('help','display usage help')
 				.check( argv => {
 					if (argv.help) {
-						Log( ARGP.help() );
+						console.log( ARGP.help() );
 
-						Log("Available services:");
-						sql.query("SELECT * FROM openv.apps WHERE ?",{Enabled:1})
+						console.log("Available services:");
+						sql.query("SELECT Nick,Title FROM openv.apps")
 						.on("result", app => {
-							Log(app.Name+" v"+app.Ver+" url="+app.Host+":"+app.Port+" db="+app.DB+" nick="+app.Nick+" sockted="+(app.Sockets?"yes":"no")+" cores="+app.Cores+" pki="+app.PKI);
+							console.log(app.Nick,app.Title);
+							//Log(app.Name+" v"+app.Ver+" url="+app.Host+":"+app.Port+" db="+app.DB+" nick="+app.Nick+" sockted="+(app.Sockets?"yes":"no")+" cores="+app.Cores+" pki="+app.PKI);
 						})
-						.on("error", err => Log(err) )
+						//.on("error", err => Log(err) )
 						.on("end", () => process.exit() );
 					}
 				})
@@ -5279,11 +5279,11 @@ size, pixels, scale, step, range, detects, infile, outfile, channel.  This endpo
 		post: "/service/algorithm/:proxy"		//< hydra endpoint
 	},  		//< reserved for soap interfaces
 		
-	/**
+	/*
 	Enable for double-blind testing 
 	@type {Boolean}
 	*/
-	blindTesting : false		//< Enable for double-blind testing 
+	//blindTesting : false		//< Enable for double-blind testing 
 }, TOTEM, ".");
 
 /**

@@ -451,7 +451,6 @@ config({
     * [~probono](#module_DEBE..probono) : <code>boolean</code>
     * [~isSpawned](#module_DEBE..isSpawned) : <code>Boolean</code>
     * [~bySOAP](#module_DEBE..bySOAP) : <code>Object</code>
-    * [~blindTesting](#module_DEBE..blindTesting) : <code>Boolean</code>
     * [~linkInspect()](#module_DEBE..linkInspect)
     * [~licenseCode()](#module_DEBE..licenseCode)
     * [~sendMail()](#module_DEBE..sendMail)
@@ -1226,12 +1225,6 @@ Enabled when this is child server spawned by a master server
 
 ### DEBE~bySOAP : <code>Object</code>
 Reserved for soap interfaces
-
-**Kind**: inner property of [<code>DEBE</code>](#module_DEBE)  
-<a name="module_DEBE..blindTesting"></a>
-
-### DEBE~blindTesting : <code>Boolean</code>
-Enable for double-blind testing
 
 **Kind**: inner property of [<code>DEBE</code>](#module_DEBE)  
 <a name="module_DEBE..linkInspect"></a>
