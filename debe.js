@@ -980,6 +980,7 @@ Usage:
 	// blogContext: BLOG,		//< blogging / skinning context
 	
 	/**
+	Default doc for reserved notebook keys
 	*/
 	defaultDocs: {	// default plugin docs (db key comments)
 		nodoc: "no documentation provided",
@@ -987,9 +988,9 @@ Usage:
 		Export: "Write notebook results [into a file](/api.view)",
 		Ingest: "Ingest notebook results [into the database](/api.view)",
 		
-		Batch: "Batch size during pipe",
-		Threshold: "Acceptance threshold during pipe",
-		Limit: "Number of accepted records during pipe",
+		//Batch: "Batch size during pipe",
+		//Threshold: "Acceptance threshold during pipe",
+		//Limit: "Number of accepted records during pipe",
 		
 		Name: "Unique usecase name",
 		
@@ -1031,7 +1032,7 @@ Save your notebook's context KEYs on exit:
 
 as described in the [Notebooks api](/api.view). `,
 
-		Ring: "[[lat,lon], ...] in degs 4+ length vector defining an aoi",
+		//Ring: "[[lat,lon], ...] in degs 4+ length vector defining an aoi",
 		
 		Save: `Save events [ {at:"AT", ...}, ...] to Save_AT store`,		
 		Save_snap: `Save detector snapshot`,
@@ -1075,7 +1076,8 @@ as described in the [Notebooks api](/api.view). `,
 		}
 	},
 
-	/**
+	/*
+	Legacy 
 	*/
 	onUpdate: function (sql,ds,body) { //< runs when dataset changed
 		//Log("update", ds, body);
@@ -4955,11 +4957,7 @@ size, pixels, scale, step, range, detects, infile, outfile, channel.  This endpo
 	admitRule: { 	//< admitRule all clients by default 	
 	},
 		
-	/*
-		Defines site context keys to load skinning context before a skin is rendered.
-		Each skin has its own {key: "SQL DB.TABLE" || "/URL?QUERY", ... } spec.
-	*/
-	//primeSkin: { //< site context extenders
+	//primeSkin: { //< legacy site context extenders
 		/*
 		rtp: {  // context keys for swag.view
 			projs: "select * from openv.milestones order by SeqNum,Num",
@@ -5127,6 +5125,7 @@ size, pixels, scale, step, range, detects, infile, outfile, channel.  This endpo
 	},
 	
 	/**
+	Error messages
 	*/
 	"errors.": {  //< error messages
 		pretty: err => {
@@ -5180,6 +5179,7 @@ size, pixels, scale, step, range, detects, infile, outfile, channel.  This endpo
 	},
 	
 	/**
+	Paths to things
 	*/
 	"paths.": {  //< append paths to things
 		low: {
@@ -5237,7 +5237,7 @@ size, pixels, scale, step, range, detects, infile, outfile, channel.  This endpo
 	isSpawned: false, 			//< Enabled when this is child server spawned by a master server
 
 	/*
-	gradeIngest: function (sql, file, cb) {  //< callback cb(stats) or cb(null) if error
+	gradeIngest: function (sql, file, cb) {  //< legacy callback cb(stats) or cb(null) if error
 		
 		var ctx = {
 			Flow: {

@@ -455,7 +455,6 @@ config({
     * [~linkInspect()](#module_DEBE..linkInspect)
     * [~licenseCode()](#module_DEBE..licenseCode)
     * [~sendMail()](#module_DEBE..sendMail)
-    * [~onUpdate()](#module_DEBE..onUpdate)
     * [~initialize(sql, init)](#module_DEBE..initialize)
     * [~SOAPsession(req, res, proxy)](#module_DEBE..SOAPsession)
     * [~genDoc(recs, req, res)](#module_DEBE..genDoc)
@@ -570,6 +569,8 @@ Route table to a database according to security requirements.
 <a name="module_DEBE..defaultDocs"></a>
 
 ### DEBE~defaultDocs
+Default doc for reserved notebook keys
+
 **Kind**: inner property of [<code>DEBE</code>](#module_DEBE)  
 <a name="module_DEBE..licenseOnDownload"></a>
 
@@ -1200,10 +1201,14 @@ Site skinning context
 <a name="module_DEBE..errors."></a>
 
 ### DEBE~errors.
+Error messages
+
 **Kind**: inner property of [<code>DEBE</code>](#module_DEBE)  
 <a name="module_DEBE..paths."></a>
 
 ### DEBE~paths.
+Paths to things
+
 **Kind**: inner property of [<code>DEBE</code>](#module_DEBE)  
 <a name="module_DEBE..probono"></a>
 
@@ -1244,10 +1249,6 @@ License notebook engine code.
 <a name="module_DEBE..sendMail"></a>
 
 ### DEBE~sendMail()
-**Kind**: inner method of [<code>DEBE</code>](#module_DEBE)  
-<a name="module_DEBE..onUpdate"></a>
-
-### DEBE~onUpdate()
 **Kind**: inner method of [<code>DEBE</code>](#module_DEBE)  
 <a name="module_DEBE..initialize"></a>
 
