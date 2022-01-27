@@ -65,7 +65,7 @@ append base_body
 		- toolbar += [users, ctrls, tick + tries, probe, notice].join("")
 
 	p.ui-banner= banner
-	
+
 	case view
 		when "cesium"
 		when "osm"
@@ -223,10 +223,9 @@ append base_body
 								ctx_editor.style.opacity = 1;
 								ed.resize();
 							}
-							
-							alert( "#{myskin.substr(0,10)}" );
+
 							const ed = ace.edit("aceEdit", {
-								value: "test\r", 
+								value: unescape("#{myskin}"), 
 								newLineMode: "linux",
 								mode: "ace/mode/coffee",
 								//mode: "ace/mode/javascript",
@@ -239,7 +238,7 @@ append base_body
 								highlightActiveLine: true,
 								hScrollBarAlwaysVisible: true,
 								vScrollBarAlwaysVisible: true,
-						
+
 								// auto complete requires ext-language scripts
 								//enableBasicAutocompletion: true,	
 								//enableLiveAutocompletion: true,
@@ -255,8 +254,7 @@ append base_body
 								// https://ourcodeworld.com/articles/read/994/how-to-make-an-ace-editor-instance-resizable-by-the-user-dinamically-with-a-drag-and-drop-bar
 								//enableLinking: true
 							}); 
-							
-							if (0)
+
 							ed.on("linkClick", data => {	// text-linking
 								console.log("CLICK", data); 
 								if (data && data.token && data.token.type == "link") 
@@ -351,7 +349,7 @@ append base_body
 										// Trigger ace editor resize()
 										editor.resize();
 
-										window.draggingAceEditor[id_editor] = false;
+										window.draggingAceEditor[id_editor] = true;
 									}
 
 									else {
