@@ -43,8 +43,8 @@ append base_body
 	- rand = Math.floor( Math.random() * 20 )
 	- logo = `/stash/${domain}/header${rand}.jpg`
 	- name = query.name
-	- tools = [ nick.link("/totem.brief"), ((profile.Credit*1e-3).toFixed(0)+"$ "+profile.QoS+"qos"), "artifacts".link(`/${query.name}.browse`), "brief".link(`/${query.name}.brief`), "stores".link(`${query.name}.stores`), "ToU".link(`${query.name}.tou`), "API".link("/api.view"), "SkinGuide".link("/skinguide.view"), "".tag("input", {id:"upload",class:"inputfile",type:"file",size:10,value:"/myfiles"})+"upload".tag("label",{for:"upload"})]
-	- toolbar = tools.join(" || ").tag("span").tag("br")
+	- tools = [ ((profile.Credit*1e-3).toFixed(0)+"$ "+profile.QoS+"qos"), "".tag("input", {id:"upload",class:"inputfile",type:"file",size:10,value:"/myfiles"})+"upload".tag("label",{for:"upload"})]
+	- toolbar = (tools.join(" || ") + " || " + uses).tag("span").tag("br")
 
 	if secureLink
 		script(type="text/javascript",src="/clients/openpgp.min.js")
@@ -225,7 +225,7 @@ append base_body
 							}
 
 							const ed = ace.edit("aceEdit", {
-								value: unescape("#{myskin}"), 
+								value: unescape("#{escape(skin)}"), 	// escape to avoid jade bug
 								newLineMode: "linux",
 								mode: "ace/mode/coffee",
 								//mode: "ace/mode/javascript",
@@ -367,11 +367,10 @@ append base_body
 
 				tab#west(class=etc)
 					:markdown
-						!{$brief}  
-						[scripts](/scripts.view)  
-						[survey](/survey.view)  
-						[notebooks](/notebooks.html)  
-						!{$rtp}  
+						[Totem](/totem.brief)  
+						[Notebooks](/notebooks.html)  
+						[API](/api.view)  
+						[SkinGuide](/skinguide.view)  
 						!{$jira}  
 						!{$ras}
 

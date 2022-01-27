@@ -139,7 +139,7 @@ follow the **ENUMS** deep copy conventions (
 	SERVICE_WORKER_URL = http(s)://DOMAIN:PORT
 	SERVICE_MASTER_URL = http(s)://DOMAIN:PORT
 	HOSTNAME = name of host machine
-	REPO = http(s)://DOMAIN:ACCOUNT
+	REPO = http://DOMAIN:ACCOUNT
 	JIRA = http://DOMAIN
 	RAS = http://DOMAIN
 	BY = https://DOMAIN

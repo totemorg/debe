@@ -5095,9 +5095,9 @@ size, pixels, scale, step, range, detects, infile, outfile, channel.  This endpo
 		
 		mods: ["totem","enum","jsdb","debe","geohack","atomic","reader","randpr"],
 		
-		jira: ENV.JIRA || "http://JIRA?",
-		ras: ENV.RAS || "http://RAS?",
-		repo: ENV.REPO || "http://REPO?",
+		jira: ENV.JIRA || "JIRA-undefined",
+		ras: ENV.RAS || "RAS-undefined",
+		repo: ENV.REPO || "REPO-undefined",
 
 		reqts: {   // defaults
 			js:  ["nodejs-12.14.0", "machine learning library-1.0".tag( "https://sc.appdev.proj.coe.ic.gov://acmesds/man" )].join(", "),
