@@ -57,17 +57,7 @@ const
 	{ runTask, queues, byAction,
 		sqlThread, errors, paths, cache, site, byTable, userID, dsThread,
 		watchFile, timeIntervals, neoThread, startJob, $master } = TOTEM,
-	{ JIMP } = $,
-	{ 
-		/*
-		savePage,
-		exePlugin, simPlugin,
-		exportPlugin, importPlugin, blogPlugin, statusPlugin, storesPlugin, usersPlugin, suitorsPlugin, helpPlugin, getPlugin, 
-		modifyPlugin, docPlugin, 
-		matchPlugin, trackPlugin, publishPlugin,
-		*/
-		//feedPlugin, savePlugin,
-		navigate } = byTable;
+	{ JIMP } = $;
 
 /**
 @module DEBE.String
@@ -2001,8 +1991,8 @@ Keys:
 		
 		/**
 		@param {Array} recs Records to filter
-		@param {Object} req Totem request
-		@param {Function} res Totem response
+		@param {Object} req Totem session request
+		@param {Function} res Totem session response
 		*/
 		dbx: (recs, req, res) => {
 			var Recs = [];
@@ -2019,8 +2009,8 @@ Keys:
 		
 		/**
 		@param {Array} recs Records to filter
-		@param {Object} req Totem request
-		@param {Function} res Totem response
+		@param {Object} req Totem session request
+		@param {Function} res Totem session response
 		*/
 		db: (recs, req, res) => {	
 			res({ 
@@ -2052,8 +2042,8 @@ Keys:
 		
 		/**
 		@param {Array} recs Records to filter
-		@param {Object} req Totem request
-		@param {Function} res Totem response
+		@param {Object} req Totem session request
+		@param {Function} res Totem session response
 		*/
 		kml: (recs,req,res) => {  //< dataset.kml converts to kml
 			res( TOKML({}) );
@@ -2061,8 +2051,8 @@ Keys:
 		
 		/**
 		@param {Array} recs Records to filter
-		@param {Object} req Totem request
-		@param {Function} res Totem response
+		@param {Object} req Totem session request
+		@param {Function} res Totem session response
 		*/
 		flat: (recs,req,res) => { //< dataset.flat flattens records
 			recs.forEach( (rec,n) => {
@@ -2075,8 +2065,8 @@ Keys:
 		
 		/**
 		@param {Array} recs Records to filter
-		@param {Object} req Totem request
-		@param {Function} res Totem response
+		@param {Object} req Totem session request
+		@param {Function} res Totem session response
 		*/
 		txt: (recs,req,res) => { //< dataset.txt convert to text
 			var head = recs[0], cols = [], cr = String.fromCharCode(13), txt="", list = ",";
@@ -2129,8 +2119,8 @@ Usage: ${uses.join(", ")}  `);
 		
 		/**
 		@param {Array} recs Records to filter
-		@param {Object} req Totem request
-		@param {Function} res Totem response
+		@param {Object} req Totem session request
+		@param {Function} res Totem session response
 		*/
 		html: (recs,req,res) => { //< dataset.html converts to html
 			res( recs.gridify({},{border: "1"}) );
@@ -2139,32 +2129,32 @@ Usage: ${uses.join(", ")}  `);
 		// MS office doc types
 		/**
 		@param {Array} recs Records to filter
-		@param {Object} req Totem request
-		@param {Function} res Totem response
+		@param {Object} req Totem session request
+		@param {Function} res Totem session response
 		*/
 		xdoc: genDoc,
 		/**
 		@param {Array} recs Records to filter
-		@param {Object} req Totem request
-		@param {Function} res Totem response
+		@param {Object} req Totem session request
+		@param {Function} res Totem session response
 		*/
 		xxls: genDoc,
 		/**
 		@param {Array} recs Records to filter
-		@param {Object} req Totem request
-		@param {Function} res Totem response
+		@param {Object} req Totem session request
+		@param {Function} res Totem session response
 		*/
 		xpps: genDoc,
 		/**
 		@param {Array} recs Records to filter
-		@param {Object} req Totem request
-		@param {Function} res Totem response
+		@param {Object} req Totem session request
+		@param {Function} res Totem session response
 		*/
 		xppt: genDoc,
 		/**
 		@param {Array} recs Records to filter
-		@param {Object} req Totem request
-		@param {Function} res Totem response
+		@param {Object} req Totem session request
+		@param {Function} res Totem session response
 		*/
 		tree: (recs,req,res) => { //< dataset.tree treeifies records sorted with _sort=keys
 			var 
@@ -2183,8 +2173,8 @@ Usage: ${uses.join(", ")}  `);
 		},
 		/**
 		@param {Array} recs Records to filter
-		@param {Object} req Totem request
-		@param {Function} res Totem response
+		@param {Object} req Totem session request
+		@param {Function} res Totem session response
 		*/
 		schema: (recs,req,res) => { //< dataset.schema 
 			var 
@@ -2220,724 +2210,13 @@ Usage: ${uses.join(", ")}  `);
 	},
 
 	/**
-	Endpoints /AREA/FILE routes by file area on specifed req-res thread
+	/AREA/FILE-endpoint routers
 	*/
 	"byArea.": {
 		/**
-		@param {Object} req Totem request
-		@param {Function} res Totem response		
-		*/
-		default: navigate
-	},
-
-	/**
-	Endpoints /TABLE routes by table name on specifed req-res thread
-	*/
-	"byTable.": {
-		// nlp
-
-		/**
-		@param {Object} req Totem request
-		@param {Function} res Totem response		
-		*/
-		search: (req,res) => {
-			const
-				{ sql, query, type } = req,
-				{ find } = query,
-				apiKey = "AIzaSyBp56CJJA0FE5enebW5_4mTssTGaYzGqz8", // "nowhere stan" / nowhere1234 / mepila7915@lege4h.com
-				searchEngine = "017944666033550212559:c1vclesecjc", // full web engine
-				url = `https://www.googleapis.com/customsearch/v1?key=${apiKey}&cx=${searchEngine}&gl=us&q=${find}`;
-
-			function score(src,ref) {
-				var
-					s = src.replace(/[,:\.]/g," ").replace(/  /g," ").toLowerCase().split(" "),
-					r = ref.replace(/[,:\.]/g," ").replace(/  /g," ").toLowerCase().split(" "),
-					cnt = 0;
-
-				s.forEach( (src,n) => cnt += (src == r[n]) ? 1 : 0 );
-				return cnt/r.length;		
-			}
-
-			if ( type == "help") 
-			return res("Execute open-source search for a document find = NAME against search engines.");
-
-			if ( find ) 
-				Fetch( url , txt => {
-					var hits = [];
-
-					try {
-						var 
-							json = JSON.parse(txt),
-							info = {
-								searchTime: json.searchInformation.searchTime,
-								results: json.searchInformation.totalResults
-							};
-
-						json.items.forEach( item => {
-							var 
-								map = item.pagemap || {},
-								tags = map.metatags || [],
-								meta = tags[0] || {};
-
-							hits.push({
-								title: item.title,
-								snippet: item.snippet,
-								author: meta.author,
-								source: meta["article:publisher"]
-							});
-						});
-					}
-					catch (err) {
-					}
-
-					hits.forEach( hit => {
-						hit.score = score(hit.title, find);
-					});
-
-					res(hits);
-				});
-
-			else
-				res( new Error("missing find parameter") );
-		},
-
-		/**
-		@param {Object} req Totem request
-		@param {Function} res Totem response		
-		*/
-		searches: (req,res) => {
-			const 
-				{ sql, query, type } = req,
-				//{ getList, Fetch } = FLEX,
-				{ file, find, out, htmlout } = query,
-				[x,name,Type] = (file||"").match(/(.*)\.(.*)/) || [],
-				path = "/config/stores/" + file,
-				save = "/config/uploads/" + name + (htmlout ? ".html" : ".txt");
-
-			Log(name,Type,path,save);
-
-			if ( type == "help" ) 
-			return res("Execute open-source searches for document find = NAME against search engine and save results to specified file = NAME.");
-
-			if ( file ) 		
-				switch ( Type ) {
-					case "news":
-						/*
-						Google api:
-							https://github.com/googleapis/google-api-nodejs-client#installation
-							https://developers.google.com/custom-search/v1/using_rest
-							https://developers.google.com/custom-search/v1/introduction
-
-						Google console to CSEs:
-							https://cse.google.com/cse/setup/basic?cx=017944666033550212559%3Ac1vclesecjc
-
-						Google account and api key:
-							account: "nowhere stan" / nowhere1234 / mepila7915@lege4h.com
-							key: AIzaSyAIP4VvzppRtiz0MvZ1WxTLG8s_Zw5T2ms
-						*/
-						var
-							hits = [];
-
-						const
-							CSEs = {
-								full: "017944666033550212559:c1vclesecjc",
-								drudge: "017944666033550212559:xrgqwdccet4"
-							},
-							searchEngine = CSEs[name],
-							apiKey = "AIzaSyBp56CJJA0FE5enebW5_4mTssTGaYzGqz8", 
-							url = `https://www.googleapis.com/customsearch/v1?key=${apiKey}&cx=${searchEngine}&gl=us&q=${find}`,
-							fmts = {
-								std: "rank(${score}) hit(${hit}) ${tag(title,link)}"
-							};
-
-						if ( searchEngine )
-							Fetch( url , txt => {
-
-								try {
-									var 
-										json = JSON.parse(txt),
-										info = {
-											searchTime: json.searchInformation.searchTime,
-											results: json.searchInformation.totalResults
-										};
-
-									//Log( json.items[0] );
-
-									json.items.forEach( (item,n) => {
-										var 
-											map = item.pagemap || {},
-											tags = map.metatags || [],
-											meta = tags[0] || {};
-
-										if ( !n ) Log( JSON.stringify( item) );							
-										Log(n,item.title,"=>", item.title.trimGoogle() );
-
-										hits.push({
-											title: item.title.trimGoogle(),
-											snippet: item.snippet,
-											author: meta.author,
-											link: item.link,
-											hit: n,
-											source: meta["article:publisher"]
-										});
-									});
-								}
-								catch (err) {
-								}
-
-								find.trimGoogle().align(hits, hit => hit.title);
-
-								if (out) {
-									hits.forEach( (hit,n) => {
-										hits[n] = (fmts[out]||out).parse$(hit);
-									});
-									hits = hits.join(",");
-								}
-
-								else
-								if (htmlout) {
-									hits.forEach( (hit,n) => {
-										hits[n] = (fmts[htmlout]||htmlout).parse$(Copy(hit, {
-											tag: (a,b) => a.link(b)
-										}));
-									});
-									hits = hits.join("<br>");
-								}
-
-								else
-									hits = JSON.stringify(hits);
-
-								res(hits);						
-								//FS.writeFile( save, JSON.stringify(hits), "utf8", err => {} );
-							});
-
-						else
-							res( new Error("bad search engine specified") );
-
-						break;
-
-					case "list":
-						//req.type = "html";
-						res( "claim results "+"here".link(save.substr(1)) );
-
-						FS.writeFileSync(save,"","utf8", err => {});
-
-						getList( path, {batch: 100, keys: ["file"]}, recs => {
-							if ( recs )
-								recs.forEach( rec => {
-									Fetch( `http:/read?file=${rec}`, txt => {
-										FS.appendFile(save, txt, "utf8", err => {});
-									});
-								});
-
-							else
-								Log("done!");
-						});
-
-						break;
-
-					default:
-						if ( reader = readers[Type] ) 
-							reader( path, txt => {
-								//FS.writeFile(save,txt,"utf8",err => {});
-								res(txt);
-							});	
-
-						else
-							res( new Error("no reader for specified file") );
-				}
-
-			else
-				res( new Error("no file specified") );
-
-		},
-
-		/**
-		@param {Object} req Totem request
-		@param {Function} res Totem response		
-		*/
-		words: (req,res) => {
-			const
-				{ sql, query, type } = req,
-				{ src, keys, N } = query,
-				//keys = keys || "").split(",") : null,
-				_keys = (keys || "").split(","),
-				vocab = {},
-				hack = txt => txt.toLowerCase().split(" "),
-				search = new RegExp("^"+src+"(.*).txt$"),
-				words = [];
-
-			if ( type == "help" ) 
-			return res(`
-Using the Porter-Lancaster stemmer, respond with a count of matched and unmatched words by comparing N 
-randomlly selected documents from stores/SOURCE*.txt with its associated src = SOURCE database documents 
-at the specified keys = KEY,... 
-`);
-
-			var
-				matches = [],
-				scans = 0;
-
-			Log(src,_keys,N);
-
-			if ( src )
-				Fetch( "file:/config/stores/", files => {
-
-					files.forEach( file => {
-						var [matched,evid] = file.match(search) || [] ;
-						if ( matched ) 
-							matches.push( {evid: evid, file: `./config/stores/${file}`} );
-					});
-
-					if ( N ) matches = matches.slice(0,N);
-
-					Log(matches);
-					matches.forEach( match => {
-
-						FS.readFile( match.file, "utf8", (err,text) => {
-							if (!err) 
-								sql.query("SELECT * FROM app.?? WHERE ? LIMIT 1", ["gtd",{evid: match.evid}], (err,recs) => {
-									//Log(err);
-									var
-										rec = recs[0] || {};
-
-									_keys.forEach( key => {
-										if ( w = rec[key] )
-											hack(w.replace(/\//g," ")).forEach( w => {
-												if ( w ) {
-													let s = stemmer(w);
-													if ( !(s in vocab) ) 
-														vocab[s] = s+"/"+w.substr(s.length);
-												}
-											});
-									});
-
-									if ( text )
-										hack(text.replace(/[\.\;\:\"\,\(\)\-\'\n\r]/g," ")).forEach( w => {
-											if (w) words.push( stemmer(w) );
-										});
-
-									if ( ++scans == matches.length ) res( [vocab,words] );
-								});
-						});				
-					});
-
-					if ( !matches.length ) res( [] );
-				});
-
-			else
-				res( new Error("missing src parameter") );
-		},
-
-		// image tiles
-
-		/**
-		@param {Object} req Totem request
-		@param {Function} res Totem response		
-		*/
-		wms: (req,res) => {
-
-			const
-				{sql,query,type} = req,
-				{src} = query;
-
-			if ( type == "help" ) 
-			return res("Provided image catalog service for src = dglobe | omar | ess.");
-
-			res(errors.ok);
-			switch (src) {
-				case "dglobe":
-				case "omar":
-				case "ess":
-				default:
-			}
-
-			if ( url = ENV[`WMS_${src.toUpperCase()}`] ) 
-				Fetch(url.tag("?", query), rtn => Log("wms returned", rtn) );
-		},
-
-		/**
-		@param {Object} req Totem request
-		@param {Function} res Totem response		
-		*/
-		wfs: (req,res) => {  //< Respond with ess-compatible image catalog
-			const
-				{ sql, query, type } = req,
-				chip = {	// chip attributes
-					width: query.width || 100, // chip pixels lat,
-					height: query.height || 100, // chip pixels lon,
-					srs: "epsg%3A4326",
-					format: "image/jpeg"
-				},
-				ring = query.ring || [],		// aoi ring
-				chipper = "wms",  // wms || jpip || wmts
-				src = (query.src || "").toUpperCase();	// catalog service
-
-			if ( type == "help" ) 
-			return res(`
-Respond with ess-compatible image catalog for service src = dglobe | omar | ess and 
-desired ring = [ [lat,lon], ....]
-`);
-
-			switch (src) {
-				case "DGLOBE":
-				case "OMAR":
-				case "ESS":
-				default:
-					//query.geometryPolygon = JSON.stringify({rings: JSON.parse(query.ring)});  // ring being monitored
-					query.geometryPolygon = JSON.stringify({rings: ring});  // ring being monitored
-			}
-
-			delete query.src;
-
-			if ( url = ENV[`WFS_${src}`] )
-				Fetch( url.tag("?", query), cat => {  // query catalog for desired data channel
-					if ( cat = cat.parseJSON() ) {
-						switch ( src ) {  // normalize cat response to ess
-							case "DGLOBE":
-								// tbd
-							case "OMAR":
-								// tbd
-							case "ESS":
-								var
-									recs = ( cat.GetRecordsResponse || {SearchResults: {}} ).SearchResults,
-									collects = recs.DatasetSummary || [],
-									sets = [];
-
-								collects.forEach( collect => {  // pull image collects from each catalog entry
-
-									//Log(collect);
-									var 
-										image = collect["Image-Product"].Image,
-										imageID = image.ImageId.replace(/ /g,""),
-										sun = image["Image-Sun-Characteristic"] || {SunElevationDim: "0", SunAzimuth: "0"},
-										restrict = collect["Image-Restriction"] || {Classification: "?", ClassificationSystemId: "?", LimitedDistributionCode: ["?"]},
-										raster = image["Image-Raster-Object-Representation"],
-										region = collect["Image-Country-Coverage"] || {CountryCode: ["??"]},
-										atm = image["Image-Atmospheric-Characteristic"],
-										urls = {
-											wms: collect.WMSUrl,
-											wmts: collect.WMTSUrl,
-											jpip: collect.JPIPUrl
-										};
-
-									if (urls.wms)  // valid collects have a wms url
-										sets.push({	
-											imported: new Date(image.ImportDate),
-											collected: new Date(image.QualityRating),
-											mission: image.MissionId,
-											sunEl: parseFloat(sun.SunElevationDim),
-											sunAz: parseFloat(sun.SunAzimuth),
-											layer: collect.CoverId,
-											clouds: atm.CloudCoverPercentageRate,
-											country: region.CountryCode[0],
-											classif: restrict.ClassificationCode + "//" + restrict.LimitedDistributionCode[0],
-											imageID: imageID,
-													// "12NOV16220905063EA00000 270000EA530040"
-											mode: image.SensorCode,
-											bands: parseInt(image.BandCountQuantity),
-											gsd: parseFloat(image.MeanGroundSpacingDistanceDim)*25.4e-3,
-											wms: urls[chipper]
-													.replace("http:", "wget:")
-													.replace("https:", "wgets:")
-													.replace(
-														"?REQUEST=GetCapabilities&VERSION=1.3.0",
-														"?request=GetMap&version=1.1.1")
-
-													.tag("&", chip)
-													+ "////"	// wget output path
-													+ paths.chips + imageID
-										});
-
-								});
-							}
-
-						res( sets );
-					}
-
-					else
-						res( "" );
-				});	
-
-			else
-			if ( src == "SPOOF" ) // spoof
-				res([{			
-					imported: new Date(),
-					collected: new Date(),
-					mission: "debug", //image.MissionId,
-					sunEl: 0, //parseFloat(sun.SunElevationDim),
-					sunAz: 0, //parseFloat(sun.SunAzimuth),
-					layer: "debug", //collect.CoverId,
-					clouds: 0, //atm.CloudCoverPercentageRate,
-					country: "XX", //region.CountryCode[0],
-					classif: "", //restrict.ClassificationCode + "//" + restrict.LimitedDistributionCode[0],
-					imageID: "ddxxxyymmmmxxxxxEAnnnnn xxxxxEAnnnnnn",
-							// "12NOV16220905063EA00000 270000EA530040"
-					mode: "XX", //image.SensorCode,
-					bands: 0, //parseInt(image.BandCountQuantity),
-					gsd: 0, //parseFloat(image.MeanGroundSpacingDistanceDim)*25.4e-3,
-					wms: "" + "////" + paths.chips + "spoof.jpg"	
-					/*{
-					GetRecordsResponse: {
-						SearchResults: {
-							DatasetSummary: [{
-								"Image-Product": {
-									Image: {
-										ImageId: "spoof",
-										"Image-Sun-Characteristic": {
-											SunElevationDim: "0", 
-											SunAzimuth: "0"
-										},
-										"Image-Raster-Object-Representation": [],
-										"Image-Atmospheric-Characteristic": []
-									},
-									"Image-Restriction": {
-										Classification: "?", 
-										ClassificationSystemId: "?", 
-										LimitedDistributionCode: ["?"]
-									},
-									"Image-Country-Coverage": {
-										CountryCode: ["??"]
-									}
-								},
-								WMSUrl: ENV.SRV_TOTEM+"/shares/spoof.jpg",
-								WMTSUrl: "",
-								JPIPUrl: ""
-							}]
-						}
-					}
-				} */
-				}]);
-
-			else
-				res( "" );
-		},
-
-		/**
-		Provide image tips.
-		@param {Object} req Totem request
-		@param {Function} res Totem response		
-		*/
-		tips: (req, res) => {
-			const
-				{sql, log, query, type} = req;
-
-			if ( type == "help" ) 
-			return res("Provide image tips found by detectors");
-
-			sql.query(
-				"SELECT *, "
-				+ "count(detects.ID) AS weight, "
-				+ "concat('/tips/',chips.ID,'.jpg') AS tip, "
-				+ "concat("
-				+ 		"linkquery('O', 'https://ldomar.ilabs.ic.gov/omar/mapView/index',concat('layers=',collects.layer)), "
-				+ 		"linkquery('S', '/minielt.view',concat('src=/chips/',chips.name))"
-				+ ") AS links, "
-				+ "datediff(now(),collected) AS age "
-				+ "FROM openv.detects "
-				+ "LEFT JOIN openv.chips ON MBRcontains(chips.address,detects.address) "
-				+ "LEFT JOIN openv.collects ON collects.ID = chips.collectID "
-				+ "LEFT JOIN openv.detectors ON detectors.name = detects.label "
-				+ "WHERE least(?,1) "
-				+ "GROUP BY detects.address "
-				+ "ORDER BY detects.made DESC "
-				+ "LIMIT 0,400", 
-				guardQuery(query,true), 
-				(err, recs) => {
-
-					if (err)
-						Log("tips",[err,q.sql]);
-					
-					else
-						recs.forEach( (rec,id) => {
-							rec.ID = id;
-							rec.lat = rec.address[0][0].x*180/Math.PI;
-							rec.lon = rec.address[0][0].y*180/Math.PI;
-							//delete rec.address;
-						});
-
-					res(err || recs);
-			});
-		},
-
-		// web links
-
-		/**
-		Track web links.
-		@param {Object} req Totem request
-		@param {Function} res Totem response		
-		*/
-		follow: (req,res) => {  // follow a link
-			const {sql,query,type} = req;
-
-			if ( type == "help" ) 
-			return res("Track client's link selections.");
-
-			res(errors.ok);
-
-			sql.query("INSERT INTO openv.follows SET ? ON DUPLICATE KEY UPDATE Count=Count+1,Event=now()", {
-				Goto: query.goto.split("?")[0], 
-				Client: query.client,
-				View: query.view,
-				Event: new Date(),
-				Count: 1
-			});
-		},
-
-		// quizes
-
-		/**
-		Proctor quizes.
-		@param {Object} req Totem request
-		@param {Function} res Totem response		
-		*/
-		proctor: (req,res) => {  //< grade quiz results
-			const 
-				{sql, query, client, type} = req;
-
-			if ( type == "help" ) 
-			return res("Grade a clients lesson = PART.PART... in module = ID.");
-
-			const 
-				parts = query.lesson.split("."),
-				topic = parts[0],
-				mod = parseInt( parts[1] ) || 1,
-				set = parseInt( parts[2] ) || 1,
-				mods = query.modules || 1,
-				passed = query.score >= query.pass;
-
-			//Log(query.score, query.pass, [topic, set, mod, mods].join("."));
-
-			sql.query("INSERT INTO openv.quizes SET ? ON DUPLICATE KEY UPDATE Tries=Tries+1,?", [{
-				Client: client,
-				Score: query.score,
-				Topic: topic,
-				Module: mod,
-				Set: set,
-				Pass: query.pass,
-				Taken: new Date(),
-				Tries: 1
-			}, {
-				Score: query.score,
-				Pass: query.pass,
-				Taken: new Date()
-			}], err => {
-
-				sql.forAll(
-					"",
-					"SELECT count(ID) AS Count FROM openv.quizes WHERE Score>Pass AND least(?) GROUP BY Module", 
-					{Client:client, Topic:topic}, 
-					function (recs) {
-
-						var certified = recs.length >= mods;
-
-						res( `Thank you ${client} - ` + (
-							certified 
-							? "you completed all modules - your certificate of completion will be emailed"
-
-							: passed 
-								? `you passed set ${set} of module ${mod}-${mods}!`
-								: "please try again" 
-						));
-
-						if ( certified ) {
-							sql.query(
-								"UPDATE openv.quizes SET Certified=now() WHERE least(?)", 
-								{Client:client, Topic:topic} ).end();
-
-							sendMail({
-								to: client,
-								subject: `${site.nick} sends its congradulations`,
-								body: 
-									`you completed all ${topic} modules and may claim your `
-									+ "certificate".tag("a", {href:`/config/stores/cert_${topic}_${client}.pdf`})
-							}, sql );
-						}
-
-				});
-
-			});
-		},
-
-		// files
-
-		/**
-		@param {Object} req Totem request
-		@param {Function} res Totem response		
-		*/
-		uploads: fileUpload,
-		/**
-		@param {Object} req Totem request
-		@param {Function} res Totem response		
-		*/
-		stores: fileUpload, 
-
-		/**
-		@param {Object} req Totem request
-		@param {Function} res Totem response		
-		*/
-		likeus: (req, res) => {
-			const
-				{sql, loq, query, type, profile, client} = req,
-				{pocs} = site,
-				user = {
-					expired: "your subscription has expired",
-					0: "elite",
-					1: "grand",
-					2: "wonderful",
-					3: "better than average",
-					4: "below average",
-					5: "first class",
-					default: "limited"
-				};
-
-			if ( type == "help") 
-			return res("Credit client's profile with a like" );
-
-			sendMail({
-				to: pocs.admin,
-				subject: req.client + " likes " + site.title + " !!", 
-				body: "Just saying"
-			}, sql );
-
-			if ( profile.Credit ) {
-				sql.query(
-					"UPDATE openv.profiles SET Challenge=0,Likeus=Likeus+1,QoS=greatest(QoS-1,0) WHERE ?",
-					{Client:req.client}
-				);
-
-				profile.QoS = Math.max(profile.QoS-1,0);  // takeoff 1 sec
-				var qos = user[Math.floor(profile.QoS)] || user.default;
-				res( `Thanks ${client} for liking ${site.nick} !  As a ${qos} user your ` 
-					+ "QoS profile".link('/profile.view')
-					+ " may have improved !" )	
-			}
-
-			else
-				res( `Thanks ${req.client} for liking ${site.nick} but ` + user.expired.link('/fundme.view') + " !" );
-
-		},
-
-		/**
-		@param {Object} req Totem request
-		@param {Function} res Totem response		
-		*/
-		users: (req, res) => {
-			const
-				{sql, query, type } = req;
-
-			if ( type == "help" ) 
-			return res("returns list of users");
-
-			sql.query("SELECT ID,Connects,Client AS Name, Location AS Path FROM openv.sessions WHERE least(?,1) ORDER BY Client", 
-				guardQuery(query,true),
-				(err, recs) => res(err || recs) );
-		},
-
-		/**
-		Folder navigator.
-		@param {Object} req Totem request
-		@param {Function} res Totem response		
+		Default area navigator.
+		@param {Object} req Totem session request
+		@param {Function} res Totem session response		
 		*/
 		navigate: (req,res) => {
 			function sendFolder(res,recs) {
@@ -3224,7 +2503,7 @@ desired ring = [ [lat,lon], ....]
 					});
 
 				else
-				if ( cmd == "xxtree") {
+				if ( cmd == "tree") {
 					Log(">>>send tree");
 					res({tree:recs});
 				}
@@ -3287,15 +2566,15 @@ desired ring = [ [lat,lon], ....]
 			const
 				btoa = b => Buffer.from(b,"utf-8").toString("base64"),
 				atob = a => Buffer.from(a,"base64").toString("utf-8"),
-				trace = true,
+				trace = false,
 				{parms} = body,
 				{target,cmd,init,tree,download,src} = parms || query,
-				targets = query["targets[]"],
+				//targets = query["targets[]"],
 				parent = atob(target||btoa(path||"/root/")), 
 				parentHash = btoa(parent),
 				[x,fpath,fname] = parent.match( /(.*)\/(.*)/ ) || ["",parent,""],
 				node = fpath.split("/").pop(),
-				json = parent.substr(1,parent.length-2).replace(/\/\[/g,"[").replace(/\//g,"."),
+				json = parent.substr(1).replace(/\/\[/g,"[").replace(/\//g,"."),
 				now = new Date().getTime(),
 				recs = [],
 				cwd = {
@@ -3306,7 +2585,7 @@ desired ring = [ [lat,lon], ....]
 					"size":0,
 					"hash": btoa(parent), // parent,
 					"volumeid":"l1_",
-					"name": "test", //node, //node,
+					"name": parent, //node, //node,
 					"locked":0,
 					"dirs":1 
 				};
@@ -3325,15 +2604,15 @@ desired ring = [ [lat,lon], ....]
 
 			if ( trace )
 				Log(">>>nav", {
-					cmd: cmd,
+					c: cmd,
 					q: query,
-					p: path,
-					b: body,
+					path: path,
+					body: body,
 					tar: target,
 					src: src,
 					act: action,
 					json: json,
-					par: parent
+					parent: parent
 				});
 
 			switch (cmd) {		// look for elFinder commands
@@ -3598,7 +2877,7 @@ desired ring = [ [lat,lon], ....]
 
 					else 	// browsing file system
 						Fetch( "file:"+parent , files => {
-							sendFolder(res, files.select( file => {
+							sendFolder(res, files.map( file => {
 								const 
 									[x,name,type] = file.match(/(.*)\.(.*)/) || ["",file,""],
 									nameHash = btoa(parent+file);
@@ -3667,7 +2946,7 @@ desired ring = [ [lat,lon], ....]
 
 					break;
 
-				case "xxtree":	// expanding folder in left paine
+				case "***tree":	// expanding folder in left paine
 					res({
 						tree: []
 					});
@@ -3712,7 +2991,15 @@ desired ring = [ [lat,lon], ....]
 					if ( path.endsWith("/") )	// requesting folder
 						Fetch( "file:"+path , files => {	
 							if ( files ) {
-								files.put( file => {
+								req.type = "html"; // override default json type
+								res([[ 
+									site.nick.link( "/brief.view?notebook=totem" ),
+									client.link( "/login.html" ),
+									"API".link( "/api.view" ),
+									"Browse".link( "/browse.view" ),
+									"Explore".link( "/xfan.view?w=1000&h=600&src=/info" ),
+									path
+								].join(" || ") , files.map( file => {
 									if ( file.endsWith(".url") ) {	// resolve windows link
 										const
 											src = "."+path+file;
@@ -3736,17 +3023,7 @@ desired ring = [ [lat,lon], ....]
 
 									else
 										return file.link( file );
-								});
-
-								req.type = "html"; // override default json type
-								res([[ 
-									site.nick.link( "/brief.view?notebook=totem" ),
-									client.link( "/login.html" ),
-									"API".link( "/api.view" ),
-									"Browse".link( "/browse.view" ),
-									"Explore".link( "/xfan.view?w=1000&h=600&src=/info" ),
-									path
-								].join(" || ") , files.join("<br>")].join("<br>") );
+								}).join("<br>")].join("<br>") );
 							}
 
 							else
@@ -3780,13 +3057,729 @@ desired ring = [ [lat,lon], ....]
 			req.type = "html";
 			res( areas.join("<br>") );
 			*/
+		}
+
+	},
+
+	/**
+	/TABLE-endpoint routers
+	*/
+	"byTable.": {
+		// nlp
+
+		/**
+		Search for a file
+		@param {Object} req Totem session request
+		@param {Function} res Totem session response		
+		*/
+		search: (req,res) => {
+			const
+				{ sql, query, type } = req,
+				{ find } = query,
+				apiKey = "AIzaSyBp56CJJA0FE5enebW5_4mTssTGaYzGqz8", // "nowhere stan" / nowhere1234 / mepila7915@lege4h.com
+				searchEngine = "017944666033550212559:c1vclesecjc", // full web engine
+				url = `https://www.googleapis.com/customsearch/v1?key=${apiKey}&cx=${searchEngine}&gl=us&q=${find}`;
+
+			function score(src,ref) {
+				var
+					s = src.replace(/[,:\.]/g," ").replace(/  /g," ").toLowerCase().split(" "),
+					r = ref.replace(/[,:\.]/g," ").replace(/  /g," ").toLowerCase().split(" "),
+					cnt = 0;
+
+				s.forEach( (src,n) => cnt += (src == r[n]) ? 1 : 0 );
+				return cnt/r.length;		
+			}
+
+			if ( type == "help") 
+			return res("Execute open-source search for a document find = NAME against search engines.");
+
+			if ( find ) 
+				Fetch( url , txt => {
+					var hits = [];
+
+					try {
+						var 
+							json = JSON.parse(txt),
+							info = {
+								searchTime: json.searchInformation.searchTime,
+								results: json.searchInformation.totalResults
+							};
+
+						json.items.forEach( item => {
+							var 
+								map = item.pagemap || {},
+								tags = map.metatags || [],
+								meta = tags[0] || {};
+
+							hits.push({
+								title: item.title,
+								snippet: item.snippet,
+								author: meta.author,
+								source: meta["article:publisher"]
+							});
+						});
+					}
+					catch (err) {
+					}
+
+					hits.forEach( hit => {
+						hit.score = score(hit.title, find);
+					});
+
+					res(hits);
+				});
+
+			else
+				res( new Error("missing find parameter") );
 		},
 
 		/**
-		Endpoint to retrieve [requested neo4j graph](/api.view#sysGraph).
+		Search of multiple files 
+		@param {Object} req Totem session request
+		@param {Function} res Totem session response		
+		*/
+		searches: (req,res) => {
+			const 
+				{ sql, query, type } = req,
+				//{ getList, Fetch } = FLEX,
+				{ file, find, out, htmlout } = query,
+				[x,name,Type] = (file||"").match(/(.*)\.(.*)/) || [],
+				path = "/config/stores/" + file,
+				save = "/config/uploads/" + name + (htmlout ? ".html" : ".txt");
 
-		@param {Object} req Totem request
-		@param {Function} res Totem response
+			Log(name,Type,path,save);
+
+			if ( type == "help" ) 
+			return res("Execute open-source searches for document find = NAME against search engine and save results to specified file = NAME.");
+
+			if ( file ) 		
+				switch ( Type ) {
+					case "news":
+						/*
+						Google api:
+							https://github.com/googleapis/google-api-nodejs-client#installation
+							https://developers.google.com/custom-search/v1/using_rest
+							https://developers.google.com/custom-search/v1/introduction
+
+						Google console to CSEs:
+							https://cse.google.com/cse/setup/basic?cx=017944666033550212559%3Ac1vclesecjc
+
+						Google account and api key:
+							account: "nowhere stan" / nowhere1234 / mepila7915@lege4h.com
+							key: AIzaSyAIP4VvzppRtiz0MvZ1WxTLG8s_Zw5T2ms
+						*/
+						var
+							hits = [];
+
+						const
+							CSEs = {
+								full: "017944666033550212559:c1vclesecjc",
+								drudge: "017944666033550212559:xrgqwdccet4"
+							},
+							searchEngine = CSEs[name],
+							apiKey = "AIzaSyBp56CJJA0FE5enebW5_4mTssTGaYzGqz8", 
+							url = `https://www.googleapis.com/customsearch/v1?key=${apiKey}&cx=${searchEngine}&gl=us&q=${find}`,
+							fmts = {
+								std: "rank(${score}) hit(${hit}) ${tag(title,link)}"
+							};
+
+						if ( searchEngine )
+							Fetch( url , txt => {
+
+								try {
+									var 
+										json = JSON.parse(txt),
+										info = {
+											searchTime: json.searchInformation.searchTime,
+											results: json.searchInformation.totalResults
+										};
+
+									//Log( json.items[0] );
+
+									json.items.forEach( (item,n) => {
+										var 
+											map = item.pagemap || {},
+											tags = map.metatags || [],
+											meta = tags[0] || {};
+
+										if ( !n ) Log( JSON.stringify( item) );							
+										Log(n,item.title,"=>", item.title.trimGoogle() );
+
+										hits.push({
+											title: item.title.trimGoogle(),
+											snippet: item.snippet,
+											author: meta.author,
+											link: item.link,
+											hit: n,
+											source: meta["article:publisher"]
+										});
+									});
+								}
+								catch (err) {
+								}
+
+								find.trimGoogle().align(hits, hit => hit.title);
+
+								if (out) {
+									hits.forEach( (hit,n) => {
+										hits[n] = (fmts[out]||out).parse$(hit);
+									});
+									hits = hits.join(",");
+								}
+
+								else
+								if (htmlout) {
+									hits.forEach( (hit,n) => {
+										hits[n] = (fmts[htmlout]||htmlout).parse$(Copy(hit, {
+											tag: (a,b) => a.link(b)
+										}));
+									});
+									hits = hits.join("<br>");
+								}
+
+								else
+									hits = JSON.stringify(hits);
+
+								res(hits);						
+								//FS.writeFile( save, JSON.stringify(hits), "utf8", err => {} );
+							});
+
+						else
+							res( new Error("bad search engine specified") );
+
+						break;
+
+					case "list":
+						//req.type = "html";
+						res( "claim results "+"here".link(save.substr(1)) );
+
+						FS.writeFileSync(save,"","utf8", err => {});
+
+						getList( path, {batch: 100, keys: ["file"]}, recs => {
+							if ( recs )
+								recs.forEach( rec => {
+									Fetch( `http:/read?file=${rec}`, txt => {
+										FS.appendFile(save, txt, "utf8", err => {});
+									});
+								});
+
+							else
+								Log("done!");
+						});
+
+						break;
+
+					default:
+						if ( reader = readers[Type] ) 
+							reader( path, txt => {
+								//FS.writeFile(save,txt,"utf8",err => {});
+								res(txt);
+							});	
+
+						else
+							res( new Error("no reader for specified file") );
+				}
+
+			else
+				res( new Error("no file specified") );
+
+		},
+
+		/**
+		Word statistics
+		@param {Object} req Totem session request
+		@param {Function} res Totem session response		
+		*/
+		words: (req,res) => {
+			const
+				{ sql, query, type } = req,
+				{ src, keys, N } = query,
+				//keys = keys || "").split(",") : null,
+				_keys = (keys || "").split(","),
+				vocab = {},
+				hack = txt => txt.toLowerCase().split(" "),
+				search = new RegExp("^"+src+"(.*).txt$"),
+				words = [];
+
+			if ( type == "help" ) 
+			return res(`
+Using the Porter-Lancaster stemmer, respond with a count of matched and unmatched words by comparing N 
+randomlly selected documents from stores/SOURCE*.txt with its associated src = SOURCE database documents 
+at the specified keys = KEY,... 
+`);
+
+			var
+				matches = [],
+				scans = 0;
+
+			Log(src,_keys,N);
+
+			if ( src )
+				Fetch( "file:/config/stores/", files => {
+
+					files.forEach( file => {
+						var [matched,evid] = file.match(search) || [] ;
+						if ( matched ) 
+							matches.push( {evid: evid, file: `./config/stores/${file}`} );
+					});
+
+					if ( N ) matches = matches.slice(0,N);
+
+					Log(matches);
+					matches.forEach( match => {
+
+						FS.readFile( match.file, "utf8", (err,text) => {
+							if (!err) 
+								sql.query("SELECT * FROM app.?? WHERE ? LIMIT 1", ["gtd",{evid: match.evid}], (err,recs) => {
+									//Log(err);
+									var
+										rec = recs[0] || {};
+
+									_keys.forEach( key => {
+										if ( w = rec[key] )
+											hack(w.replace(/\//g," ")).forEach( w => {
+												if ( w ) {
+													let s = stemmer(w);
+													if ( !(s in vocab) ) 
+														vocab[s] = s+"/"+w.substr(s.length);
+												}
+											});
+									});
+
+									if ( text )
+										hack(text.replace(/[\.\;\:\"\,\(\)\-\'\n\r]/g," ")).forEach( w => {
+											if (w) words.push( stemmer(w) );
+										});
+
+									if ( ++scans == matches.length ) res( [vocab,words] );
+								});
+						});				
+					});
+
+					if ( !matches.length ) res( [] );
+				});
+
+			else
+				res( new Error("missing src parameter") );
+		},
+
+		// image tiles
+
+		/**
+		WMS
+		@param {Object} req Totem session request
+		@param {Function} res Totem session response		
+		*/
+		wms: (req,res) => {
+
+			const
+				{sql,query,type} = req,
+				{src} = query;
+
+			if ( type == "help" ) 
+			return res("Provided image catalog service for src = dglobe | omar | ess.");
+
+			res(errors.ok);
+			switch (src) {
+				case "dglobe":
+				case "omar":
+				case "ess":
+				default:
+			}
+
+			if ( url = ENV[`WMS_${src.toUpperCase()}`] ) 
+				Fetch(url.tag("?", query), rtn => Log("wms returned", rtn) );
+		},
+
+		/**
+		WFS
+		@param {Object} req Totem session request
+		@param {Function} res Totem session response		
+		*/
+		wfs: (req,res) => {  //< Respond with ess-compatible image catalog
+			const
+				{ sql, query, type } = req,
+				chip = {	// chip attributes
+					width: query.width || 100, // chip pixels lat,
+					height: query.height || 100, // chip pixels lon,
+					srs: "epsg%3A4326",
+					format: "image/jpeg"
+				},
+				ring = query.ring || [],		// aoi ring
+				chipper = "wms",  // wms || jpip || wmts
+				src = (query.src || "").toUpperCase();	// catalog service
+
+			if ( type == "help" ) 
+			return res(`
+Respond with ess-compatible image catalog for service src = dglobe | omar | ess and 
+desired ring = [ [lat,lon], ....]
+`);
+
+			switch (src) {
+				case "DGLOBE":
+				case "OMAR":
+				case "ESS":
+				default:
+					//query.geometryPolygon = JSON.stringify({rings: JSON.parse(query.ring)});  // ring being monitored
+					query.geometryPolygon = JSON.stringify({rings: ring});  // ring being monitored
+			}
+
+			delete query.src;
+
+			if ( url = ENV[`WFS_${src}`] )
+				Fetch( url.tag("?", query), cat => {  // query catalog for desired data channel
+					if ( cat = cat.parseJSON() ) {
+						switch ( src ) {  // normalize cat response to ess
+							case "DGLOBE":
+								// tbd
+							case "OMAR":
+								// tbd
+							case "ESS":
+								var
+									recs = ( cat.GetRecordsResponse || {SearchResults: {}} ).SearchResults,
+									collects = recs.DatasetSummary || [],
+									sets = [];
+
+								collects.forEach( collect => {  // pull image collects from each catalog entry
+
+									//Log(collect);
+									var 
+										image = collect["Image-Product"].Image,
+										imageID = image.ImageId.replace(/ /g,""),
+										sun = image["Image-Sun-Characteristic"] || {SunElevationDim: "0", SunAzimuth: "0"},
+										restrict = collect["Image-Restriction"] || {Classification: "?", ClassificationSystemId: "?", LimitedDistributionCode: ["?"]},
+										raster = image["Image-Raster-Object-Representation"],
+										region = collect["Image-Country-Coverage"] || {CountryCode: ["??"]},
+										atm = image["Image-Atmospheric-Characteristic"],
+										urls = {
+											wms: collect.WMSUrl,
+											wmts: collect.WMTSUrl,
+											jpip: collect.JPIPUrl
+										};
+
+									if (urls.wms)  // valid collects have a wms url
+										sets.push({	
+											imported: new Date(image.ImportDate),
+											collected: new Date(image.QualityRating),
+											mission: image.MissionId,
+											sunEl: parseFloat(sun.SunElevationDim),
+											sunAz: parseFloat(sun.SunAzimuth),
+											layer: collect.CoverId,
+											clouds: atm.CloudCoverPercentageRate,
+											country: region.CountryCode[0],
+											classif: restrict.ClassificationCode + "//" + restrict.LimitedDistributionCode[0],
+											imageID: imageID,
+													// "12NOV16220905063EA00000 270000EA530040"
+											mode: image.SensorCode,
+											bands: parseInt(image.BandCountQuantity),
+											gsd: parseFloat(image.MeanGroundSpacingDistanceDim)*25.4e-3,
+											wms: urls[chipper]
+													.replace("http:", "wget:")
+													.replace("https:", "wgets:")
+													.replace(
+														"?REQUEST=GetCapabilities&VERSION=1.3.0",
+														"?request=GetMap&version=1.1.1")
+
+													.tag("&", chip)
+													+ "////"	// wget output path
+													+ paths.chips + imageID
+										});
+
+								});
+							}
+
+						res( sets );
+					}
+
+					else
+						res( "" );
+				});	
+
+			else
+			if ( src == "SPOOF" ) // spoof
+				res([{			
+					imported: new Date(),
+					collected: new Date(),
+					mission: "debug", //image.MissionId,
+					sunEl: 0, //parseFloat(sun.SunElevationDim),
+					sunAz: 0, //parseFloat(sun.SunAzimuth),
+					layer: "debug", //collect.CoverId,
+					clouds: 0, //atm.CloudCoverPercentageRate,
+					country: "XX", //region.CountryCode[0],
+					classif: "", //restrict.ClassificationCode + "//" + restrict.LimitedDistributionCode[0],
+					imageID: "ddxxxyymmmmxxxxxEAnnnnn xxxxxEAnnnnnn",
+							// "12NOV16220905063EA00000 270000EA530040"
+					mode: "XX", //image.SensorCode,
+					bands: 0, //parseInt(image.BandCountQuantity),
+					gsd: 0, //parseFloat(image.MeanGroundSpacingDistanceDim)*25.4e-3,
+					wms: "" + "////" + paths.chips + "spoof.jpg"	
+					/*{
+					GetRecordsResponse: {
+						SearchResults: {
+							DatasetSummary: [{
+								"Image-Product": {
+									Image: {
+										ImageId: "spoof",
+										"Image-Sun-Characteristic": {
+											SunElevationDim: "0", 
+											SunAzimuth: "0"
+										},
+										"Image-Raster-Object-Representation": [],
+										"Image-Atmospheric-Characteristic": []
+									},
+									"Image-Restriction": {
+										Classification: "?", 
+										ClassificationSystemId: "?", 
+										LimitedDistributionCode: ["?"]
+									},
+									"Image-Country-Coverage": {
+										CountryCode: ["??"]
+									}
+								},
+								WMSUrl: ENV.SRV_TOTEM+"/shares/spoof.jpg",
+								WMTSUrl: "",
+								JPIPUrl: ""
+							}]
+						}
+					}
+				} */
+				}]);
+
+			else
+				res( "" );
+		},
+
+		/**
+		Provide image tips.
+		@param {Object} req Totem session request
+		@param {Function} res Totem session response		
+		*/
+		tips: (req, res) => {
+			const
+				{sql, log, query, type} = req;
+
+			if ( type == "help" ) 
+			return res("Provide image tips found by detectors");
+
+			sql.query(
+				"SELECT *, "
+				+ "count(detects.ID) AS weight, "
+				+ "concat('/tips/',chips.ID,'.jpg') AS tip, "
+				+ "concat("
+				+ 		"linkquery('O', 'https://ldomar.ilabs.ic.gov/omar/mapView/index',concat('layers=',collects.layer)), "
+				+ 		"linkquery('S', '/minielt.view',concat('src=/chips/',chips.name))"
+				+ ") AS links, "
+				+ "datediff(now(),collected) AS age "
+				+ "FROM openv.detects "
+				+ "LEFT JOIN openv.chips ON MBRcontains(chips.address,detects.address) "
+				+ "LEFT JOIN openv.collects ON collects.ID = chips.collectID "
+				+ "LEFT JOIN openv.detectors ON detectors.name = detects.label "
+				+ "WHERE least(?,1) "
+				+ "GROUP BY detects.address "
+				+ "ORDER BY detects.made DESC "
+				+ "LIMIT 0,400", 
+				guardQuery(query,true), 
+				(err, recs) => {
+
+					if (err)
+						Log("tips",[err,q.sql]);
+					
+					else
+						recs.forEach( (rec,id) => {
+							rec.ID = id;
+							rec.lat = rec.address[0][0].x*180/Math.PI;
+							rec.lon = rec.address[0][0].y*180/Math.PI;
+							//delete rec.address;
+						});
+
+					res(err || recs);
+			});
+		},
+
+		// web links
+
+		/**
+		Track web links.
+		@param {Object} req Totem session request
+		@param {Function} res Totem session response		
+		*/
+		follow: (req,res) => {  // follow a link
+			const {sql,query,type} = req;
+
+			if ( type == "help" ) 
+			return res("Track client's link selections.");
+
+			res(errors.ok);
+
+			sql.query("INSERT INTO openv.follows SET ? ON DUPLICATE KEY UPDATE Count=Count+1,Event=now()", {
+				Goto: query.goto.split("?")[0], 
+				Client: query.client,
+				View: query.view,
+				Event: new Date(),
+				Count: 1
+			});
+		},
+
+		// quizes
+
+		/**
+		Proctor quizes.
+		@param {Object} req Totem session request
+		@param {Function} res Totem session response		
+		*/
+		proctor: (req,res) => {  //< grade quiz results
+			const 
+				{sql, query, client, type} = req;
+
+			if ( type == "help" ) 
+			return res("Grade a clients lesson = PART.PART... in module = ID.");
+
+			const 
+				parts = query.lesson.split("."),
+				topic = parts[0],
+				mod = parseInt( parts[1] ) || 1,
+				set = parseInt( parts[2] ) || 1,
+				mods = query.modules || 1,
+				passed = query.score >= query.pass;
+
+			//Log(query.score, query.pass, [topic, set, mod, mods].join("."));
+
+			sql.query("INSERT INTO openv.quizes SET ? ON DUPLICATE KEY UPDATE Tries=Tries+1,?", [{
+				Client: client,
+				Score: query.score,
+				Topic: topic,
+				Module: mod,
+				Set: set,
+				Pass: query.pass,
+				Taken: new Date(),
+				Tries: 1
+			}, {
+				Score: query.score,
+				Pass: query.pass,
+				Taken: new Date()
+			}], err => {
+
+				sql.forAll(
+					"",
+					"SELECT count(ID) AS Count FROM openv.quizes WHERE Score>Pass AND least(?) GROUP BY Module", 
+					{Client:client, Topic:topic}, 
+					function (recs) {
+
+						var certified = recs.length >= mods;
+
+						res( `Thank you ${client} - ` + (
+							certified 
+							? "you completed all modules - your certificate of completion will be emailed"
+
+							: passed 
+								? `you passed set ${set} of module ${mod}-${mods}!`
+								: "please try again" 
+						));
+
+						if ( certified ) {
+							sql.query(
+								"UPDATE openv.quizes SET Certified=now() WHERE least(?)", 
+								{Client:client, Topic:topic} ).end();
+
+							sendMail({
+								to: client,
+								subject: `${site.nick} sends its congradulations`,
+								body: 
+									`you completed all ${topic} modules and may claim your `
+									+ "certificate".tag("a", {href:`/config/stores/cert_${topic}_${client}.pdf`})
+							}, sql );
+						}
+
+				});
+
+			});
+		},
+
+		// files
+
+		/**
+		Upload files to upload area
+		@param {Object} req Totem session request
+		@param {Function} res Totem session response		
+		*/
+		uploads: fileUpload,
+		
+		/**
+		Upload files to stores area
+		@param {Object} req Totem session request
+		@param {Function} res Totem session response		
+		*/
+		stores: fileUpload, 
+
+		/**
+		Update like-us stats
+		@param {Object} req Totem session request
+		@param {Function} res Totem session response		
+		*/
+		likeus: (req, res) => {
+			const
+				{sql, loq, query, type, profile, client} = req,
+				{pocs} = site,
+				user = {
+					expired: "your subscription has expired",
+					0: "elite",
+					1: "grand",
+					2: "wonderful",
+					3: "better than average",
+					4: "below average",
+					5: "first class",
+					default: "limited"
+				};
+
+			if ( type == "help") 
+			return res("Credit client's profile with a like" );
+
+			sendMail({
+				to: pocs.admin,
+				subject: req.client + " likes " + site.title + " !!", 
+				body: "Just saying"
+			}, sql );
+
+			if ( profile.Credit ) {
+				sql.query(
+					"UPDATE openv.profiles SET Challenge=0,Likeus=Likeus+1,QoS=greatest(QoS-1,0) WHERE ?",
+					{Client:req.client}
+				);
+
+				profile.QoS = Math.max(profile.QoS-1,0);  // takeoff 1 sec
+				var qos = user[Math.floor(profile.QoS)] || user.default;
+				res( `Thanks ${client} for liking ${site.nick} !  As a ${qos} user your ` 
+					+ "QoS profile".link('/profile.view')
+					+ " may have improved !" )	
+			}
+
+			else
+				res( `Thanks ${req.client} for liking ${site.nick} but ` + user.expired.link('/fundme.view') + " !" );
+
+		},
+
+		/**
+		Return list of clients that have used this service
+		@param {Object} req Totem session request
+		@param {Function} res Totem session response		
+		*/
+		users: (req, res) => {
+			const
+				{sql, query, type } = req;
+
+			if ( type == "help" ) 
+			return res("returns list of users");
+
+			sql.query("SELECT ID,Connects,Client AS Name, Location AS Path FROM openv.sessions WHERE least(?,1) ORDER BY Client", 
+				guardQuery(query,true),
+				(err, recs) => res(err || recs) );
+		},
+
+		/**
+		Retrieve [requested neo4j graph](/api.view#sysGraph).
+
+		@param {Object} req Totem session request
+		@param {Function} res Totem session response
 		*/
 		graph: function (req,res) {
 			const 
@@ -3901,8 +3894,9 @@ desired ring = [ [lat,lon], ....]
 		// notebooks
 
 		/**
-		@param {Object} req Totem request
-		@param {Function} res Totem response		
+		Return published notebooks
+		@param {Object} req Totem session request
+		@param {Function} res Totem session response		
 		*/
 		notebooks: (req,res) => {
 			const
@@ -4018,8 +4012,8 @@ desired ring = [ [lat,lon], ....]
 		/**
 		Endpoint to ingest a source into the sql database
 
-		@param {Object} req Totem request
-		@param {Function} res Totem response
+		@param {Object} req Totem session request
+		@param {Function} res Totem session response
 		*/
 		ingest: (req,res) => {
 
@@ -4089,8 +4083,8 @@ desired ring = [ [lat,lon], ....]
 		/**
 		Endpoint to return release information about requested license.
 
-		@param {Object} req Totem request
-		@param {Function} res Totem response
+		@param {Object} req Totem session request
+		@param {Function} res Totem session response
 		*/
 		decode: (req,res) => {
 			const 
@@ -4117,8 +4111,8 @@ desired ring = [ [lat,lon], ....]
 		/**
 		Endpoint to restart totem if authorized.
 
-		@param {Object} req Totem request
-		@param {Function} res Totem response
+		@param {Object} req Totem session request
+		@param {Function} res Totem session response
 		*/
 		restart: (req,res) => {
 			const
@@ -4149,8 +4143,8 @@ desired ring = [ [lat,lon], ....]
 		/**
 		Endpoint to send notice to outsource jobs to agents.
 
-		@param {Object} req Totem request
-		@param {Function} res Totem response
+		@param {Object} req Totem session request
+		@param {Function} res Totem session response
 		*/
 		agent: (req,res) => {
 			const
@@ -4254,8 +4248,8 @@ save = CLIENT.HOST.CASE to save
 		/**
 		Endpoint to send notice to all clients
 
-		@param {Object} req Totem request
-		@param {Function} res Totem response
+		@param {Object} req Totem session request
+		@param {Function} res Totem session response
 		*/
 		alert: (req,res) => {
 			const
@@ -4281,8 +4275,8 @@ save = CLIENT.HOST.CASE to save
 		/**
 		Endpoint to send emergency message to all clients then halt totem
 
-		@param {Object} req Totem request
-		@param {Function} res Totem response
+		@param {Object} req Totem session request
+		@param {Function} res Totem session response
 		*/
 		stop: (req,res) => {
 
@@ -4301,8 +4295,8 @@ save = CLIENT.HOST.CASE to save
 		},
 
 		/**
-		@param {Object} req Totem request
-		@param {Function} res Totem response
+		@param {Object} req Totem session request
+		@param {Function} res Totem session response
 		*/
 		devstatus: (req, res) => {
 			function statRepo(sql) {
@@ -4391,8 +4385,8 @@ save = CLIENT.HOST.CASE to save
 		},
 
 		/**
-		@param {Object} req Totem request
-		@param {Function} res Totem response
+		@param {Object} req Totem session request
+		@param {Function} res Totem session response
 		*/
 		milestones: (req, res) => {
 			const 
@@ -4417,8 +4411,8 @@ save = CLIENT.HOST.CASE to save
 		},	
 
 		/**
-		@param {Object} req Totem request
-		@param {Function} res Totem response
+		@param {Object} req Totem session request
+		@param {Function} res Totem session response
 		*/
 		config: (req,res) => {
 			const 
@@ -4467,8 +4461,8 @@ Respond with system configuration information on requested module mod = NAME or 
 		},
 
 		/**
-		@param {Object} req Totem request
-		@param {Function} res Totem response
+		@param {Object} req Totem session request
+		@param {Function} res Totem session response
 		*/
 		info: (req,res) => {
 			function toSchema( path, obj ) {
@@ -4733,8 +4727,8 @@ Respond with system configuration information on requested module mod = NAME or 
 
 		/**
 		Digital globe interface.
-		@param {Object} req Totem request
-		@param {Function} res Totem response
+		@param {Object} req Totem session request
+		@param {Function} res Totem session response
 		*/		
 		DG: (req, res) => {  
 			const 
@@ -4744,8 +4738,8 @@ Respond with system configuration information on requested module mod = NAME or 
 
 		/**
 		Hydra interface.
-		@param {Object} req Totem request
-		@param {Function} res Totem response
+		@param {Object} req Totem session request
+		@param {Function} res Totem session response
 		*/		
 		HYDRA: (req, res) => { // Hydra interface
 
@@ -4804,8 +4798,8 @@ size, pixels, scale, step, range, detects, infile, outfile, channel.  This endpo
 
 		/**
 		NCL interface.
-		@param {Object} req Totem request
-		@param {Function} res Totem response
+		@param {Object} req Totem session request
+		@param {Function} res Totem session response
 		*/		
 		NCL: (req, res) => { // Reserved for NCL and ESS service alerts
 			const 
@@ -4815,8 +4809,8 @@ size, pixels, scale, step, range, detects, infile, outfile, channel.  This endpo
 
 		/**
 		ESS interface.
-		@param {Object} req Totem request
-		@param {Function} res Totem response
+		@param {Object} req Totem session request
+		@param {Function} res Totem session response
 		*/		
 		ESS: (req, res) => { // Reserved for NCL and ESS service alerts
 			const 
@@ -4826,8 +4820,8 @@ size, pixels, scale, step, range, detects, infile, outfile, channel.  This endpo
 
 		/**
 		MIDB interface.
-		@param {Object} req Totem request
-		@param {Function} res Totem response
+		@param {Object} req Totem session request
+		@param {Function} res Totem session response
 		*/		
 		MIDB: (req, res) => { // Reserved for NCL and ESS service alerts
 			const 
@@ -4837,8 +4831,8 @@ size, pixels, scale, step, range, detects, infile, outfile, channel.  This endpo
 		
 		/**
 		Matlab interface.
-		@param {Object} req Totem request
-		@param {Function} res Totem response
+		@param {Object} req Totem session request
+		@param {Function} res Totem session response
 		*/		
 		matlab: (req,res) => {
 			const
@@ -4852,8 +4846,8 @@ size, pixels, scale, step, range, detects, infile, outfile, channel.  This endpo
 
 		/**
 		ESC remedy interface.
-		@param {Object} req Totem request
-		@param {Function} res Totem response
+		@param {Object} req Totem session request
+		@param {Function} res Totem session response
 		*/		
 		ESC: (req,res) => {
 			const
@@ -4874,7 +4868,7 @@ size, pixels, scale, step, range, detects, infile, outfile, channel.  This endpo
 	},
 	
 	/**
-	Endpoints /TABLE.TYPE routes by table type on specifed req-res thread
+	/TABLE.TYPE-endpoint routers
 	*/			
 	"byType.": {
 		// doc generators
@@ -5339,8 +5333,8 @@ function SOAPsession(req,res,peer,action) {
 /**
 Convert records to requested req.type office file.
 @param {Array} recs list of records to be converted
-@param {Object} req Totem request
-@param {Function} res Totem response
+@param {Object} req Totem session request
+@param {Function} res Totem session response
 */
 function genDoc(recs,req,res) {
 	
@@ -6133,7 +6127,7 @@ function simPlugin(req,res) {
 Endpoint to blog a specifiec field from [requested](/api.view#blogPlugin) plugin/notebook/table.
 
 @param {Object} req http request
-@param {Function} res Totem response callback
+@param {Function} res Totem session response callback
 */
 function blogPlugin(req,res) {
 	const 
@@ -6178,7 +6172,7 @@ function blogPlugin(req,res) {
 Endpoint to return users of a [requested](/api.view#usersPlugin) plugin/notebook/table.
 
 @param {Object} req http request
-@param {Function} res Totem response callback
+@param {Function} res Totem session response callback
 */
 function usersPlugin(req,res) {
 	const 
@@ -6197,7 +6191,7 @@ function usersPlugin(req,res) {
 Endpoint to export [requested](/api.view#usersPlugin) plugin/notebook/table.
 
 @param {Object} req http request
-@param {Function} res Totem response callback
+@param {Function} res Totem session response callback
 */
 function exportPlugin(req,res) {
 	const 
@@ -6217,7 +6211,7 @@ function exportPlugin(req,res) {
 Endpoint to import [requested](/api.view#usersPlugin) plugin/notebook/table.
 
 @param {Object} req http request
-@param {Function} res Totem response callback
+@param {Function} res Totem session response callback
 */
 function importPlugin(req,res) {
 	const 
@@ -6865,7 +6859,7 @@ function storesPlugin(req,res) {
 Endpoint to execute plugin req.table using usecase req.query.ID || req.query.Name.
 
 @param {Object} req http request
-@param {Function} res Totem response callback
+@param {Function} res Totem session response callback
 */	
 function exePlugin(req,res) {	//< execute plugin in specified usecase context
 	const 
@@ -6929,7 +6923,7 @@ function exePlugin(req,res) {	//< execute plugin in specified usecase context
 Endpoint to add keys to [requested](/api.view#modifyPlugin) plugin/notebook/table.
 
 @param {Object} req http request
-@param {Function} res Totem response callback
+@param {Function} res Totem session response callback
 */
 function modifyPlugin(req,res) {	//< add usecase keys to plugin
 	const 
@@ -6974,7 +6968,7 @@ function modifyPlugin(req,res) {	//< add usecase keys to plugin
 Endpoint to remove keys from [requested](/api.view#retractPlugin) plugin/notebook/table given.
 
 @param {Object} req http request
-@param {Function} res Totem response callback
+@param {Function} res Totem session response callback
 */
 function retractPlugin(req,res) {	//< remove usecase keys from plugin
 	const { query, sql, table, type } = req;
@@ -6993,7 +6987,7 @@ function retractPlugin(req,res) {	//< remove usecase keys from plugin
 Endpoint to return plugin/notebook/table usage info.
 
 @param {Object} req http request
-@param {Function} res Totem response callback
+@param {Function} res Totem session response callback
 */
 function helpPlugin(req,res) {
 	const
@@ -7034,8 +7028,8 @@ vacant, then responds with res(results).  If a Q.agent is present, then the plug
 out-sourced to the requested agent, which is periodically polled for its results, then
 responds with res(results).  
 
-@param {Object} req Totem request
-@param {Function} res Totem response
+@param {Object} req Totem session request
+@param {Function} res Totem session response
 */
 function runPlugin(req, res) {  //< callback res(ctx) with resulting ctx or cb(null) if error
 
@@ -7242,8 +7236,8 @@ function runPlugin(req, res) {  //< callback res(ctx) with resulting ctx or cb(n
 /**
 Endpoint to create/return public-private certs of given [url query](/api.view#getCert) 
 
-@param {Object} req Totem request
-@param {Function} res Totem response
+@param {Object} req Totem session request
+@param {Function} res Totem session response
 */
 function getCert(req,res) { // create/return public-private certs
 

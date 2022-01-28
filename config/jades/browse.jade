@@ -17,11 +17,11 @@ append base_head
 	script.
 		const
 			opts = {
-				src: "#{query.src}"
-						? "#{query.json}"
-							? "/#{query.json}/".tag("?",{ src: "#{query.src}"})
-							: "/root/artifacts/#{query.name}/"
-						: "/root/"
+				src: "#{query.json}"
+						? "/#{query.json}/".tag("?",{ src: "#{query.src}"})
+						: "#{query.name}"
+							? "/root/artifacts/#{query.name}/"
+							: "/root/"
 			};
 
 append base_body
