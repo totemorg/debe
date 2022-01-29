@@ -1,7 +1,7 @@
 ﻿// UNCLASSIFIED 
 
 const
-	READ = require("reader");			// partial config of NLP (avoids string prototype collision)
+	READ = require("../reader");		// partial config of NLP (avoids string prototype collision)
 
 // NodeJS modules
 const 									
@@ -7333,7 +7333,7 @@ switch ( process.argv[2] ) { // unit tests
 
 	case "admin":
 		const
-			{ ingestFile } = require("geohack");
+			{ ingestFile } = require("../geohack");
 		
 		config({
 			"secureLink.challenge.extend": 10,
