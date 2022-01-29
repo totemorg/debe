@@ -312,12 +312,12 @@ config({
 			res("here i go again");
 
 			Fetch(ENV.WFS_TEST, data => {
-				Log(data);
+				Trace(data);
 			});
 		}
 	}
 }, sql => {
-	Log( "This bad boy in an encrypted service with a database and has an /wfs endpoint" );
+	Trace( "This bad boy in an encrypted service with a database and has an /wfs endpoint" );
 });	
 ```
 **Example**  
@@ -327,7 +327,7 @@ config({
 
 config({
 }, sql => {
-	Log( "Stateful network flow manger started" );
+	Trace( "Stateful network flow manger started" );
 });
 ```
 **Example**  
@@ -367,7 +367,7 @@ config({
 				Reported: rec.reported || rec.Reported || now,
 				Name: rec.reportID || ("tbd-"+recs),
 				Pipe: JSON.stringify( text )
-			}, err => Log("add", err) );
+			}, err => Trace("add", err) );
 		}
 	});
 });
@@ -410,7 +410,7 @@ config({
         * [.tree(recs, req, res)](#module_DEBE..filterType..tree)
         * [.schema(recs, req, res)](#module_DEBE..filterType..schema)
     * [~byArea.](#module_DEBE..byArea.)
-        * [.default](#module_DEBE..byArea..default)
+        * [.root(req, res)](#module_DEBE..byArea..root)
     * [~byTable.](#module_DEBE..byTable.)
         * [.uploads](#module_DEBE..byTable..uploads)
         * [.stores](#module_DEBE..byTable..stores)
@@ -424,7 +424,6 @@ config({
         * [.proctor(req, res)](#module_DEBE..byTable..proctor)
         * [.likeus(req, res)](#module_DEBE..byTable..likeus)
         * [.users(req, res)](#module_DEBE..byTable..users)
-        * [.navigate(req, res)](#module_DEBE..byTable..navigate)
         * [.graph(req, res)](#module_DEBE..byTable..graph)
         * [.notebooks(req, res)](#module_DEBE..byTable..notebooks)
         * [.ingest(req, res)](#module_DEBE..byTable..ingest)
@@ -648,8 +647,8 @@ Filter dataset recs on specifed req-res thread
 | Param | Type | Description |
 | --- | --- | --- |
 | recs | <code>Array</code> | Records to filter |
-| req | <code>Object</code> | Totem request |
-| res | <code>function</code> | Totem response |
+| req | <code>Object</code> | Totem session request |
+| res | <code>function</code> | Totem session response |
 
 <a name="module_DEBE..filterType..xxls"></a>
 
@@ -659,8 +658,8 @@ Filter dataset recs on specifed req-res thread
 | Param | Type | Description |
 | --- | --- | --- |
 | recs | <code>Array</code> | Records to filter |
-| req | <code>Object</code> | Totem request |
-| res | <code>function</code> | Totem response |
+| req | <code>Object</code> | Totem session request |
+| res | <code>function</code> | Totem session response |
 
 <a name="module_DEBE..filterType..xpps"></a>
 
@@ -670,8 +669,8 @@ Filter dataset recs on specifed req-res thread
 | Param | Type | Description |
 | --- | --- | --- |
 | recs | <code>Array</code> | Records to filter |
-| req | <code>Object</code> | Totem request |
-| res | <code>function</code> | Totem response |
+| req | <code>Object</code> | Totem session request |
+| res | <code>function</code> | Totem session response |
 
 <a name="module_DEBE..filterType..xppt"></a>
 
@@ -681,8 +680,8 @@ Filter dataset recs on specifed req-res thread
 | Param | Type | Description |
 | --- | --- | --- |
 | recs | <code>Array</code> | Records to filter |
-| req | <code>Object</code> | Totem request |
-| res | <code>function</code> | Totem response |
+| req | <code>Object</code> | Totem session request |
+| res | <code>function</code> | Totem session response |
 
 <a name="module_DEBE..filterType..dbx"></a>
 
@@ -692,8 +691,8 @@ Filter dataset recs on specifed req-res thread
 | Param | Type | Description |
 | --- | --- | --- |
 | recs | <code>Array</code> | Records to filter |
-| req | <code>Object</code> | Totem request |
-| res | <code>function</code> | Totem response |
+| req | <code>Object</code> | Totem session request |
+| res | <code>function</code> | Totem session response |
 
 <a name="module_DEBE..filterType..db"></a>
 
@@ -703,8 +702,8 @@ Filter dataset recs on specifed req-res thread
 | Param | Type | Description |
 | --- | --- | --- |
 | recs | <code>Array</code> | Records to filter |
-| req | <code>Object</code> | Totem request |
-| res | <code>function</code> | Totem response |
+| req | <code>Object</code> | Totem session request |
+| res | <code>function</code> | Totem session response |
 
 <a name="module_DEBE..filterType..kml"></a>
 
@@ -714,8 +713,8 @@ Filter dataset recs on specifed req-res thread
 | Param | Type | Description |
 | --- | --- | --- |
 | recs | <code>Array</code> | Records to filter |
-| req | <code>Object</code> | Totem request |
-| res | <code>function</code> | Totem response |
+| req | <code>Object</code> | Totem session request |
+| res | <code>function</code> | Totem session response |
 
 <a name="module_DEBE..filterType..flat"></a>
 
@@ -725,8 +724,8 @@ Filter dataset recs on specifed req-res thread
 | Param | Type | Description |
 | --- | --- | --- |
 | recs | <code>Array</code> | Records to filter |
-| req | <code>Object</code> | Totem request |
-| res | <code>function</code> | Totem response |
+| req | <code>Object</code> | Totem session request |
+| res | <code>function</code> | Totem session response |
 
 <a name="module_DEBE..filterType..txt"></a>
 
@@ -736,8 +735,8 @@ Filter dataset recs on specifed req-res thread
 | Param | Type | Description |
 | --- | --- | --- |
 | recs | <code>Array</code> | Records to filter |
-| req | <code>Object</code> | Totem request |
-| res | <code>function</code> | Totem response |
+| req | <code>Object</code> | Totem session request |
+| res | <code>function</code> | Totem session response |
 
 <a name="module_DEBE..filterType..html"></a>
 
@@ -747,8 +746,8 @@ Filter dataset recs on specifed req-res thread
 | Param | Type | Description |
 | --- | --- | --- |
 | recs | <code>Array</code> | Records to filter |
-| req | <code>Object</code> | Totem request |
-| res | <code>function</code> | Totem response |
+| req | <code>Object</code> | Totem session request |
+| res | <code>function</code> | Totem session response |
 
 <a name="module_DEBE..filterType..tree"></a>
 
@@ -758,8 +757,8 @@ Filter dataset recs on specifed req-res thread
 | Param | Type | Description |
 | --- | --- | --- |
 | recs | <code>Array</code> | Records to filter |
-| req | <code>Object</code> | Totem request |
-| res | <code>function</code> | Totem response |
+| req | <code>Object</code> | Totem session request |
+| res | <code>function</code> | Totem session response |
 
 <a name="module_DEBE..filterType..schema"></a>
 
@@ -769,29 +768,31 @@ Filter dataset recs on specifed req-res thread
 | Param | Type | Description |
 | --- | --- | --- |
 | recs | <code>Array</code> | Records to filter |
-| req | <code>Object</code> | Totem request |
-| res | <code>function</code> | Totem response |
+| req | <code>Object</code> | Totem session request |
+| res | <code>function</code> | Totem session response |
 
 <a name="module_DEBE..byArea."></a>
 
 ### DEBE~byArea.
-Endpoints /AREA/FILE routes by file area on specifed req-res thread
+/AREA/FILE-endpoint routers
 
 **Kind**: inner property of [<code>DEBE</code>](#module_DEBE)  
-<a name="module_DEBE..byArea..default"></a>
+<a name="module_DEBE..byArea..root"></a>
 
-#### byArea..default
-**Kind**: static property of [<code>byArea.</code>](#module_DEBE..byArea.)  
+#### byArea..root(req, res)
+Default area navigator.
+
+**Kind**: static method of [<code>byArea.</code>](#module_DEBE..byArea.)  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| req | <code>Object</code> | Totem request |
-| res | <code>function</code> | Totem response |
+| req | <code>Object</code> | Totem session request |
+| res | <code>function</code> | Totem session response |
 
 <a name="module_DEBE..byTable."></a>
 
 ### DEBE~byTable.
-Endpoints /TABLE routes by table name on specifed req-res thread
+/TABLE-endpoint routers
 
 **Kind**: inner property of [<code>DEBE</code>](#module_DEBE)  
 
@@ -808,7 +809,6 @@ Endpoints /TABLE routes by table name on specifed req-res thread
     * [.proctor(req, res)](#module_DEBE..byTable..proctor)
     * [.likeus(req, res)](#module_DEBE..byTable..likeus)
     * [.users(req, res)](#module_DEBE..byTable..users)
-    * [.navigate(req, res)](#module_DEBE..byTable..navigate)
     * [.graph(req, res)](#module_DEBE..byTable..graph)
     * [.notebooks(req, res)](#module_DEBE..byTable..notebooks)
     * [.ingest(req, res)](#module_DEBE..byTable..ingest)
@@ -832,72 +832,86 @@ Endpoints /TABLE routes by table name on specifed req-res thread
 <a name="module_DEBE..byTable..uploads"></a>
 
 #### byTable..uploads
+Upload files to upload area
+
 **Kind**: static property of [<code>byTable.</code>](#module_DEBE..byTable.)  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| req | <code>Object</code> | Totem request |
-| res | <code>function</code> | Totem response |
+| req | <code>Object</code> | Totem session request |
+| res | <code>function</code> | Totem session response |
 
 <a name="module_DEBE..byTable..stores"></a>
 
 #### byTable..stores
+Upload files to stores area
+
 **Kind**: static property of [<code>byTable.</code>](#module_DEBE..byTable.)  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| req | <code>Object</code> | Totem request |
-| res | <code>function</code> | Totem response |
+| req | <code>Object</code> | Totem session request |
+| res | <code>function</code> | Totem session response |
 
 <a name="module_DEBE..byTable..search"></a>
 
 #### byTable..search(req, res)
+Search for a file
+
 **Kind**: static method of [<code>byTable.</code>](#module_DEBE..byTable.)  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| req | <code>Object</code> | Totem request |
-| res | <code>function</code> | Totem response |
+| req | <code>Object</code> | Totem session request |
+| res | <code>function</code> | Totem session response |
 
 <a name="module_DEBE..byTable..searches"></a>
 
 #### byTable..searches(req, res)
+Search of multiple files
+
 **Kind**: static method of [<code>byTable.</code>](#module_DEBE..byTable.)  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| req | <code>Object</code> | Totem request |
-| res | <code>function</code> | Totem response |
+| req | <code>Object</code> | Totem session request |
+| res | <code>function</code> | Totem session response |
 
 <a name="module_DEBE..byTable..words"></a>
 
 #### byTable..words(req, res)
+Word statistics
+
 **Kind**: static method of [<code>byTable.</code>](#module_DEBE..byTable.)  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| req | <code>Object</code> | Totem request |
-| res | <code>function</code> | Totem response |
+| req | <code>Object</code> | Totem session request |
+| res | <code>function</code> | Totem session response |
 
 <a name="module_DEBE..byTable..wms"></a>
 
 #### byTable..wms(req, res)
+WMS
+
 **Kind**: static method of [<code>byTable.</code>](#module_DEBE..byTable.)  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| req | <code>Object</code> | Totem request |
-| res | <code>function</code> | Totem response |
+| req | <code>Object</code> | Totem session request |
+| res | <code>function</code> | Totem session response |
 
 <a name="module_DEBE..byTable..wfs"></a>
 
 #### byTable..wfs(req, res)
+WFS
+
 **Kind**: static method of [<code>byTable.</code>](#module_DEBE..byTable.)  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| req | <code>Object</code> | Totem request |
-| res | <code>function</code> | Totem response |
+| req | <code>Object</code> | Totem session request |
+| res | <code>function</code> | Totem session response |
 
 <a name="module_DEBE..byTable..tips"></a>
 
@@ -908,8 +922,8 @@ Provide image tips.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| req | <code>Object</code> | Totem request |
-| res | <code>function</code> | Totem response |
+| req | <code>Object</code> | Totem session request |
+| res | <code>function</code> | Totem session response |
 
 <a name="module_DEBE..byTable..follow"></a>
 
@@ -920,8 +934,8 @@ Track web links.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| req | <code>Object</code> | Totem request |
-| res | <code>function</code> | Totem response |
+| req | <code>Object</code> | Totem session request |
+| res | <code>function</code> | Totem session response |
 
 <a name="module_DEBE..byTable..proctor"></a>
 
@@ -932,62 +946,56 @@ Proctor quizes.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| req | <code>Object</code> | Totem request |
-| res | <code>function</code> | Totem response |
+| req | <code>Object</code> | Totem session request |
+| res | <code>function</code> | Totem session response |
 
 <a name="module_DEBE..byTable..likeus"></a>
 
 #### byTable..likeus(req, res)
+Update like-us stats
+
 **Kind**: static method of [<code>byTable.</code>](#module_DEBE..byTable.)  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| req | <code>Object</code> | Totem request |
-| res | <code>function</code> | Totem response |
+| req | <code>Object</code> | Totem session request |
+| res | <code>function</code> | Totem session response |
 
 <a name="module_DEBE..byTable..users"></a>
 
 #### byTable..users(req, res)
-**Kind**: static method of [<code>byTable.</code>](#module_DEBE..byTable.)  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| req | <code>Object</code> | Totem request |
-| res | <code>function</code> | Totem response |
-
-<a name="module_DEBE..byTable..navigate"></a>
-
-#### byTable..navigate(req, res)
-Folder navigator.
+Return list of clients that have used this service
 
 **Kind**: static method of [<code>byTable.</code>](#module_DEBE..byTable.)  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| req | <code>Object</code> | Totem request |
-| res | <code>function</code> | Totem response |
+| req | <code>Object</code> | Totem session request |
+| res | <code>function</code> | Totem session response |
 
 <a name="module_DEBE..byTable..graph"></a>
 
 #### byTable..graph(req, res)
-Endpoint to retrieve [requested neo4j graph](/api.view#sysGraph).
+Retrieve [requested neo4j graph](/api.view#sysGraph).
 
 **Kind**: static method of [<code>byTable.</code>](#module_DEBE..byTable.)  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| req | <code>Object</code> | Totem request |
-| res | <code>function</code> | Totem response |
+| req | <code>Object</code> | Totem session request |
+| res | <code>function</code> | Totem session response |
 
 <a name="module_DEBE..byTable..notebooks"></a>
 
 #### byTable..notebooks(req, res)
+Return published notebooks
+
 **Kind**: static method of [<code>byTable.</code>](#module_DEBE..byTable.)  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| req | <code>Object</code> | Totem request |
-| res | <code>function</code> | Totem response |
+| req | <code>Object</code> | Totem session request |
+| res | <code>function</code> | Totem session response |
 
 <a name="module_DEBE..byTable..ingest"></a>
 
@@ -998,8 +1006,8 @@ Endpoint to ingest a source into the sql database
 
 | Param | Type | Description |
 | --- | --- | --- |
-| req | <code>Object</code> | Totem request |
-| res | <code>function</code> | Totem response |
+| req | <code>Object</code> | Totem session request |
+| res | <code>function</code> | Totem session response |
 
 <a name="module_DEBE..byTable..decode"></a>
 
@@ -1010,8 +1018,8 @@ Endpoint to return release information about requested license.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| req | <code>Object</code> | Totem request |
-| res | <code>function</code> | Totem response |
+| req | <code>Object</code> | Totem session request |
+| res | <code>function</code> | Totem session response |
 
 <a name="module_DEBE..byTable..restart"></a>
 
@@ -1022,8 +1030,8 @@ Endpoint to restart totem if authorized.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| req | <code>Object</code> | Totem request |
-| res | <code>function</code> | Totem response |
+| req | <code>Object</code> | Totem session request |
+| res | <code>function</code> | Totem session response |
 
 <a name="module_DEBE..byTable..agent"></a>
 
@@ -1034,8 +1042,8 @@ Endpoint to send notice to outsource jobs to agents.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| req | <code>Object</code> | Totem request |
-| res | <code>function</code> | Totem response |
+| req | <code>Object</code> | Totem session request |
+| res | <code>function</code> | Totem session response |
 
 <a name="module_DEBE..byTable..alert"></a>
 
@@ -1046,8 +1054,8 @@ Endpoint to send notice to all clients
 
 | Param | Type | Description |
 | --- | --- | --- |
-| req | <code>Object</code> | Totem request |
-| res | <code>function</code> | Totem response |
+| req | <code>Object</code> | Totem session request |
+| res | <code>function</code> | Totem session response |
 
 <a name="module_DEBE..byTable..stop"></a>
 
@@ -1058,8 +1066,8 @@ Endpoint to send emergency message to all clients then halt totem
 
 | Param | Type | Description |
 | --- | --- | --- |
-| req | <code>Object</code> | Totem request |
-| res | <code>function</code> | Totem response |
+| req | <code>Object</code> | Totem session request |
+| res | <code>function</code> | Totem session response |
 
 <a name="module_DEBE..byTable..devstatus"></a>
 
@@ -1068,8 +1076,8 @@ Endpoint to send emergency message to all clients then halt totem
 
 | Param | Type | Description |
 | --- | --- | --- |
-| req | <code>Object</code> | Totem request |
-| res | <code>function</code> | Totem response |
+| req | <code>Object</code> | Totem session request |
+| res | <code>function</code> | Totem session response |
 
 <a name="module_DEBE..byTable..milestones"></a>
 
@@ -1078,8 +1086,8 @@ Endpoint to send emergency message to all clients then halt totem
 
 | Param | Type | Description |
 | --- | --- | --- |
-| req | <code>Object</code> | Totem request |
-| res | <code>function</code> | Totem response |
+| req | <code>Object</code> | Totem session request |
+| res | <code>function</code> | Totem session response |
 
 <a name="module_DEBE..byTable..config"></a>
 
@@ -1088,8 +1096,8 @@ Endpoint to send emergency message to all clients then halt totem
 
 | Param | Type | Description |
 | --- | --- | --- |
-| req | <code>Object</code> | Totem request |
-| res | <code>function</code> | Totem response |
+| req | <code>Object</code> | Totem session request |
+| res | <code>function</code> | Totem session response |
 
 <a name="module_DEBE..byTable..info"></a>
 
@@ -1098,8 +1106,8 @@ Endpoint to send emergency message to all clients then halt totem
 
 | Param | Type | Description |
 | --- | --- | --- |
-| req | <code>Object</code> | Totem request |
-| res | <code>function</code> | Totem response |
+| req | <code>Object</code> | Totem session request |
+| res | <code>function</code> | Totem session response |
 
 <a name="module_DEBE..byTable..DG"></a>
 
@@ -1110,8 +1118,8 @@ Digital globe interface.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| req | <code>Object</code> | Totem request |
-| res | <code>function</code> | Totem response |
+| req | <code>Object</code> | Totem session request |
+| res | <code>function</code> | Totem session response |
 
 <a name="module_DEBE..byTable..HYDRA"></a>
 
@@ -1122,8 +1130,8 @@ Hydra interface.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| req | <code>Object</code> | Totem request |
-| res | <code>function</code> | Totem response |
+| req | <code>Object</code> | Totem session request |
+| res | <code>function</code> | Totem session response |
 
 <a name="module_DEBE..byTable..NCL"></a>
 
@@ -1134,8 +1142,8 @@ NCL interface.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| req | <code>Object</code> | Totem request |
-| res | <code>function</code> | Totem response |
+| req | <code>Object</code> | Totem session request |
+| res | <code>function</code> | Totem session response |
 
 <a name="module_DEBE..byTable..ESS"></a>
 
@@ -1146,8 +1154,8 @@ ESS interface.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| req | <code>Object</code> | Totem request |
-| res | <code>function</code> | Totem response |
+| req | <code>Object</code> | Totem session request |
+| res | <code>function</code> | Totem session response |
 
 <a name="module_DEBE..byTable..MIDB"></a>
 
@@ -1158,8 +1166,8 @@ MIDB interface.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| req | <code>Object</code> | Totem request |
-| res | <code>function</code> | Totem response |
+| req | <code>Object</code> | Totem session request |
+| res | <code>function</code> | Totem session response |
 
 <a name="module_DEBE..byTable..matlab"></a>
 
@@ -1170,8 +1178,8 @@ Matlab interface.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| req | <code>Object</code> | Totem request |
-| res | <code>function</code> | Totem response |
+| req | <code>Object</code> | Totem session request |
+| res | <code>function</code> | Totem session response |
 
 <a name="module_DEBE..byTable..ESC"></a>
 
@@ -1182,13 +1190,13 @@ ESC remedy interface.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| req | <code>Object</code> | Totem request |
-| res | <code>function</code> | Totem response |
+| req | <code>Object</code> | Totem session request |
+| res | <code>function</code> | Totem session response |
 
 <a name="module_DEBE..byType."></a>
 
 ### DEBE~byType.
-Endpoints /TABLE.TYPE routes by table type on specifed req-res thread
+/TABLE.TYPE-endpoint routers
 
 **Kind**: inner property of [<code>DEBE</code>](#module_DEBE)  
 <a name="module_DEBE..site."></a>
@@ -1279,8 +1287,8 @@ Convert records to requested req.type office file.
 | Param | Type | Description |
 | --- | --- | --- |
 | recs | <code>Array</code> | list of records to be converted |
-| req | <code>Object</code> | Totem request |
-| res | <code>function</code> | Totem response |
+| req | <code>Object</code> | Totem session request |
+| res | <code>function</code> | Totem session response |
 
 <a name="module_DEBE..setAutorun"></a>
 
@@ -1336,7 +1344,7 @@ Endpoint to blog a specifiec field from [requested](/api.view#blogPlugin) plugin
 | Param | Type | Description |
 | --- | --- | --- |
 | req | <code>Object</code> | http request |
-| res | <code>function</code> | Totem response callback |
+| res | <code>function</code> | Totem session response callback |
 
 <a name="module_DEBE..usersPlugin"></a>
 
@@ -1348,7 +1356,7 @@ Endpoint to return users of a [requested](/api.view#usersPlugin) plugin/notebook
 | Param | Type | Description |
 | --- | --- | --- |
 | req | <code>Object</code> | http request |
-| res | <code>function</code> | Totem response callback |
+| res | <code>function</code> | Totem session response callback |
 
 <a name="module_DEBE..exportPlugin"></a>
 
@@ -1360,7 +1368,7 @@ Endpoint to export [requested](/api.view#usersPlugin) plugin/notebook/table.
 | Param | Type | Description |
 | --- | --- | --- |
 | req | <code>Object</code> | http request |
-| res | <code>function</code> | Totem response callback |
+| res | <code>function</code> | Totem session response callback |
 
 <a name="module_DEBE..importPlugin"></a>
 
@@ -1372,7 +1380,7 @@ Endpoint to import [requested](/api.view#usersPlugin) plugin/notebook/table.
 | Param | Type | Description |
 | --- | --- | --- |
 | req | <code>Object</code> | http request |
-| res | <code>function</code> | Totem response callback |
+| res | <code>function</code> | Totem session response callback |
 
 <a name="module_DEBE..exePlugin"></a>
 
@@ -1384,7 +1392,7 @@ Endpoint to execute plugin req.table using usecase req.query.ID || req.query.Nam
 | Param | Type | Description |
 | --- | --- | --- |
 | req | <code>Object</code> | http request |
-| res | <code>function</code> | Totem response callback |
+| res | <code>function</code> | Totem session response callback |
 
 <a name="module_DEBE..modifyPlugin"></a>
 
@@ -1396,7 +1404,7 @@ Endpoint to add keys to [requested](/api.view#modifyPlugin) plugin/notebook/tabl
 | Param | Type | Description |
 | --- | --- | --- |
 | req | <code>Object</code> | http request |
-| res | <code>function</code> | Totem response callback |
+| res | <code>function</code> | Totem session response callback |
 
 <a name="module_DEBE..retractPlugin"></a>
 
@@ -1408,7 +1416,7 @@ Endpoint to remove keys from [requested](/api.view#retractPlugin) plugin/noteboo
 | Param | Type | Description |
 | --- | --- | --- |
 | req | <code>Object</code> | http request |
-| res | <code>function</code> | Totem response callback |
+| res | <code>function</code> | Totem session response callback |
 
 <a name="module_DEBE..helpPlugin"></a>
 
@@ -1420,7 +1428,7 @@ Endpoint to return plugin/notebook/table usage info.
 | Param | Type | Description |
 | --- | --- | --- |
 | req | <code>Object</code> | http request |
-| res | <code>function</code> | Totem response callback |
+| res | <code>function</code> | Totem session response callback |
 
 <a name="module_DEBE..runPlugin"></a>
 
@@ -1439,8 +1447,8 @@ responds with res(results).
 
 | Param | Type | Description |
 | --- | --- | --- |
-| req | <code>Object</code> | Totem request |
-| res | <code>function</code> | Totem response |
+| req | <code>Object</code> | Totem session request |
+| res | <code>function</code> | Totem session response |
 
 <a name="module_DEBE..getCert"></a>
 
@@ -1451,8 +1459,8 @@ Endpoint to create/return public-private certs of given [url query](/api.view#ge
 
 | Param | Type | Description |
 | --- | --- | --- |
-| req | <code>Object</code> | Totem request |
-| res | <code>function</code> | Totem response |
+| req | <code>Object</code> | Totem session request |
+| res | <code>function</code> | Totem session response |
 
 </details>
 

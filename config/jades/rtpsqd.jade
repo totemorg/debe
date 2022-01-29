@@ -17,8 +17,8 @@ append site_parms
 	- view = "kiss"
 
 append site_body
-	- title = `${query.name} Research Technology Plan`
-	- folder = `/shares/${query.name}`
+	- title = `${name} Research Technology Plan`
+	- folder = `/shares/${name}`
 
 	h1= title
 	img(src="#{folder}/logo.jpg")
@@ -29,5 +29,5 @@ append site_body
 
 	each i in [1,2,3]
 		:markdown
-			# [edit](/faqs.view) Section #{i} 
-			#embed{/faqs.html?Num:=Seq&Question:=Q&Answer:=A&Seq=#{i}.*&_sort=Seq}
+			# [Section #{i}](/faqs.view)  
+		iframe(src="/faqs.html?Num:=Seq&Question:=Q&Answer:=A&Seq=#{i}",width=1200,height=200,style="border:none")

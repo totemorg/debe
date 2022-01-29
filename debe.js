@@ -13,8 +13,7 @@ const
 	CP = require("child_process"), 		//< Child process threads
 	FS = require("fs"), 				//< filesystem and uploads
 	VM = require("vm"),					//< virtual machines
-	OS = require("os"),					//< os utilities
-	REPL = require("repl");
+	OS = require("os");					//< os utilities
 
 // 3rd party modules
 const	 
@@ -36,19 +35,19 @@ const
 const
 	// include modules
 	//EAT = require("./ingesters"),	
-	TOTEM = require("totem"),
-	ATOM = require("atomic"), 
-	ENUMS = require("enums"),
-	$ = require("man"),
-	RAN = require("randpr"),
-	PIPE = require("pipe"),
-	SKIN = require("skin"),
-	BLOG = require("blog"),
-	DOGS = require("dogs");
+	TOTEM = require("../totem"),
+	ATOM = require("../atomic"), 
+	ENUMS = require("../enums"),
+	$ = require("../man"),
+	RAN = require("../randpr"),
+	PIPE = require("../pipe"),
+	SKIN = require("../skin"),
+	BLOG = require("../blog"),
+	DOGS = require("../dogs");
 
 const 
 	{ exec } = CP,
-	{ Copy,Each,
+	{ Copy,Each,Log,Debug,
 	 isKeyed,isString,isFunction,isError,isArray,isObject,isEmpty,
 	 getList, getURL,
 	 typeOf,Stream, Fetch } = ENUMS,
@@ -90,12 +89,12 @@ Copy({
 						(x0.length>y0.length) ? $.oga( x0,y0,s ) : $.oga( y0,x0,s ),
 				aligned = [];
 			
-			if ( !n ) Log(hit.title,aligns);
+			if ( !n ) Trace(hit.title,aligns);
 			
 			aligns[0].forEach( al => aligned.push( al.y ) );
 			hit.score = score;
 			hit.title += " => " + aligned.join(" ");
-			//Log(">>>t", x0.join(">"), y0.join(">") );
+			//Trace(">>>t", x0.join(">"), y0.join(">") );
 		});
 		
 		hits = hits.sort( (a,b) => b.score-a.score );
@@ -253,7 +252,7 @@ Copy({  // array prototypes
 							: rec.Name			// request only this case
 					});
 
-				//Log(">>>>>>>>>>blog", src, ds, key, rec[key]);
+				//Trace(">>>>>>>>>>blog", src, ds, key, rec[key]);
 
 				if ( md = rec[key] ) // have valid markdown
 					md.blogify(src, ctx, rec, html => {	// blog it
@@ -296,7 +295,7 @@ Copy({  // array prototypes
 										});
 									}
 								});		
-								Log(`TRACKING ${client}`);
+								Trace(`TRACKING ${client}`);
 							}
 					}); 
 
@@ -342,7 +341,7 @@ Copy({  // array prototypes
 
 		if (Rec)
 		recs.forEach( (rec,n) => {
-	//Log([n,k,recs.length, Recs.length, idx, rec[idx], Rec[idx]]);
+	//Trace([n,k,recs.length, Recs.length, idx, rec[idx], Rec[idx]]);
 
 			while (Rec && (rec[idx]  == Rec[idx])) {
 				if ( changed(rec,Rec) ) { // return only changed records
@@ -371,7 +370,7 @@ Copy({  // array prototypes
 		function nodeify(store, path, cb) {	// return list of nodes from store node
 
 			var nodes = [];
-			//Log("node>>", "isobj", isKeyed(store), store.constructor.name );
+			//Trace("node>>", "isobj", isKeyed(store), store.constructor.name );
 
 			if ( typeof store == "object" ) 
 				if ( store.forEach )  	// at an array node
@@ -455,7 +454,7 @@ Copy({  // array prototypes
 			expandLeaf = false,
 			root = this[0] || {};
 
-		//Log(">>root", root);
+		//Trace(">>root", root);
 
 		return nodeify( root, null, path => 
 					src+"&rtn:=" + path.substr(5).replace(/^([^.]*)/, key => key+"$")  
@@ -479,14 +478,14 @@ Copy({  // array prototypes
 			pos = idx, end = idx+kids,
 			tar = [];
 
-	//Log([level,keys,ref,idx]);
+	//Trace([level,keys,ref,idx]);
 
 		if (key)
 			for (var ref = rec[key]; pos < end; ) {
 				var stop = (idx==end) ? true : (rec[key] != ref);
 
 				if ( stop ) {
-					//Log([pos,idx,end,key,ref,recs.length]);
+					//Trace([pos,idx,end,key,ref,recs.length]);
 
 					var node = {
 						name: key+" "+ref, 
@@ -535,7 +534,7 @@ Copy({  // array prototypes
 		var 
 			rtn = [];
 
-		//Log(">keys=", Object.keys(src));
+		//Trace(">keys=", Object.keys(src));
 
 		Object.keys(src).forEach( key => {
 			var list = src[key];
@@ -547,7 +546,7 @@ Copy({  // array prototypes
 				rtn.push( key + "(" + [].joinify(list) + ")" );
 		});
 
-		//Log(">>rtn", rtn);
+		//Trace(">>rtn", rtn);
 		return rtn.join(",");
 	}	
 
@@ -619,12 +618,12 @@ config({
 			res("here i go again");
 
 			Fetch(ENV.WFS_TEST, data => {
-				Log(data);
+				Trace(data);
 			});
 		}
 	}
 }, sql => {
-	Log( "This bad boy in an encrypted service with a database and has an /wfs endpoint" );
+	Trace( "This bad boy in an encrypted service with a database and has an /wfs endpoint" );
 });	
 
 @example 
@@ -634,7 +633,7 @@ config({
 
 config({
 }, sql => {
-	Log( "Stateful network flow manger started" );
+	Trace( "Stateful network flow manger started" );
 });
 
 @example
@@ -674,7 +673,7 @@ config({
 				Reported: rec.reported || rec.Reported || now,
 				Name: rec.reportID || ("tbd-"+recs),
 				Pipe: JSON.stringify( text )
-			}, err => Log("add", err) );
+			}, err => Trace("add", err) );
 		}
 	});
 });
@@ -682,18 +681,17 @@ config({
 */
 
 const
-	{ sendMail, Log, Trace, routeTable, $libs, config,
+	{ sendMail, Trace, routeTable, $libs, config,
 	 	licenseOnDownload, defaultDocs } = DEBE = module.exports = Copy({
 	
-	Log: (...args) => console.log(">>>debe", args),
-	Trace: (msg,req,res) => "debe".trace(msg,req,res),
+	Trace: (msg, ...args) => `debe>>>${msg}`.trace( args ),
 		
 	/**
 	Inspect doc - kludge i/f to support nlp project
 	*/
 	linkInspect: (doc,to,cb) => {
 		
-		Log("sendmail", doc,to);
+		Trace("sendmail", doc,to);
 		
 		if ( ! to.endsWith("@totem.org") && ! to.endsWith(".mil") )
 			sendMail({	// send email to those outside totem's eco system
@@ -706,7 +704,7 @@ const
 			[x,Doc,Topic] = doc.match( /(.*)#(.*)/ ) || ["",doc,""];
 		
 		scanner(Doc, Topic||"default", 0.1, score => {
-			Log(doc,score);
+			Trace(doc,score);
 			cb(score);
 		});
 			
@@ -813,7 +811,7 @@ Usage:
 		function validateLicense(pub, cb) {
 
 			function genLicense(code, secret) {  //< callback cb(minifiedCode, license)
-				Log("gen license", secret);
+				Trace("gen license", secret);
 				if (secret)
 					return CRYPTO.createHmac("sha256", secret).update(code).digest("hex");
 
@@ -913,12 +911,12 @@ Usage:
 		milestones: req => "openv.milestones", 
 		
 		engines: req => { // protect engines 
-			//Log("<<<", req);
+			//Trace("<<<", req);
 			return "openv.engines";
 			
 			const { overlord } = {overlord: "guest@guest.org"}; //site.pocs;
 			
-			//Log(">>>sec check", site.pocs, req.client);
+			//Trace(">>>sec check", site.pocs, req.client);
 			
 			if ( overlord )
 				if ( overlord.indexOf(req.client.toLowerCase()) >= 0 ) // allow access
@@ -958,13 +956,13 @@ Usage:
 		
 		mods: req => "openv.mods",
 		
-		faqs: req => {
+		/*faqs: req => {
 			if ( set = req.set ) {
 				set._By = req.client;
 				set._Dirty = true;
 			}
 			return "openv.faqs";
-		}
+		}*/
 	},
 
 	// blogContext: BLOG,		//< blogging / skinning context
@@ -1048,7 +1046,7 @@ as described in the [Notebooks api](/api.view). `,
 	
 		const {txMail} = DEBE;
 		
-		Log(">>>sendmail", opts);
+		Trace(">>>sendmail", opts);
 		
 		//return;
 		if (opts.to) {
@@ -1058,9 +1056,9 @@ as described in the [Notebooks api](/api.view). `,
 				contents: ""
 			}]; */
 
-			//Log(">>>sendmail", opts);
+			//Trace(">>>sendmail", opts);
 			txMail.sendMail( opts, (err,info) => {
-				//Log(">>>email", err,info);
+				//Trace(">>>email", err,info);
 				if ( cb ) cb(info);
 			});
 		}
@@ -1070,7 +1068,7 @@ as described in the [Notebooks api](/api.view). `,
 	Legacy 
 	*/
 	onUpdate: function (sql,ds,body) { //< runs when dataset changed
-		//Log("update", ds, body);
+		//Trace("update", ds, body);
 		if (false)
 		sql.Hawk({Dataset:ds, Field:""});  // journal entry for the record itself
 		
@@ -1163,7 +1161,7 @@ as described in the [Notebooks api](/api.view). `,
 
 					: {
 						sendMail: (opts, cb) => {
-							Log(opts);   // -r "${opts.from}" 
+							Trace(opts);   // -r "${opts.from}" 
 			
 							if ( DEBE.watchMail ) 
 								sqlThread( sql => {
@@ -1179,7 +1177,7 @@ as described in the [Notebooks api](/api.view). `,
 							else
 								exec(`echo -e "${opts.body}\n" | mailx -s "${opts.subject}" ${opts.to}`, err => {
 									cb( err );
-									//Log("MAIL "+ (err || opts.to) );
+									//Trace("MAIL "+ (err || opts.to) );
 								});
 						}
 					}; 
@@ -1188,32 +1186,32 @@ as described in the [Notebooks api](/api.view). `,
 			
 			if (rxMail)					// Establish server's email inbox	
 				rxMail.connect( err => {  // login cb
-					if (err) Log(err);
+					if (err) Trace(err);
 
 					rxMail.openBox('INBOX', true, (err,mailbox) => {
 
-						if (err) Log(err);
+						if (err) Trace(err);
 
 						rxMail.search([ 'UNSEEN', ['SINCE', 'May 20, 2012'] ], (err, results) => {
 
-							if (err) Log(err);
+							if (err) Trace(err);
 
 							rxMail.Fetch(results, { 
 								headers: ['from', 'to', 'subject', 'date'],
 								cb: fetch => {
 									fetch.on('message', msg => {
-										Log('Saw message no. ' + msg.seqno);
+										Trace('Saw message no. ' + msg.seqno);
 										msg.on('headers', hdrs => {
-											Log('Headers for no. ' + msg.seqno + ': ' + hdrs);
+											Trace('Headers for no. ' + msg.seqno + ': ' + hdrs);
 										});
 										msg.on('end', () => {
-											Log('Finished message no. ' + msg.seqno);
+											Trace('Finished message no. ' + msg.seqno);
 										});
 									});
 								}
 							}, err => {
 								if (err) throw err;
-								Log('Done fetching all messages!');
+								Trace('Done fetching all messages!');
 								rxMail.logout();
 							});
 						});
@@ -1224,7 +1222,7 @@ as described in the [Notebooks api](/api.view). `,
 		}
 				
 		function initSES(cb) {	// init sessions
-			Log(`INIT SESSIONS`);
+			Trace(`INIT SESSIONS`);
 
 			/*
 			Each( CRUDE, function (n,routes) { // Map engine CRUD to DEBE workers
@@ -1252,7 +1250,7 @@ as described in the [Notebooks api](/api.view). `,
 		}
 
 		function initENV(cb) {	// init runtime env
-			Log(`INIT ENVIRONMENT`);
+			Trace(`INIT ENVIRONMENT`);
 
 			var 
 				args = ARGP
@@ -1276,7 +1274,7 @@ as described in the [Notebooks api](/api.view). `,
 				.boolean('dump')
 				.describe('dump','display derived site parameters')  
 				.check( argv => {
-					//Log(site);
+					//Trace(site);
 				}) */
 
 				/*
@@ -1290,7 +1288,7 @@ as described in the [Notebooks api](/api.view). `,
 				.boolean('info')
 				.describe('info','display site info')
 				.check( argv => {
-					Log(site);
+					Trace(site);
 				})
 
 				/*
@@ -1311,9 +1309,9 @@ as described in the [Notebooks api](/api.view). `,
 						sql.query("SELECT Nick,Title FROM openv.apps")
 						.on("result", app => {
 							console.log(app.Nick,app.Title);
-							//Log(app.Name+" v"+app.Ver+" url="+app.Host+":"+app.Port+" db="+app.DB+" nick="+app.Nick+" sockted="+(app.Sockets?"yes":"no")+" cores="+app.Cores+" pki="+app.PKI);
+							//Trace(app.Name+" v"+app.Ver+" url="+app.Host+":"+app.Port+" db="+app.DB+" nick="+app.Nick+" sockted="+(app.Sockets?"yes":"no")+" cores="+app.Cores+" pki="+app.PKI);
 						})
-						//.on("error", err => Log(err) )
+						//.on("error", err => Trace(err) )
 						.on("end", () => process.exit() );
 					}
 				})
@@ -1508,7 +1506,7 @@ as described in the [Notebooks api](/api.view). `,
 														[ $ds, $usecase ], (err,recs) => {
 
 															if ( err ) 
-																Log(err);
+																Trace(err);
 
 															else
 															if ( ctx = recs[0] ) {
@@ -1524,7 +1522,7 @@ as described in the [Notebooks api](/api.view). `,
 														[ $ds, $usecase ], (err,recs) => {
 
 															if ( err ) 
-																Log(err);
+																Trace(err);
 
 															else
 															if ( ctx = recs[0] )
@@ -1662,7 +1660,7 @@ Keys:
 						
 							else
 								Fetch( `${host}/${skey}.help`, help => {
-									//Log(">>>>help",key,val.name, help);
+									//Trace(">>>>help",key,val.name, help);
 									cb( `${skey}: ${help}`.replace(/\n/mg,"<br>") );
 								});
 
@@ -1670,7 +1668,7 @@ Keys:
 							Stream( FLEX.select, {}, (val,fkey,cb) => {	// flex endpoints
 								if ( cb )	// streaming
 									Fetch( `${host}/${fkey}.help`, help => {
-										//Log(">>>>help",key,val.name, help);
+										//Trace(">>>>help",key,val.name, help);
 										cb( `${fkey}: ${help}`.replace(/\n/mg,"<br>") );
 									});
 
@@ -1736,7 +1734,7 @@ Keys:
 											scripts[ rec.Name ] = eval( script );
 										}
 										catch (err) {
-											Log( "Bad $script", script );
+											Trace( "Bad $script", script );
 										}
 
 									else
@@ -1790,7 +1788,7 @@ Keys:
 					sql = req.sql,
 					cleanurl = req.url.replace(`_save=${req.flags.save}`,"");
 
-				Log(`PUBLISH ${cleanurl} AT ${req.flags.save} FOR ${req.client}`, req);sql
+				Trace(`PUBLISH ${cleanurl} AT ${req.flags.save} FOR ${req.client}`, req);sql
 				sql.query("INSERT INTO openv.engines SET ?", {
 					Name: req.flags.save,
 					Enabled: 1,
@@ -1830,7 +1828,7 @@ Keys:
 				opts = [],
 				id = "_"+select;
 			
-			//Log("select", recs);
+			//Trace("select", recs);
 			// _select=Client,window.open(`/
 			//  iframe(src="/junk.html")
 			recs.forEach( rec => opts.push( rec[select].tag("option",{value:rec[select]}) ));
@@ -1845,7 +1843,7 @@ Keys:
 				{ flags, table, query } = req,
 				{ blog } = flags;
 			
-			//Log("blog", flags);
+			//Trace("blog", flags);
 			
 			if ( blog )
 				if ( recs.forEach )
@@ -1868,14 +1866,14 @@ Keys:
 				
 				function indexArray(ctx) {
 					Each( store[0] || {} , (key,val) => ctx[key] = store.get(key) );
-					//Log("getctx", store, script);
+					//Trace("getctx", store, script);
 					if ( script ) $( "$="+script, ctx );
 					return $.toList(ctx.$);					
 				}
 				
 				function indexObject(ctx) {
 					Each( store, (key,val) => ctx[key] = store[key] );
-					//Log("getctx", store, script);
+					//Trace("getctx", store, script);
 					if ( script ) $( "$="+script, ctx );
 					return $.toList(ctx.$);					
 				}
@@ -1895,7 +1893,7 @@ Keys:
 						},
 						store = ctx.$;
 					
-					//Log("$>>>>>>", flag, script, typeOf(store) );
+					//Trace("$>>>>>>", flag, script, typeOf(store) );
 					if ( isArray(store) )
 						rtn = indexArray(ctx);
 					
@@ -2004,7 +2002,7 @@ Keys:
 			res({
 				data: Recs
 			});
-			Log(Recs);
+			Trace(Recs);
 		},
 		
 		/**
@@ -2022,7 +2020,7 @@ Keys:
 			/*
 			req.sql.query("select found_rows()")
 			.on('result', stat => {		// records sourced from sql	
-				Log(">>>>>>", stat);
+				Trace(">>>>>>", stat);
 				res({ 
 					success: true,
 					msg: errors.ok,
@@ -2182,7 +2180,7 @@ Usage: ${uses.join(", ")}  `);
 				query = req.query,
 				src = ("/"+req.table+".json").tag("?",{name:query.name});
 			
-			//Log(">>src", src);
+			//Trace(">>src", src);
 			res( recs.forEach ? recs.schemaify( src ) : [recs].schemaify( src ));
 		},
 		
@@ -2213,14 +2211,15 @@ Usage: ${uses.join(", ")}  `);
 	/AREA/FILE-endpoint routers
 	*/
 	"byArea.": {
+		all: null, 
 		/**
 		Default area navigator.
 		@param {Object} req Totem session request
 		@param {Function} res Totem session response		
 		*/
-		navigate: (req,res) => {
+		root: (req,res) => {
 			function sendFolder(res,recs) {
-				//Log("sending",cwd, recs);
+				//Trace("sending",cwd, recs);
 				if ( false ) // debug
 					res({  
 						cwd: { 
@@ -2504,7 +2503,7 @@ Usage: ${uses.join(", ")}  `);
 
 				else
 				if ( cmd == "tree") {
-					Log(">>>send tree");
+					Trace(">>>send tree");
 					res({tree:recs});
 				}
 
@@ -2528,7 +2527,7 @@ Usage: ${uses.join(", ")}  `);
 								extract:[] }
 						}, */
 
-						files: recs, //[cwd].concat(recs),
+						files: [cwd].concat(recs),
 
 						api: 2.1057,
 
@@ -2583,9 +2582,9 @@ Usage: ${uses.join(", ")}  `);
 					"read":1,
 					"write":0,
 					"size":0,
-					"hash": btoa(parent), // parent,
+					"hash": btoa(parent), 
 					"volumeid":"l1_",
-					"name": parent, //node, //node,
+					"name": parent, 
 					"locked":0,
 					"dirs":1 
 				};
@@ -2603,7 +2602,7 @@ Usage: ${uses.join(", ")}  `);
 				}, */		
 
 			if ( trace )
-				Log(">>>nav", {
+				Trace(">>>nav", {
 					c: cmd,
 					q: query,
 					path: path,
@@ -2626,7 +2625,7 @@ Usage: ${uses.join(", ")}  `);
 									name = parent.split("/").pop(),
 									get = "http:"+src.tag("&",{name: name.substr(0,name.length-1), "json:":path.substr(1,path.length-2)});
 								
-								Log("fetch", get );
+								Trace("fetch", get );
 								Fetch( get, txt => {
 
 									if ( files = JSON.parse(txt)[0].json ) {
@@ -3034,7 +3033,7 @@ Usage: ${uses.join(", ")}  `);
 						Fetch( "file:"+path, res );
 
 						if ( area == "refs" && profile.Track ) {		// track client's download
-							//Log(">>>>>track download", profile );
+							//Trace(">>>>>track download", profile );
 							sql.query(
 								"INSERT INTO openv.bricks SET ? ON DUPLICATE KEY UPDATE Samples=Samples+1",
 								{
@@ -3147,7 +3146,7 @@ Usage: ${uses.join(", ")}  `);
 				path = "/config/stores/" + file,
 				save = "/config/uploads/" + name + (htmlout ? ".html" : ".txt");
 
-			Log(name,Type,path,save);
+			Trace(name,Type,path,save);
 
 			if ( type == "help" ) 
 			return res("Execute open-source searches for document find = NAME against search engine and save results to specified file = NAME.");
@@ -3194,7 +3193,7 @@ Usage: ${uses.join(", ")}  `);
 											results: json.searchInformation.totalResults
 										};
 
-									//Log( json.items[0] );
+									//Trace( json.items[0] );
 
 									json.items.forEach( (item,n) => {
 										var 
@@ -3202,8 +3201,8 @@ Usage: ${uses.join(", ")}  `);
 											tags = map.metatags || [],
 											meta = tags[0] || {};
 
-										if ( !n ) Log( JSON.stringify( item) );							
-										Log(n,item.title,"=>", item.title.trimGoogle() );
+										if ( !n ) Trace( JSON.stringify( item) );							
+										Trace(n,item.title,"=>", item.title.trimGoogle() );
 
 										hits.push({
 											title: item.title.trimGoogle(),
@@ -3264,7 +3263,7 @@ Usage: ${uses.join(", ")}  `);
 								});
 
 							else
-								Log("done!");
+								Trace("done!");
 						});
 
 						break;
@@ -3312,7 +3311,7 @@ at the specified keys = KEY,...
 				matches = [],
 				scans = 0;
 
-			Log(src,_keys,N);
+			Trace(src,_keys,N);
 
 			if ( src )
 				Fetch( "file:/config/stores/", files => {
@@ -3325,13 +3324,13 @@ at the specified keys = KEY,...
 
 					if ( N ) matches = matches.slice(0,N);
 
-					Log(matches);
+					Trace(matches);
 					matches.forEach( match => {
 
 						FS.readFile( match.file, "utf8", (err,text) => {
 							if (!err) 
 								sql.query("SELECT * FROM app.?? WHERE ? LIMIT 1", ["gtd",{evid: match.evid}], (err,recs) => {
-									//Log(err);
+									//Trace(err);
 									var
 										rec = recs[0] || {};
 
@@ -3388,7 +3387,7 @@ at the specified keys = KEY,...
 			}
 
 			if ( url = ENV[`WMS_${src.toUpperCase()}`] ) 
-				Fetch(url.tag("?", query), rtn => Log("wms returned", rtn) );
+				Fetch(url.tag("?", query), rtn => Trace("wms returned", rtn) );
 		},
 
 		/**
@@ -3442,7 +3441,7 @@ desired ring = [ [lat,lon], ....]
 
 								collects.forEach( collect => {  // pull image collects from each catalog entry
 
-									//Log(collect);
+									//Trace(collect);
 									var 
 										image = collect["Image-Product"].Image,
 										imageID = image.ImageId.replace(/ /g,""),
@@ -3582,7 +3581,7 @@ desired ring = [ [lat,lon], ....]
 				(err, recs) => {
 
 					if (err)
-						Log("tips",[err,q.sql]);
+						Trace("tips",[err,q.sql]);
 					
 					else
 						recs.forEach( (rec,id) => {
@@ -3642,7 +3641,7 @@ desired ring = [ [lat,lon], ....]
 				mods = query.modules || 1,
 				passed = query.score >= query.pass;
 
-			//Log(query.score, query.pass, [topic, set, mod, mods].join("."));
+			//Trace(query.score, query.pass, [topic, set, mod, mods].join("."));
 
 			sql.query("INSERT INTO openv.quizes SET ? ON DUPLICATE KEY UPDATE Tries=Tries+1,?", [{
 				Client: client,
@@ -3801,16 +3800,16 @@ desired ring = [ [lat,lon], ....]
 			if ( type == "help" )
 			return res("Return graph name = NAME:NAME: ... & idmode = name||hat" );
 
-			//Log(">>>get", net);
+			//Trace(">>>get", net);
 			neoThread( neo => {			
 				if ( net.indexOf("cnet")>=0 )
 					neo.cypher( `MATCH (a:${net})-[r]->(b:${net}) RETURN r,a,b ORDER BY r.cutsize`, {}, (err,recs) => {
 
 						const poly = [];
 
-						//Log(">>>err",err);
-						//Log(">>>rel", JSON.stringify(recs[0]));
-						//Log(recs);
+						//Trace(">>>err",err);
+						//Trace(">>>rel", JSON.stringify(recs[0]));
+						//Trace(recs);
 
 						for ( var n=0, rad=1, rec=recs[n] ; rec; rad++, rec=recs[n+=deg] ) {
 
@@ -3825,7 +3824,7 @@ desired ring = [ [lat,lon], ....]
 									rec && (rec.r.properties.cutsize == cutsize); 
 									rec=recs[n+deg], deg++ );
 
-							//Log(n, deg, recs.length, rec, cutsize, maxflow);
+							//Trace(n, deg, recs.length, rec, cutsize, maxflow);
 
 							for (var d=0,u=2*PI/deg,rec=recs[n]; d<deg; d++,rec=recs[n+d] )
 								pts.push({
@@ -3840,13 +3839,13 @@ desired ring = [ [lat,lon], ....]
 							});
 						}
 
-						//Log(">>>>>>>>>>>poly",poly);
+						//Trace(">>>>>>>>>>>poly",poly);
 						res(poly);
 					});
 
 				else
 					neo.cypher( `MATCH (n:${net}) RETURN n`, query, (err,recs) => {
-						//Log(">act", recs[0]);
+						//Trace(">act", recs[0]);
 						recs.forEach( rec => {
 							const 
 								props = rec.n.properties,
@@ -3861,7 +3860,7 @@ desired ring = [ [lat,lon], ....]
 						});
 
 						neo.cypher( `MATCH (a:${net})-[r]->(b:${net}) RETURN r,a,b`, {}, (err,recs) => {
-							//Log(">rel", recs[0]);
+							//Trace(">rel", recs[0]);
 
 							recs.forEach( rec => {
 								const 
@@ -3903,7 +3902,7 @@ desired ring = [ [lat,lon], ....]
 				{sql,query,type} = req,
 				plugins = [];
 
-			//Log(query, isEmpty(query) );
+			//Trace(query, isEmpty(query) );
 			if ( type == "help" ) 
 			return res("Return list of notebooks and their methods.");
 
@@ -4039,7 +4038,7 @@ desired ring = [ [lat,lon], ....]
 				}
 
 				catch(err) {
-					Log("INGEST FAILED",err);
+					Trace("INGEST FAILED",err);
 				}
 			}		
 
@@ -4051,7 +4050,7 @@ desired ring = [ [lat,lon], ....]
 			if ( type == "help" )
 			return res("Run the src = NAME ingestor against the specified fileID = BRICK." );
 
-			Log("INGEST", query, body);
+			Trace("INGEST", query, body);
 			res("ingesting events");
 
 			if (fileID) {
@@ -4062,7 +4061,7 @@ desired ring = [ [lat,lon], ....]
 					if ( opts = EAT[src] )   // use builtin src ingester (event eater)
 						ingest( opts, query, evs => {
 							ingestList( sql, evs, fileID, file.Class, aoi => {
-								Log("INGESTED", aoi);
+								Trace("INGESTED", aoi);
 							});
 						});
 
@@ -4072,7 +4071,7 @@ desired ring = [ [lat,lon], ....]
 							if ( opts = JSON.parse(file._Ingest_Script) ) 
 								ingest( opts, query, evs => {
 									ingestList( sql, evs, fileID, file.Class, aoi => {
-										Log("INGESTED", aoi);	
+										Trace("INGESTED", aoi);	
 									});
 								});
 						});
@@ -4122,16 +4121,16 @@ desired ring = [ [lat,lon], ....]
 			if ( type == "help" )
 			return res("Restart system after a delay = SECONDS and notify all clients with the specifed msg = MESSAGE.");
 
-			//Log(client,profile);
+			//Trace(client,profile);
 			if ( profile.Admin ) {
 				res( errors.ok );
 
 				query.msg = msg || `System restarting in ${delay} seconds`;
 
-				byTable.alert(req, msg => Log( msg ) );
+				byTable.alert(req, msg => Trace( msg ) );
 
 				setTimeout( () => {
-					Trace( "RESTART", req );
+					Trace( "restart*", req );
 					process.exit();
 				}, (delay||10)*1e3);
 			}
@@ -4197,12 +4196,12 @@ save = CLIENT.HOST.CASE to save
 					plugin = "app." + parts.pop(),
 					results = ATOM.matlab.path.save + load + ".out";
 
-				Log("SAVE MATLAB",query.save,plugin,id,results);
+				Trace("SAVE MATLAB",query.save,plugin,id,results);
 
 				FS.readFile(results, "utf8", function (err,json) {
 
 					sql.query("UPDATE ?? SET ? WHERE ?", [plugin, {Save: json}, {ID: id}], err => {
-						Log("save",err);
+						Trace("save",err);
 					});
 
 				});	
@@ -4404,7 +4403,7 @@ save = CLIENT.HOST.CASE to save
 			xlsx( sql, "milestones.xlsx","stores", rec => {
 				for (var n in map) map[n] = rec[n] || "";
 
-				sql.query("INSERT INTO openv.milestones SET ?",map, err => Log(err) );
+				sql.query("INSERT INTO openv.milestones SET ?",map, err => Trace(err) );
 			});
 
 			res(SUBMITTED);
@@ -5063,7 +5062,7 @@ size, pixels, scale, step, range, detects, infile, outfile, channel.  This endpo
 					return "#";
 				});
 
-			//Log("link", url, urlPath, keys);
+			Trace("link", url, urlPath, keys);
 			switch (urlType) { 
 				case "jpg":  
 				case "png":
@@ -5244,14 +5243,14 @@ size, pixels, scale, step, range, detects, infile, outfile, channel.  This endpo
 				"SELECT * FROM openv.events WHERE fileID=? ORDER BY t LIMIT 10000", [file.ID] )
 		};
 		
-		Log("ingest stats ctx", ctx);
+		Trace("ingest stats ctx", ctx);
 		
 		if (cints = LAB.plugins.cints) 
 			cints( ctx, function (ctx) {  // estimate/learn hidden process parameters
 				
 				if ( ctx ) {
 					var stats = ctx.Save.pop() || {};  // retain last estimate at end
-					Log("ingest stats", stats);
+					Trace("ingest stats", stats);
 
 					cb(stats);
 				}
@@ -5313,11 +5312,11 @@ function SOAPsession(req,res,peer,action) {
 				
 				var VTL = (APP[action]||{})[peer];
 				
-				Log(action.toUpperCase() + peer + (VTL ? "LOCATED" : "MISSING"));
+				Trace(action.toUpperCase() + peer + (VTL ? "LOCATED" : "MISSING"));
 				
 				if (VTL) 
 					VTL(req, function (msg) {
-						Log("PEER " + peer + ":" + msg);
+						Trace("PEER " + peer + ":" + msg);
 					});
 					
 			});
@@ -5363,7 +5362,7 @@ function genDoc(recs,req,res) {
 
 		docx.generate( docs );
 		docs.on("close", function () {
-			Log("CREATED "+docf);
+			Trace("CREATED "+docf);
 		});
 
 		if (false) {  // debugging
@@ -5460,7 +5459,7 @@ function setAutorun(path) {
 */
 function exeAutorun(sql,name,path) {
 
-	Log("autorun", path);
+	Trace("autorun", path);
 	sql.query( "SELECT * FROM openv.bricks WHERE Name=?", path.substr(1) )
 	.on("result", file => {
 
@@ -5470,7 +5469,7 @@ function exeAutorun(sql,name,path) {
 			endOk = now <= file.PoP_End || !file.PoP_End,
 			fileOk = startOk && endOk;
 
-		// Log("autorun", startOk, endOk);
+		// Trace("autorun", startOk, endOk);
 
 		if ( fileOk )
 			sql.query( "SELECT Run FROM openv.watches WHERE File=?", path.substr(1) )
@@ -5481,7 +5480,7 @@ function exeAutorun(sql,name,path) {
 					caseName = parts[1],
 					exePath = `/${pluginName}.exe?Name=${caseName}`;
 
-				//Log("autorun", link,exePath);
+				//Trace("autorun", link,exePath);
 				Fetch( exePath, msg => Trace("autorun",msg) );
 			});
 	});
@@ -5666,12 +5665,12 @@ function savePage(req,res) {
 		case "gif":
 			/*
 			CP.execFile( "node", ["phantomjs", "rasterize.js", url, docf, res], function (err,stdout) { 
-				if (err) Log(err,stdout);
+				if (err) Trace(err,stdout);
 			});  */
 			res( "Claim your results "+"here".link(tar) );
 			
 			CP.exec(`phantomjs rasterize.js ${src} ${tar}`, (err,log) => {
-				Log(err || `SAVED ${url}` );
+				Trace(err || `SAVED ${url}` );
 			});
 			break;
 
@@ -5679,7 +5678,7 @@ function savePage(req,res) {
 			res( "Claim your results "+"here".link(tar) );
 			Fetch( src, html => {
 				FS.writeFile(tar, html, err => {
-					Log(err || `SAVED ${url}` );
+					Trace(err || `SAVED ${url}` );
 				});
 			});
 			break;	
@@ -5687,7 +5686,7 @@ function savePage(req,res) {
 		default:
 			res( "Claim your results "+"here".link(xtar) );
 			CP.exec(`phantomjs rasterize.js ${xsrc} ${xtar}`, (err,log) => {
-				Log(err || `SAVED ${url}` );
+				Trace(err || `SAVED ${url}` );
 			});
 			
 	}
@@ -5701,7 +5700,7 @@ function statusPlugin(req,res) {
 		//ctx = { name:table, host:host, client:client, query:query},
 		fetchUsers = (rec, cb) => {	// callback with endservice users
 			Fetch("http://"+rec._EndService, info => { 
-				//Log("status users", info);
+				//Trace("status users", info);
 				cb( (info.toLowerCase().parseJSON() || [] ).join(";") ) ;
 			});
 		},
@@ -5711,7 +5710,7 @@ function statusPlugin(req,res) {
 				{ _Product: rec.Name+".html" },
 				(err, mods) => { 
 
-					//Log("status mods", err, mods);
+					//Trace("status mods", err, mods);
 					if ( mod = mods[0] || { MODs: "" } )
 						cb( mod.MODs || "" );
 
@@ -5737,7 +5736,7 @@ function statusPlugin(req,res) {
 
 			[ {_Product: product}], (err,recs) => {
 
-				//Log("status", err, q.sql);
+				//Trace("status", err, q.sql);
 
 				if ( !err && recs.length )
 					recs.serialize( fetchUsers, (rec,users) => {  // retain user stats
@@ -5801,7 +5800,7 @@ function matchPlugin(req,res) {
 			[{Ref: name}, {Ref:"notebooks"}], (err,recs) => {
 
 			recs.forEach( rec => {
-				//Log([ctx.transfer, rec.Path, name]);
+				//Trace([ctx.transfer, rec.Path, name]);
 				suits.push( rec.Name.tag( `${ctx.transfer}${rec.Path}/${name}` ));
 			});
 
@@ -5851,10 +5850,10 @@ function docPlugin(req,res) {
 	return res("Return notebook api help");
 
 	skinContext( req, ctx => {
-		//Log(">>tou ctx",ctx);
+		//Trace(">>tou ctx",ctx);
 		getEngine( sql, name, eng => {
 			if ( eng ) {
-				//Log(">>>tou", eng.ToU);
+				//Trace(">>>tou", eng.ToU);
 				renderJade( eng.ToU || "no ToU", ctx, tou => res( tou ) );
 			}
 			/*
@@ -5912,7 +5911,7 @@ function getPlugin(req,res) {
 	}
 
 	function genLicense(code, secret) {  //< callback cb(minifiedCode, license)
-		Log(">>>release passphrase", secret);
+		Trace(">>>release passphrase", secret);
 		if (secret)
 			return CRYPTO.createHmac("sha256", secret).update(code).digest("hex");
 
@@ -5948,7 +5947,7 @@ function getPlugin(req,res) {
 				cb( null );
 		}
 
-		//Log("license code", pub);
+		//Trace("license code", pub);
 		if (pub._EndService)  // an end-service specified so validate it
 			Fetch( "http:"+pub._EndService, users => {  // check users provided by end-service
 				const 
@@ -5956,7 +5955,7 @@ function getPlugin(req,res) {
 					inLoopback = endservice == "loopback",
 					valid = users.parseJSON([]).concat( inLoopback ? partner : [] ).any( partner );
 
-				Log(">>>release fetched users", users, partner, valid);
+				Trace(">>>release fetched users", users, partner, valid);
 
 				if (valid) // signal valid
 					returnLicense(pub);
@@ -5997,7 +5996,7 @@ function getPlugin(req,res) {
 	if (type == "help")
 	return res("Return notebook code to authorized user");
 
-	Log( ">>>release opts", {endPart: endPartner, endSrv: endService}, suitor );
+	Trace( "release opts", {endPart: endPartner, endSrv: endService}, suitor );
 
 	if ( endservice )
 		skinContext( req, ctx => {
@@ -6006,7 +6005,7 @@ function getPlugin(req,res) {
 				type = ctx.type,
 				product = name + "." + type;
 
-			Log(">>>release ctx", [name,type,product]);
+			Trace("release ctx", [name,type,product]);
 			switch ( ctx.type) {
 				case "R":
 				case "js":
@@ -6045,10 +6044,10 @@ function getPlugin(req,res) {
 							});
 						}
 
-						//Log(">>>>release", name, type, err, pubs );
+						//Trace(">>>>release", name, type, err, pubs );
 						// May rework this to use eng.Code by priming the Code in the publish phase
 						sql.query( "SELECT Code,Minified FROM openv.engines WHERE ? LIMIT 1", { Name: name }, (err,engs) => {
-							//Log(">>eng", engs[0]);
+							//Trace(">>eng", engs[0]);
 							if ( eng = engs[0] )
 								FS.readFile( `./notebooks/${name}.d/source`, "utf8", (err, srcCode) => {
 									if (!err) eng.Code = srcCode;
@@ -6068,7 +6067,7 @@ function getPlugin(req,res) {
 												Path: "/"+product
 											}, pub => {
 
-												Log(">>>release license", pub);
+												Trace("release license", pub);
 												if (pub) // distribute licensed version
 													addTerms( eng.Code, type, pub, res );
 
@@ -6147,7 +6146,7 @@ function blogPlugin(req,res) {
 	if (type == "help")
 	return res("Blog notebook");
 
-	//Log(">>>>>>blog", table, key, type, query.subs, src);
+	//Trace(">>>>>>blog", table, key, type, query.subs, src);
 	if ( key )
 		sql.query(
 			"SELECT * FROM app.?? WHERE ? LIMIT 1",
@@ -6183,7 +6182,7 @@ function usersPlugin(req,res) {
 	if (type == "help")
 	return res("Return list of notebook users");
 
-	Log("users", users);
+	Trace("users", users);
 	res( users );
 }
 					 
@@ -6309,11 +6308,11 @@ append base_body
 			outputs: outputs,
 			created: ctime
 		}), html => {
-			//Log(">>>html", html.length);
+			//Trace(">>>html", html.length);
 			cb(html);
 		});
 		
-		//Log(jade);
+		//Trace(jade);
 	}
 	
 	res( "Retrieve your WIKI page "+"here".link(`./uploads/${book}.html`) );
@@ -6345,7 +6344,7 @@ append base_body
 				stats: FS.statSync( `./notebooks/${book}.js` )
 			} , html => {
 				
-				FS.writeFile( `./uploads/${book}.html`, html, err => Log(err||"saved") );
+				FS.writeFile( `./uploads/${book}.html`, html, err => Trace(err||"saved") );
 				
 			});
 		});
@@ -6367,7 +6366,7 @@ function publishPlugin(req,res) {
 
 	function genTable( sql, name, mod ) {
 		function minifyCode( code, cb ) {  //< callback cb(minifiedCode)
-			//Log(">>>>min", code.length, type, name);
+			//Trace(">>>>min", code.length, type, name);
 
 			switch (type) {
 				case "html":
@@ -6418,7 +6417,7 @@ function publishPlugin(req,res) {
 
 					FS.writeFile(pyTmp, code.replace(/\t/g,"  ").replace(/^\n/gm,""), "utf8", err => {
 						CP.exec(`pyminifier -O ${pyTmp}`, (err,minCode) => {
-							//Log("pymin>>>>", err);
+							//Trace("pymin>>>>", err);
 
 							if (err)
 								cb(err);
@@ -6451,7 +6450,7 @@ function publishPlugin(req,res) {
 
 					FS.writeFile(mTmp, code.replace(/\t/g,"  "), "utf8", err => {
 						CP.execFile("python", ["matlabtopython.py", "smop", mTmp, "-o", pyTmp], err => {	
-							//Log("matmin>>>>", err);
+							//Trace("matmin>>>>", err);
 
 							if (err)
 								cb( err );
@@ -6502,7 +6501,7 @@ function publishPlugin(req,res) {
 
 		function getComment( sql, cb ) {
 			var com = sql.replace( /(.*) comment '((.|\n|\t)*)'/, (str,spec,doc) => { 
-				//Log(">>>>>>>>>>>>>>spec", spec, doc);
+				//Trace(">>>>>>>>>>>>>>spec", spec, doc);
 				cb( spec, doc );
 				return "#";
 			});
@@ -6520,7 +6519,7 @@ function publishPlugin(req,res) {
 			prokeys = modkeys || addkeys || {},
 			product = name + "." + type;
 
-		Log(">>>>>>publish", path, name, type);
+		Trace("publish", path, name, type);
 
 		skinContext( req, ctx => {	// get a skinning ctx to generate the ToU
 			const 
@@ -6542,7 +6541,7 @@ function publishPlugin(req,res) {
 								return escape(com).replace(/[\.|\*|_|']/g,arg=>"%"+arg.charCodeAt(0).toString(16) );
 							}
 
-							//Log("gen", key,spec,html.substr(0,100));
+							//Trace("gen", key,spec,html.substr(0,100));
 							speckeys[key] = spec;
 							dockeys[key] = makeSkinable(html);
 							cb();
@@ -6578,7 +6577,7 @@ function publishPlugin(req,res) {
 									doc = dockeys[key];
 
 								sql.query( `ALTER TABLE app.${name} MODIFY ${keyId} ${spec} comment '${doc}'`, [], err => {
-									if ( err ) Log("PUBLISH NOMOD:"+key);
+									if ( err ) Trace("PUBLISH NOMOD:"+key);
 								});
 							});
 
@@ -6590,9 +6589,9 @@ function publishPlugin(req,res) {
 									spec = speckeys[key],
 									doc = dockeys[key];
 
-								//Log("add", keyId, spec);
+								//Trace("add", keyId, spec);
 								sql.query( `ALTER TABLE app.${name} ADD ${keyId} ${spec} comment '${doc}'`, [], err => {
-									if ( err ) Log("PUBLISH NOADD:"+key);
+									if ( err ) Trace("PUBLISH NOADD:"+key);
 								});
 							});
 
@@ -6626,7 +6625,7 @@ function publishPlugin(req,res) {
 									};
 
 								Trace( `PUBLISH ${name} CONVERT ${from}=>${to}` );
-								// Log(">>>save ",name, type, code);
+								// Trace(">>>save ",name, type, code);
 
 								if ( from == to )  { // use code as-is
 									sql.query( 
@@ -6693,7 +6692,7 @@ function publishPlugin(req,res) {
 			].join(";");
 
 		CP.exec(sh, (err,log) => {
-			Log("gen readme", err,log);					
+			Trace("gen readme", err,log);					
 		});
 	}
 
@@ -6711,7 +6710,7 @@ function publishPlugin(req,res) {
 
 		FS.mkdir( `./artifacts/${name}`, err => {
 			if ( err ) 
-				Log(err);
+				Trace(err);
 			
 			else { // prime the notebook
 				// make a login link
@@ -6807,7 +6806,7 @@ IDList=
 	if (type == "help")
 	return res("Publish notebook");
 
-	//Log(flags, profile);
+	//Trace(flags, profile);
 	
 	if ( mod = getModule( modPath ) ) {
 		res( errors.ok );
@@ -6865,7 +6864,7 @@ function exePlugin(req,res) {	//< execute plugin in specified usecase context
 	const 
 		{ sql, client, profile, table, query, index, type } = req;
 
-	//Log("Execute", query);
+	//Trace("Execute", query);
 	
 	if (type == "help")
 	return res("Execute notebook");
@@ -6893,14 +6892,14 @@ function exePlugin(req,res) {	//< execute plugin in specified usecase context
 					Each( index, (rtnKey,ctxKey) => {
 						var
 							[x,lhs,rhs] = ctxKey.match( /(.*?)\$(.*)/ ) || [ ];
-//Log(">>>index", rtnKey, ctxKey, lhs,rhs);
+//Trace("index", rtnKey, ctxKey, lhs,rhs);
 
 						if ( x ) {
 							var 
 								store = {$: ctx[lhs] },
 								rtn = ctxRtn[rtnKey] = [];
 
-							//Log("arg=", store, "key=", ctxKey);
+							//Trace("arg=", store, "key=", ctxKey);
 							rhs.split(",").forEach( ctxKey => rtn.push( ("$"+ctxKey).parseJS( store, err => null ) ) );
 						}
 
@@ -7040,7 +7039,7 @@ function runPlugin(req, res) {  //< callback res(ctx) with resulting ctx or cb(n
 		trace = true,			
 		{ agent } = query;
 
-	// Log(">>run", book);
+	// Trace(">>run", book);
 
 	if (type == "help")
 	return res("Run notebook");
@@ -7101,21 +7100,21 @@ function runPlugin(req, res) {  //< callback res(ctx) with resulting ctx or cb(n
 			delete runCtx.Pipe;
 			//for (var key in runCtx) if ( key.startsWith("Save") ) delete runCtx[key];
 
-			//Log(">>>init run", runCtx);
-			//Log(">>>book", TOTEM.$master);
+			//Trace(">>>init run", runCtx);
+			//Trace(">>>book", TOTEM.$master);
 
 			sql.getFields( `app.${book}`, "Field NOT LIKE 'Save%'", ({Field,Type}) => {		// generate use cases
 
 				sql.query( `DELETE FROM app.${book} WHERE Name LIKE '${ctx.Name}-%' ` );
 
 				crossParms( 0 , Object.keys(Pipe), Pipe, {}, {}, (setCtx,idxCtx) => {	// enumerate keys to provide a setCtx key-context for each enumeration
-					//Log("set", setCtx, idxCtx, Pipe.Name);
+					//Trace("set", setCtx, idxCtx, Pipe.Name);
 					const 
 						fix = {X: idxCtx, L:jobs.length, N: ctx.Name},
 						set = Copy(setCtx, {}, "."),
 						job = Copy(setCtx, Copy(runCtx, {}), "." );
 
-					//Log(">>>set", setCtx, set, fix);
+					//Trace(">>>set", setCtx, set, fix);
 					Field.forEach( (key,i) => {
 						if ( (key in job) && (Type[i] == "json") ) 
 							job[key] = JSON.stringify( job[key] );
@@ -7123,11 +7122,11 @@ function runPlugin(req, res) {  //< callback res(ctx) with resulting ctx or cb(n
 
 					Each( set, (key,val) => set[key] = job[key] );
 
-					//Log(">>set", job, set);
+					//Trace(">>set", job, set);
 
 					job.Name = ( Pipe.Name || "${N}-${L}" ).parse$( fix );
 
-					//Log(">>>>debug", job);
+					//Trace(">>>>debug", job);
 					
 					Each( job, (key,val) => {	// build sub replaceor
 						if ( val )
@@ -7142,7 +7141,7 @@ function runPlugin(req, res) {  //< callback res(ctx) with resulting ctx or cb(n
 				tracePipe("enumerate", jobs);
 
 				jobs.forEach( (job,idx) => {
-					//Log(idx,job,sets[idx]);
+					//Trace(idx,job,sets[idx]);
 
 					sql.query( 
 						noClobber
@@ -7151,7 +7150,7 @@ function runPlugin(req, res) {  //< callback res(ctx) with resulting ctx or cb(n
 
 						[job,sets[idx]], err => {
 
-						//Log(">>>ins", err, [inserts,jobs.length]);
+						//Trace(">>>ins", err, [inserts,jobs.length]);
 						if ( ++inserts == jobs.length )  // run usecases after they are all created
 							if ( !noRun )
 								jobs.forEach( job => {
@@ -7171,7 +7170,7 @@ function runPlugin(req, res) {  //< callback res(ctx) with resulting ctx or cb(n
 			Fetch(Pipe, buff => cb(buff) );
 		}
 
-		// Log(">>>notebook ctx", ctx);
+		// Trace(">>>notebook ctx", ctx);
 
 		if (ctx) {
 			res(errors.ok);
@@ -7187,8 +7186,8 @@ function runPlugin(req, res) {  //< callback res(ctx) with resulting ctx or cb(n
 						ATOM.$libs.$pipe = cb => PIPE(Pipe,cb); 
 						
 						ATOM.select(req, ctx => {
-							//Log("pipe run ctx", ctx);
-							// Log("save ctx?", ctx?ctx._net?"net":ctx:false);
+							// Trace("pipe run ctx", ctx);
+							// Trace("save ctx?", ctx?ctx._net?"net":ctx:false);
 							if ( ctx )
 								Trace( sql.saveContext( ctx ) );
 						});
@@ -7199,7 +7198,7 @@ function runPlugin(req, res) {  //< callback res(ctx) with resulting ctx or cb(n
 						ATOM.$libs.$pipe = eventPipe;
 
 						ATOM.select(req, ctx => {
-							//Log(">>>engine select", ctx);
+							//Trace(">>>engine select", ctx);
 							if ( ctx )
 								Trace( sql.saveContext( ctx ) );
 
@@ -7220,8 +7219,8 @@ function runPlugin(req, res) {  //< callback res(ctx) with resulting ctx or cb(n
 			
 			else
 				ATOM.select(req, ctx => {
-					//Log("pipe run ctx", ctx);
-					Log("save ctx?", ctx);
+					//Trace("pipe run ctx", ctx);
+					Trace("save ctx?", ctx);
 					if ( ctx )
 						Trace( sql.saveContext( ctx ) );
 				});	
@@ -7321,8 +7320,9 @@ To connect to ${site.Nick} from Windows:
 }
 
 switch ( process.argv[2] ) { // unit tests
+	case "D?":
 	case "?":
-		Log("unit test with 'node debe MODE'");
+		Trace("unit test with 'node debe [D$ || D1 || ...]'");
 		break;
 	
 	/**
@@ -7381,13 +7381,13 @@ assessments from our worldwide reporting system, please contact ${poc}.
 										}, {ID: file.ID}
 									], err => {
 										ingestFile(sql, path, file.ID, aoi => {
-											//Log( `CREDIT ${client}` );
+											//Trace( `CREDIT ${client}` );
 
 											sql.query("UPDATE openv.profiles SET Credit=Credit+? WHERE Client=?", [aoi.snr, client]);
 
 											if (false)  // put upload into LTS - move this to file watchDog
 												exec(`zip ${path}.zip ${path}; rm ${path}; touch ${path}`, err => {
-													Log(`PURGED ${name}`);
+													Trace(`PURGED ${name}`);
 												});
 										});
 									});
@@ -7399,7 +7399,7 @@ assessments from our worldwide reporting system, please contact ${poc}.
 				}
 			}
 		}, sql => {
-			Log( 
+			Trace( 
 `Yowzers - this does everything but eat!  An encrypted service, a database, a jade UI for clients,
 usecase-engine plugins, file-upload watchers, and watch dogs that monitor system resources (jobs, files, 
 clients, users, system health, etc).` 
@@ -7421,12 +7421,12 @@ clients, users, system health, etc).`
 					res("here i go again");
 
 					Fetch(ENV.WFS_TEST, data => {
-						Log(data);
+						Trace(data);
 					});
 				}
 			}
 		}, sql => {
-			Log( "This bad boy in an encrypted service with a database and has an /wfs endpoint" );
+			Trace( "This bad boy in an encrypted service with a database and has an /wfs endpoint" );
 		});
 		break;
 		
@@ -7439,7 +7439,7 @@ clients, users, system health, etc).`
 	case "D3":
 		config({
 		}, sql => {
-			Log( "Stateful network flow manger started" );
+			Trace( "Stateful network flow manger started" );
 		});
 		break;
 		
@@ -7484,7 +7484,7 @@ clients, users, system health, etc).`
 						Reported: rec.reported || rec.Reported || now,
 						Name: rec.reportID || ("tbd-"+recs),
 						Pipe: JSON.stringify( text )
-					}, err => Log("add", err) );
+					}, err => Trace("add", err) );
 				}
 			});
 		});
@@ -7492,7 +7492,7 @@ clients, users, system health, etc).`
 		
 	case "D5":
 		const {pdf} = readers;
-		pdf( "./config.stores/ocrTest01.pdf", txt => Log(txt) );
+		pdf( "./config.stores/ocrTest01.pdf", txt => Trace(txt) );
 		break;
 		
 	case "raster":
@@ -7506,14 +7506,14 @@ clients, users, system health, etc).`
 			if ( tar.endsWith(".html") ) 
 				Fetch( src, html => {
 					FS.writeFile(tar, html, err => {
-						Log(err || "rastered");
+						Trace(err || "rastered");
 						DEBE.stop( () => process.exit() );
 					});
 				});
 
 			else
 				CP.exec(`phantomjs rasterize.js ${src} ${tar}`, (err,log) => {
-					Log(err || "rastered");
+					Trace(err || "rastered");
 					DEBE.stop( () => process.exit() );
 				});
 		});
@@ -7522,23 +7522,10 @@ clients, users, system health, etc).`
 	case "lab":
 		
 		config({}, sql => {
-			Log( "Welcome to TOTEM Lab!" );
+			Trace( "Welcome to TOTEM Lab!" );
 
-			const 
-				{$api} = $libs,
-				ctx = REPL.start({
-					eval: (cmd, ctx, filename, cb) => {
-						if ( cmd ) {
-							DEBE.replCmd = cmd;
-							ctx.$ = $;
-							cb( null, VM.runInContext(cmd,VM.createContext(ctx)));
-						}
-					}, 
-					prompt: "$> ", 
-					useGlobal: true
-				}).context;
-
-			Each( $libs, (key,lib) => ctx[key] = lib );
+			Debug($libs, cmd => DEBE.replCmd = cmd );
+			//Each( $libs, (key,lib) => ctx[key] = lib );
 			
 			$api();
 		});
