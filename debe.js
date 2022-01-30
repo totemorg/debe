@@ -1348,7 +1348,7 @@ as described in the [Notebooks api](/api.view). `,
 						return toggle.chain ? $me : null;
 					}
 					
-					function runCommand( cmd, log ) {
+					function logCommand( cmd, log ) {
 						CP.exec( cmd, log );
 						return toggle.chain ? $me : null;
 					}
@@ -1426,7 +1426,7 @@ as described in the [Notebooks api](/api.view). `,
 								//return $me;
 							},
 							chain: query => toggle.chain = !toggle.chain,
-							edit: query => runCommand( `code ./notebooks/${book}.js`, logRun ),
+							edit: query => logCommand( `code ./notebooks/${book}.js`, logRun ),
 							focus: index => {
 								if (index) 
 									return foci[book] = index;
@@ -2222,29 +2222,18 @@ Usage: ${uses.join(", ")}  `);
 				//Trace("sending",cwd, recs);
 				const
 					cwd = {
-						"mime":"directory",
-						"ts":1334071677,
-						"read":1,
-						"write":1,
-						"size":0,
-						"hash": btoa(parent), 
-						"volumeid":"l1_",
-						"name": parent, 
-						"locked":0,
-						"dirs":1 
+						mime:"directory",
+						ts:now,
+						read:1,
+						write:1,
+						size:0,
+						hash: btoa(parent), 
+						volumeid:"totem",
+						name: parent, 
+						locked:0,
+						dirs:1,
+						isowner: true
 					};
-					/*{ 
-						"mime":"directory",
-						"ts":1334071677,
-						"read":1,
-						"write":0,
-						"size":0,
-						"hash": parent,
-						"volumeid":"v1_",
-						"name": parent,
-						"locked":1,
-						"dirs":1
-					}, */		
 
 				switch (0) {
 					case 1: // debug
@@ -2535,7 +2524,6 @@ Usage: ${uses.join(", ")}  `);
 							: {
 								cwd: cwd, 
 
-								//debug: true,   //enable client debugger in about info
 								options: {
 								   "separator"       : "/",                                     // (String) Path separator for the current volume
 								   "disabled"        : [],                                      // (Array)  List of commands not allowed (disabled) on this volume
@@ -2583,6 +2571,7 @@ Usage: ${uses.join(", ")}  `);
 								netDrivers:[]
 
 								/*
+								debug: true,   //enable client debugger in about info
 								debug: {
 									connector:"php",
 									phpver:"5.3.26-1~dotdeb.0",
@@ -2604,9 +2593,9 @@ Usage: ${uses.join(", ")}  `);
 				}
 			}
 
-			function runCommand(tar, cmd) {
+			function logCommand(cmd, info) {
 				if (isString(cmd)) {
-					Trace( "log", cmd );
+					Trace( "file", cmd );
 					sql.query("INSERT INTO openc.acelog set ?", {
 						On: new Date(),
 						Op: cmd,
@@ -2616,17 +2605,17 @@ Usage: ${uses.join(", ")}  `);
 				}
 				
 				else {
-					Trace( "log", cmd.name, tar);
-					cmd(tar);
+					Trace( "file", cmd.name);
+					cmd(info);
 				}
 
-				return btoa(tar);
+				return info;
 			}
 			
 			const 
-				{sql,query,path,client,body,action,host,area,profile,referer,type} = req;
+				{sql,query,path,client,body,action,host,area,profile,referer} = req;
 
-			if ( type == "help" )
+			if ( req.type == "help" )
 			return res("Navigate folder target=NAME/NAME/... per command cmd=open|tree|file|size|...|null" );
 
 			if ( query.target == "null") delete query.target;
@@ -2635,7 +2624,7 @@ Usage: ${uses.join(", ")}  `);
 				btoa = b => Buffer.from(b,"utf-8").toString("base64"),
 				atob = a => Buffer.from(a,"base64").toString("utf-8"),
 				trace = true,
-				{cmd,init,tree,src,name} = body.cmd ? body : query,
+				{cmd,init,tree,src} = body.cmd ? body : query,
 				targets = [query["targets[]"] || query.target || btoa(path)].map( tar => atob(tar) ),
 				[target] = targets,
 				  // parent = target.split("/").slice(0,-1).join("/")+"/",
@@ -2644,251 +2633,170 @@ Usage: ${uses.join(", ")}  `);
 				parent = pre + "/",
 				parentHash = btoa(parent),
 				json = parent.substr(1).replace(/\/\[/g,"[").replace(/\//g,"."),
-				now = new Date().getTime(),
-				recs = [];
+				now = new Date().getTime();
 			
-			//delete body["upload[]"];
-			
-			if ( trace )
-				Trace("nav", {
-					cmd: cmd,
-					query: query,
-					//body: body,
-					path: path,
-					tar: target,
-					tars: targets,
-					src: src,
-					act: action,
-					json: json,
-					parent: parent,
-					node: node
-				});
-
 			// https://github.com/Studio-42/elFinder/wiki/Client-Server-API-2.1
-			switch (cmd) {		// look for elFinder commands
-				case "tree":	// expanding folder in left paine
-				case "open":	// expanding folder 
-					
-					if ( src )	// nav json
-						/*
-						if ( src.endsWith("?") )	// nav folders
-							if ( parent.endsWith("=/") ) {	// this is still experimental
-								const
-									name = parent.split("/").pop(),
-									get = "http:"+src.tag("&",{name: name.substr(0,name.length-1), "json:":path.substr(1,path.length-2)});
-								
-								Trace("fetch", get );
-								Fetch( get, txt => {
+			sql.query("SELECT Client,Name FROM openv.engines WHERE ? LIMIT 1", {Name:node}, (err,engs) => {
+				const
+					eng = engs[0] || {
+					  Client: "totem",
+					  Name: node
+					},
+					isOwner = (eng.Client == client) || profile.Overlord || profile.Creator,
+					isRead = true,
+					isWrite = isOwner,
+					isLocked = false;
+					  
+				if ( trace )
+					Trace("nav", {
+						cmd: cmd,
+						query: query,
+						//body: body,
+						path: path,
+						tar: target,
+						tars: targets,
+						src: src,
+						act: action,
+						json: json,
+						parent: parent,
+						node: node,
+						//prof: profile,
+						owner: isOwner
+					});
 
-									if ( files = JSON.parse(txt)[0].json ) {
-										if ( files.forEach ) 
-											sendFolder(res, files.map( (file,idx) => {
-												const 
-													name = "["+idx+"]/",
-													nameHash = btoa(parent+name),
-													type = !(isArray(file) || isObject(file)),
-													info = {
-														ts: now,
-														size: file.length,
-														hash: nameHash, 				// hash name
-														name: name, 					// keys name
-														phash: parentHash, 				// parent hash name
+				switch (cmd) {		// look for elFinder commands
+					case "tree":	// expanding folder in left paine
+					case "open":	// expanding folder 
 
-														read: 1,						// read state
-														write: 1,						// write state
-														locked: 0,						// lock state
-														//tmb: "",						// thumbnail for images
-														//alias: "",					// sumbolic link pack
-														//dim: "",						// image dims
-														//isowner: true,				//	had ownership
-														//volumeid: "l1_", 				// rec.group,										
-													};
+						if ( src )	// nav json
+							/*
+							if ( src.endsWith("?") )	// nav folders
+								if ( parent.endsWith("=/") ) {	// this is still experimental
+									const
+										name = parent.split("/").pop(),
+										get = "http:"+src.tag("&",{name: name.substr(0,name.length-1), "json:":path.substr(1,path.length-2)});
 
+									Trace("fetch", get );
+									Fetch( get, txt => {
+
+										if ( files = JSON.parse(txt)[0].json ) {
+											if ( files.forEach ) 
+												sendFolder(res, files.map( (file,idx) => {
+													const 
+														name = "["+idx+"]/",
+														nameHash = btoa(parent+name),
+														type = !(isArray(file) || isObject(file)),
+														info = {
+															ts: now,
+															size: file.length,
+															hash: nameHash, 				// hash name
+															name: name, 					// keys name
+															phash: parentHash, 				// parent hash name
+
+															read: 1,						// read state
+															write: 1,						// write state
+															locked: 0,						// lock state
+															//tmb: "",						// thumbnail for images
+															//alias: "",					// sumbolic link pack
+															//dim: "",						// image dims
+															isowner: true,				//	had ownership
+															//volumeid: "l1_", 				// rec.group,										
+														};
+
+													/ *{
+														mime: type,	// mime type
+														ts:1310252178,		// time stamp format?
+														read: 1,				// read state
+														write: 0,			// write state
+														size: 666,			// size
+														hash: nameHash, // parent+name, 
+														name: name, // keys name
+														phash: parentHash,	// parent
+														locked: 0,		// lock state
+														//volumeid: type ? "v2_" : "v1_", // rec.group,
+														dirs: 1, 			// place inside tree too
+													}* /
+													return Copy(info, type
+														? {
+															mime: "application/txt",	// mime type
+															dirs: 0, 			// place inside tree too
+														}
+														: {
+															mime: "directory",	// mime type
+															dirs: 1, 			// place inside tree too
+														} );	
+												}));
+
+											else
+											if ( isObject(files) ) {
 												/ *{
 													mime: type,	// mime type
 													ts:1310252178,		// time stamp format?
 													read: 1,				// read state
 													write: 0,			// write state
 													size: 666,			// size
-													hash: nameHash, // parent+name, 
+													hash: nameHash, //parent+name,
 													name: name, // keys name
-													phash: parentHash,	// parent
+													phash: parentHash, //parent,
 													locked: 0,		// lock state
 													//volumeid: type ? "v2_" : "v1_", // rec.group,
 													dirs: 1, 			// place inside tree too
-												}* /
-												return Copy(info, type
-													? {
-														mime: "application/txt",	// mime type
-														dirs: 0, 			// place inside tree too
-													}
-													: {
-														mime: "directory",	// mime type
-														dirs: 1, 			// place inside tree too
-													} );	
-											}));
+												} * /
+												Each(files, (idx,file) => {
+													const 
+														name = `"${idx}"/`,
+														nameHash = btoa(parent+name),
+														type = !(isArray(file) || isObject(file)),
+														info = {
+															ts: now,
+															size: Object.keys(file).length,
+															hash: nameHash, 				// hash name
+															name: name, 					// keys name
+															phash: parentHash, 				// parent hash name
 
-										else
-										if ( isObject(files) ) {
-											/ *{
-												mime: type,	// mime type
-												ts:1310252178,		// time stamp format?
-												read: 1,				// read state
-												write: 0,			// write state
-												size: 666,			// size
-												hash: nameHash, //parent+name,
-												name: name, // keys name
-												phash: parentHash, //parent,
-												locked: 0,		// lock state
-												//volumeid: type ? "v2_" : "v1_", // rec.group,
-												dirs: 1, 			// place inside tree too
-											} * /
-											Each(files, (idx,file) => {
-												const 
-													name = `"${idx}"/`,
-													nameHash = btoa(parent+name),
-													type = !(isArray(file) || isObject(file)),
-													info = {
-														ts: now,
-														size: Object.keys(file).length,
-														hash: nameHash, 				// hash name
-														name: name, 					// keys name
-														phash: parentHash, 				// parent hash name
+															read: 1,						// read state
+															write: 1,						// write state
+															locked: 0,						// lock state
+															//tmb: "",						// thumbnail for images
+															//alias: "",					// sumbolic link pack
+															//dim: "",						// image dims
+															//isowner: true,				//	had ownership
+															//volumeid: "l1_", 				// rec.group,										
+														};
 
-														read: 1,						// read state
-														write: 1,						// write state
-														locked: 0,						// lock state
-														//tmb: "",						// thumbnail for images
-														//alias: "",					// sumbolic link pack
-														//dim: "",						// image dims
-														//isowner: true,				//	had ownership
-														//volumeid: "l1_", 				// rec.group,										
-													};
+													recs.push( Copy(info, type 
+														? {
+															mime: "application/txt",	// mime type
+															dirs: 0, 			// place inside tree too
+														}
+														: {
+															mime: "directory",	// mime type
+															dirs: 1, 			// place inside tree too
+														} ));
+												});
+												sendFolder(res,recs);
+											}
 
-												recs.push( Copy(info, type 
-													? {
-														mime: "application/txt",	// mime type
-														dirs: 0, 			// place inside tree too
-													}
-													: {
-														mime: "directory",	// mime type
-														dirs: 1, 			// place inside tree too
-													} ));
-											});
-											sendFolder(res,recs);
+											else 
+												res(files);
 										}
 
-										else 
-											res(files);
-									}
+										else
+											res("bad src provided");
 
-									else
-										res("bad src provided");
-
-								});	
-							}
-
-							else
-								Fetch( "http:"+src+"&name", txt => {
-									sendFolder(res, JSON.parse(txt).map( file => {
-										const
-											name = `${file.name}=/`,
-											nameHash = btoa(parent+name);
-
-										return {
-											mime: "directory",	// mime type
-											dirs: 1, 					// place inside tree too
-											ts: now,
-											size: Object.keys(file).length,
-											hash: nameHash, 				// hash name
-											name: name, 					// keys name
-											phash: parentHash, 				// parent hash name
-
-											read: 1,						// read state
-											write: 1,						// write state
-											locked: 0,						// lock state
-											//tmb: "",						// thumbnail for images
-											//alias: "",					// sumbolic link pack
-											//dim: "",						// image dims
-											//isowner: true,				//	had ownership
-											//volumeid: "l1_", 				// rec.group,										
-										};
-									}) );
-								});
-
-						else	// nav json
-						*/
-						Fetch( "http:"+src.tag("&",{"json:":json}), txt => {
-
-							if ( files = JSON.parse(txt)[0].json ) {
-								if ( files.forEach ) 
-									sendFolder(res, files.map( (file,idx) => {
-										const 
-											name = "["+idx+"]/",
-											nameHash = btoa(parent+name),
-											type = !(isArray(file) || isObject(file)),
-											info = {
-												ts: now,
-												size: file.length,
-												hash: nameHash, 				// hash name
-												name: name, 					// keys name
-												phash: parentHash, 				// parent hash name
-
-												read: 1,						// read state
-												write: 1,						// write state
-												locked: 0,						// lock state
-												//tmb: "",						// thumbnail for images
-												//alias: "",					// sumbolic link pack
-												//dim: "",						// image dims
-												//isowner: true,				//	had ownership
-												//volumeid: "l1_", 				// rec.group,										
-											};
-
-										/*{
-											mime: type,	// mime type
-											ts:1310252178,		// time stamp format?
-											read: 1,				// read state
-											write: 0,			// write state
-											size: 666,			// size
-											hash: nameHash, // parent+name, 
-											name: name, // keys name
-											phash: parentHash,	// parent
-											locked: 0,		// lock state
-											//volumeid: type ? "v2_" : "v1_", // rec.group,
-											dirs: 1, 			// place inside tree too
-										}*/
-										return Copy(info, type
-											? {
-												mime: "application/txt",	// mime type
-												dirs: 0, 			// place inside tree too
-											}
-											: {
-												mime: "directory",	// mime type
-												dirs: 1, 			// place inside tree too
-											} );	
-									}));
+									});	
+								}
 
 								else
-								if ( isObject(files) ) {
-									/*{
-										mime: type,	// mime type
-										ts:1310252178,		// time stamp format?
-										read: 1,				// read state
-										write: 0,			// write state
-										size: 666,			// size
-										hash: nameHash, //parent+name,
-										name: name, // keys name
-										phash: parentHash, //parent,
-										locked: 0,		// lock state
-										//volumeid: type ? "v2_" : "v1_", // rec.group,
-										dirs: 1, 			// place inside tree too
-									} */
-									Each(files, (idx,file) => {
-										const 
-											name = `"${idx}"/`,
-											nameHash = btoa(parent+name),
-											type = !(isArray(file) || isObject(file)),
-											info = {
+									Fetch( "http:"+src+"&name", txt => {
+										sendFolder(res, JSON.parse(txt).map( file => {
+											const
+												name = `${file.name}=/`,
+												nameHash = btoa(parent+name);
+
+											return {
+												mime: "directory",	// mime type
+												dirs: 1, 					// place inside tree too
 												ts: now,
 												size: Object.keys(file).length,
 												hash: nameHash, 				// hash name
@@ -2904,257 +2812,390 @@ Usage: ${uses.join(", ")}  `);
 												//isowner: true,				//	had ownership
 												//volumeid: "l1_", 				// rec.group,										
 											};
-
-										recs.push( Copy(info, type 
-											? {
-												mime: "application/txt",	// mime type
-												dirs: 0, 			// place inside tree too
-											}
-											: {
-												mime: "directory",	// mime type
-												dirs: 1, 			// place inside tree too
-											} ));
+										}) );
 									});
-									sendFolder(res,recs);
-								} 
 
-								else 
-									res(files);
-							}
+							else	// nav json
+							*/
+							Fetch( "http:"+src.tag("&",{"json:":json}), txt => {
 
-							else
-								res("bad src provided");
+								if ( files = JSON.parse(txt)[0].json ) {
+									if ( files.forEach ) 
+										sendFolder(res, files.map( (file,idx) => {
+											const 
+												name = "["+idx+"]/",
+												type = !(isArray(file) || isObject(file));
 
-						});
-
-					else 		// nav folder
-						Fetch( "file:"+parent , files => {
-							sendFolder(res, files.map( file => {
-								const 
-									[x,name,type] = file.match(/(.*)\.(.*)/) || ["",file,""],
-									nameHash = btoa(parent+file);
-
-								switch (type) {
-									case "url":
-									case "lnk":
-										return null;
-
-									default:
-										/*{
-											mime: `application/${type}`,	// mime type
-											ts:1310252178,		// mod time stamp
-											size: 666,			// size
-											hash: nameHash, //parent+file,	// hash name
-											name: file, // keys name
-											phash: parentHash, //parent, 		// parent hash name
-											//tmb: "",			// thumbnail for images
-											//alias: ""			// sumbolic link pack
-											//dim: ""			// image dims
-											//isowner: true		//	had ownership
-											//volumeid: type ? "v2_" : "v1_", // rec.group,
-											dirs: 0 			// place inside tree too
-										} */
-										const 
-											stat = FS.statSync( "."+parent+file ),
-											info = {
-												ts: new Date(stat.mtime).getTime(),
-												size: stat.size,
-												hash: nameHash, //parent+file,	// hash name
-												name: file, 					// keys name
+											return {
+												ts: now,
+												mime: type ? `application/txt` : "directory",	// mime type
+												dirs: type ? 0 : 1, 			// place inside tree too												
+												size: file.length,
+												hash: btoa(parent+name), 				// hash name
+												name: name, 					// keys name
 												phash: parentHash, 				// parent hash name
-
-												read: 1,						// read state
-												write: 1,						// write state
-												locked: 0,						// lock state
+												read: isRead,						// read state
+												write: isWrite,					// write state
+												locked: isLocked,						// lock state
+												isowner: isOwner				// has ownership
 												//tmb: "",						// thumbnail for images
 												//alias: "",					// sumbolic link pack
 												//dim: "",						// image dims
-												isowner: true,				//	had ownership
 												//volumeid: "l1_", 				// rec.group,										
 											};
-
-										return Copy(info, type 
-												? {
-													mime: `application/${type}`,	// mime type
-													dirs: 0 			// place inside tree too
-												}
-												: {
-													mime: "directory",	// mime type
-													dirs: 1 			// place inside tree too
-												} );
-								}
-							}));
-						});
-
-					break;
-
-				case "file":	// requesting a single file
-
-					if ( src ) 
-						res( parent );
-
-					else
-						Fetch( "file:"+parent, txt => res( txt ) );
-
-					break;
-
-				case "size":
-					res({
-						size: 222
-					});
-					break;
-
-				case "abort":
-					break;
-					
-				case "zipdl":
-					res({
-						file: "5abf02cc77050",       // key of temporary archive file 
-						name: "files.zip", // download file name
-						mime: "application/zip"      // MIME type
-					});
-					break;
-
-				case "rename":
-					res({
-						added: targets.map( tar => runCommand( tar, 
-							`mv -n .${parent}{${node},${name}}` 
-						)),
-						removed: []
-					});
-					break;
-
-				case "resize":
-					res({
-						changed: targets.map( tar => runCommand( tar, 
-							`resize .${tar}`
-						))
-					});
-					break;
-					
-				case "rm":
-					res({
-						removed: targets.map( tar => runCommand( tar, 
-								`rm .${tar}`
-						))
-					});
-					break;
-					
-				case "url":
-					res({
-						url: target
-					});
-					break;
-					
-				case "search":
-					res({
-						files: []
-					});
-					break;
-					
-				case "ping":
-					res("");
-					break;
-					
-				case "ls":
-					res({
-						list: []
-					});
-					break;
-					
-				case "upload":
-					/*Trace("up", {
-						tar: atob(body.target),
-						fn: body.filename,
-						con: body["upload[]"].length,
-						upp: atob(body["upload_path[]"])
-					});*/
-					res({
-						added: [ "."+atob(body["upload_path[]"])+body.filename].map( tar => runCommand(tar, function uploadFile(tar) {
-							FS.writeFile( tar, body["upload[]"], "utf8", err => Trace("upload", err||"ok") );
-						}))
-					});
-					break;
-					
-				case "parents": // requesting all parents
-				case "tmb":
-				case "put":
-				case "get":
-				case "mkdir":
-				case "mkfile":
-				case "netmount":
-				case "info":
-				case "editor":
-				case "chmod":
-				case "callback":
-				case "extract":
-				case "archive":
-				case "abort":
-				//case "copy":
-				case "paste":
-					res({
-						error: "unsupported command"
-					});
-					break;
-
-				default:	// request made w/o elFinder
-					if ( path.endsWith("/") )	// requesting folder
-						Fetch( "file:"+path , files => {	
-							if ( files ) {
-								req.type = "html"; // override default json type
-								res([[ 
-									site.nick.link( "/brief.view?notebook=totem" ),
-									client.link( "/login.html" ),
-									"API".link( "/api.view" ),
-									"Browse".link( "/browse.view" ),
-									"Explore".link( "/xfan.view?w=1000&h=600&src=/info" ),
-									path
-								].join(" || ") , files.map( file => {
-									if ( file.endsWith(".url") ) {	// resolve windows link
-										const
-											src = "."+path+file;
-
-										if ( html = cache[src] ) 
-											return html;
-
-										else 
-											try {
-												const
-													[x, url] = FS.readFileSync( src, "utf8").match( /URL=(.*)/ ) || ["",""],
-													{href} = URL(url,referer);
-
-												return cache[src] = url ? file.substr(0,file.indexOf(".url")).tag( href ) : "?"+file;
-											}
-
-											catch (err) {
-												return "?"+file
-											}
-									}
+										}));
 
 									else
-										return file.link( file );
-								}).join("<br>")].join("<br>") );
-							}
+									if ( isObject(files) ) {
+										const recs = [];
+										Each(files, (idx,file) => recs.push( [idx,file] ) );
+										sendFolder(res,recs.map( ([idx,file]) => {
+											const 
+												name = `"${idx}"/`,
+												type = !(isArray(file) || isObject(file));
 
-							else
-								res( "folder not found" );
+											return {
+												ts: now,
+												mime: type ? `application/txt` : "directory",	// mime type
+												dirs: type ? 0 : 1, 			// place inside tree too												
+												size: Object.keys(file).length,
+												hash: btoa(parent+name), 				// hash name
+												name: name, 					// keys name
+												phash: parentHash, 				// parent hash name
+												read: isRead,						// read state
+												write: isWrite,						// write state
+												locked: isLocked,						// lock state
+												isowner: isOwner,					// has ownership
+												//tmb: "",						// thumbnail for images
+												//alias: "",					// sumbolic link pack
+												//dim: "",						// image dims
+												//volumeid: "l1_", 				// rec.group,										
+											};
+										}));
+									} 
+
+									else 
+										res(files);
+								}
+
+								else
+									res("bad src provided");
+
+							});
+
+						else 		// nav folder
+							Fetch( "file:"+parent , files => {
+								sendFolder(res, files.map( file => {
+									const 
+										[x,name,type] = file.match(/(.*)\.(.*)/) || ["",file,""];
+
+									switch (type) {
+										case "url":
+										case "lnk":
+											return null;
+
+										default:
+											const 
+												stat = FS.statSync( "."+parent+file );
+
+											return {
+												ts: now,
+												mime: type ? `application/${type}` : "directory",	// mime type
+												dirs: type ? 0 : 1, 			// place inside tree too
+												size: stat.size,
+												hash: btoa(parent+file), //parent+file,	// hash name
+												name: file, 					// keys name
+												phash: parentHash, 				// parent hash name
+												read: isRead,						// read state
+												write: isWrite,						// write state
+												locked: isLocked,						// lock state
+												isowner: isOwner,					// has ownership
+												//tmb: "",						// thumbnail for images
+												//alias: "",					// sumbolic link pack
+												//dim: "",						// image dims
+												//volumeid: "l1_", 				// rec.group,										
+											};
+									}
+								}));
+							});
+
+						break;
+
+					case "file":	// requesting a single file
+
+						if ( src ) 
+							res( parent );
+
+						else
+							Fetch( "file:"+parent, txt => res( txt ) );
+
+						break;
+
+					case "size":
+						res({
+							size: 222
 						});
+						break;
 
-					else { // requesting file
-						Fetch( "file:"+path, res );
+					case "abort":
+						break;
 
-						if ( area == "refs" && profile.Track ) {		// track client's download
-							//Trace(">>>>>track download", profile );
-							sql.query(
-								"INSERT INTO openv.bricks SET ? ON DUPLICATE KEY UPDATE Samples=Samples+1",
-								{
-									Name: path,
-									Area: area,
-									Client: client
-								});
+					case "zipdl":
+						res({
+							file: "5abf02cc77050",       // key of temporary archive file 
+							name: "files.zip", // download file name
+							mime: "application/zip"      // MIME type
+						});
+						break;
+
+					case "rename":
+						var 
+							{name} = query,
+							type = name.split(".").pop();
+
+						res({
+							added: targets.map( tar => logCommand( `mv -n .${parent}{${node},${name}}`, {
+								ts: now,
+								mime: `application/${type}`,	// mime type
+								dirs: 0, 						// place inside tree too												
+								size: 666,
+								hash: btoa(parent+name), 				// hash name
+								name: name, 					// keys name
+								phash: parentHash, 				// parent hash name
+								read: isRead,						// read state
+								write: isWrite,						// write state
+								locked: isLocked,						// lock state
+								isowner: isOwner						// has ownership
+							})),
+							removed: [btoa(`${parent}{${node}`)]
+						});
+						break;
+
+					case "resize":
+						var 
+							name = node,
+							type = name.split(".").pop();
+
+						res({
+							changed: targets.map( tar => logCommand( `resize .${tar}`, {
+								ts: now,
+								mime: `application/${type}`,	// mime type
+								dirs: 0, 						// place inside tree too												
+								size: 666,
+								hash: btoa(parent+node), 		// hash name
+								name: name, 					// keys name
+								phash: parentHash, 				// parent hash name
+								read: isRead,						// read state
+								write: isWrite,						// write state
+								locked: isLocked,						// lock state
+								isowner: isOwner						// has ownership
+							}))
+						});
+						break;
+
+					case "rm":
+						res({
+							removed: targets.map( tar => logCommand( `rm .${tar}`, btoa(tar) ))
+						});
+						break;
+
+					case "url":
+						res({
+							url: target
+						});
+						break;
+
+					case "search":
+						res({
+							files: []
+						});
+						break;
+
+					case "ping":
+						res("");
+						break;
+
+					case "ls":
+						res({
+							list: []
+						});
+						break;
+
+					case "upload":
+						Trace("up", {
+							tar: atob(body.target),
+							fnname: body.filename,
+							bcon: body["upload[]"].constructor,
+							upath: atob(body["upload_path[]"])
+						});
+						var
+							name = body.filename,
+							type = name.split(".").pop();
+
+						res({
+							added: [ "."+atob(body["upload_path[]"])+name].map( tar => logCommand( function uploadFile(tar) {
+								FS.writeFile( tar, body["upload[]"].toString(), "utf8", err => Trace("upload", err||"ok") );
+							}, {
+								ts: now,
+								mime: `application/"${type}`,	// mime type
+								dirs: 0, 						// place inside tree too												
+								size: body["upload[]"].length,
+								hash: btoa(parent+name), 		// hash name
+								name: name, 					// keys name
+								phash: parentHash, 				// parent hash name
+								read: isRead,						// read state
+								write: isWrite,						// write state
+								locked: isLocked,						// lock state
+								isowner: isOwner						// has ownership
+							}))
+						});
+						break;
+
+					case "paste":
+					case "duplicate":
+						var
+							name = `copy_${node}`,
+							type = name.split(".").pop();
+
+						res({
+							added: targets.map( tar => logCommand( `cp -n .${tar} .${parent}${name}`, {
+								ts: now,
+								mime: `application/${type}`,	// mime type
+								dirs: 0, 						// place inside tree too												
+								size: body["upload[]"].length,
+								hash: btoa(parent+name), 		// hash name
+								name: name, 					// keys name
+								phash: parentHash, 				// parent hash name
+								read: isRead,						// read state
+								write: isWrite,						// write state
+								locked: isLocked,						// lock state
+								isowner: isOwner						// has ownership
+							}))
+						});
+						break;
+
+					case "archive":
+						var 
+							{name} = query,
+							type = name.split(".").pop();
+
+						res({
+							added: targets.map( tar => logCommand( `zip -r .${parent}${name} .${tar}`, {
+								ts: now,
+								mime: `application/${type}`,	// mime type
+								dirs: 0, 						// place inside tree too												
+								size: 666,
+								hash: btoa(parent+name), 		// hash name
+								name: name, 					// keys name
+								phash: parentHash, 				// parent hash name
+								read: isRead,						// read state
+								write: isWrite,						// write state
+								locked: isLocked,						// lock state
+								isowner: isOwner						// has ownership
+							}))
+						});
+						break;
+
+					case "mkdir":
+						break;
+
+					case "mkfile":
+						var 
+							{name} = query,
+							type = name.split(".").pop();
+
+						res({
+							added: targets.map( tar => logCommand( `touch .${tar}${name}`, {
+								ts: now,
+								mime: `application/${type}`,	// mime type
+								dirs: 0, 						// place inside tree too												
+								size: 0,
+								hash: btoa(parent+name), 		// hash name
+								name: name, 					// keys name
+								phash: parentHash, 				// parent hash name
+								read: isRead,						// read state
+								write: isWrite,						// write state
+								locked: isLocked,						// lock state
+								isowner: isOwner						// has ownership
+							}))
+						});
+						break;
+
+					case "parents": // requesting all parents
+					case "tmb":
+					case "put":
+					case "get":
+					case "netmount":
+					case "info":
+					case "editor":
+					case "chmod":
+					case "callback":
+					case "extract":
+					case "abort":
+						res({
+							error: "unsupported command"
+						});
+						break;
+
+					default:	// request made w/o elFinder
+						if ( path.endsWith("/") )	// requesting folder
+							Fetch( "file:"+path , files => {	
+								if ( files ) {
+									req.type = "html"; // override default json type
+									res([[ 
+										site.nick.link( "/brief.view?notebook=totem" ),
+										client.link( "/login.html" ),
+										"API".link( "/api.view" ),
+										"Explore".link( "/site.view?explore=root" ),
+										"Info".link( "/xfan.view?w=1000&h=600&src=/info" ),
+										path
+									].join(" || ") , files.map( file => {
+										if ( file.endsWith(".url") ) {	// resolve windows link
+											const
+												src = "."+path+file;
+
+											if ( html = cache[src] ) 
+												return html;
+
+											else 
+												try {
+													const
+														[x, url] = FS.readFileSync( src, "utf8").match( /URL=(.*)/ ) || ["",""],
+														{href} = URL(url,referer);
+
+													return cache[src] = url ? file.substr(0,file.indexOf(".url")).tag( href ) : "?"+file;
+												}
+
+												catch (err) {
+													return "?"+file
+												}
+										}
+
+										else
+											return file.link( file );
+									}).join("<br>")].join("<br>") );
+								}
+
+								else
+									res( "folder not found" );
+							});
+
+						else { // requesting file
+							Fetch( "file:"+path, res );
+
+							if ( area == "refs" && profile.Track ) {		// track client's download
+								//Trace(">>>>>track download", profile );
+								sql.query(
+									"INSERT INTO openv.bricks SET ? ON DUPLICATE KEY UPDATE Samples=Samples+1",
+									{
+										Name: path,
+										Area: area,
+										Client: client
+									});
+							}
 						}
-					}
-			}		
+				}
+			});
 
 			/*
 			areas.forEach( (area,i) => 
