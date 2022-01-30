@@ -1,0 +1,55 @@
+extends base
+append base_help
+	:markdown
+		# Explore files and json stores with options:
+
+			- name = notebook (!{query.name})
+			- src = path to json source (!{query.src})
+			- json = name of json store (!{query.json})
+
+		[sample](/explore.help?json=Save_baseline$&src=/nets.json?name=gtdcsv)  
+		[example](/explore.view?json=Save_baseline$&src=/nets.json?name=gtdcsv)
+
+append base_parms
+	- tech = "elFinder"
+
+append base_head
+	script.
+		const
+			opts = {
+				src: "#{query.json}"
+						? "/#{query.json}/".tag("?",{ src: "#{query.src}"})
+						: "#{query.name}"
+							? "/root/artifacts/#{query.name}/"
+							: "#{query.src}" || "/root/"
+			};
+
+append base_body
+	script.
+		$().ready( () => {
+			//alert(JSON.stringify(opts));
+			const { src } = opts;
+			$('#content').elfinder({
+				url : src,
+				
+				lang: "en",
+				//debug: ["error", "warning"],
+				rememberLastDir: true,
+				requestType: "get",
+				defaultView: "list",  // list||icons
+				resizable: true,
+				sort: "name",
+				sortDirect: "asc",
+				dragUploadAllow: "auto",
+				/*commands: [
+					"getfile","help","rename","open"
+				],*/
+				handlers: {
+					add: ev => console.log("add",ev),
+					upload: ev => console.log("up",ev),
+					//select: ev => console.log("sel",ev),
+					//open: ev => alert("open"),
+					//back: ev => alert("back"),
+				},
+			}).elfinder('instance');
+		});
