@@ -2596,7 +2596,7 @@ Usage: ${uses.join(", ")}  `);
 			function logCommand(cmd, info) {
 				if (isString(cmd)) {
 					Trace( "file", cmd );
-					sql.query("INSERT INTO openc.acelog set ?", {
+					sql.query("INSERT INTO openc.acelogs set ?", {
 						On: new Date(),
 						Op: cmd,
 						Client: client
