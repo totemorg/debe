@@ -21,27 +21,33 @@ append base_head
 						? "/#{query.json}/".tag("?",{ src: "#{query.src}"})
 						: "#{query.name}"
 							? "/root/artifacts/#{query.name}/"
-							: "/root/"
+							: "#{query.src}" || "/root/"
 			};
 
 append base_body
 	script.
-		$().ready( () => {			
+		$().ready( () => {
+			//alert(JSON.stringify(opts));
 			const { src } = opts;
 			$('#content').elfinder({
 				url : src,
 				
 				lang: "en",
 				//debug: ["error", "warning"],
-				rememberLastDir: false,
+				rememberLastDir: true,
 				requestType: "get",
-				defaultView: "icons",  // list||icons
+				defaultView: "list",  // list||icons
 				resizable: true,
+				sort: "name",
+				sortDirect: "asc",
+				dragUploadAllow: "auto",
 				/*commands: [
 					"getfile","help","rename","open"
 				],*/
 				handlers: {
-					//select: ev => alert("select"),
+					add: ev => console.log("add",ev),
+					upload: ev => console.log("up",ev),
+					//select: ev => console.log("sel",ev),
 					//open: ev => alert("open"),
 					//back: ev => alert("back"),
 				},

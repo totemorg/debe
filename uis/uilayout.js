@@ -1077,6 +1077,7 @@ $().ready( () => {
 					});	
 				});
 
+			/*
 			if ( elfinder )
 				$("div#elFinder", $el).each( el => {
 					Log("elf start",path);
@@ -1086,21 +1087,23 @@ $().ready( () => {
 						lang: 'en', 
 						url :  path,
 							// "http://localhost:8080/cmd=open&parent=/", 
-						//rememberLastDir: false,
+						
+						rememberLastDir: true,
 						//requestType: "get",
-						//defaultView: "list",  // list||icons
-						//resizable: true,
-						/*handlers: {
+						defaultView: "list",  // list||icons
+						resizable: true,
+						handlers: {
 							
-							//select: ev => alert("select"),
+							select: ev => alert("select"),
 							//open: ev => alert("open"),
 							//back: ev => alert("back"),
 							
-						}*/
+						}
 					}).elfinder('instance');
 					//alert("elf started");
 				});
-
+			*/
+			
 			if ( isotope )
 				$("div.isotope", $el).each( div => { 		// isotope pivots
 			//alert("iso path="+path+" pivs="+cols);
