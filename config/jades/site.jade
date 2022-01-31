@@ -22,11 +22,11 @@ append base_parms
 		- view = query.explore ? "explore" : "tabbed"
 		- page = 50
 		- pulse = 120
-		- secureLink = query.explore ? false : true
+		- secureLink = true
 		- editskin = query.explore ? false : true
-		- explore = {root: "/explore.view?src=/root/", earth: "http://localhost:8083/Apps/totem_index.html", graph: "http://localhost:7474", streets: "http://localhost:3000", process: "http://localhost:5050"}
+		- explore = {root: "/explore.view?src=/root/", earth: `http://${domain}:8083/Apps/totem_index.html`, graph: `http://${domain}:7474`, streets: `http://${domain}:3000`, process: `http://${domain}:5050`}
 		- Explore = {}
-		- Object.keys(explore).forEach( key => Explore[key] = key.link(`${worker}/site.view?explore=${key}`) )
+		- Object.keys(explore).forEach( key => Explore[key] = key.link( explore[key].startsWith("http:") ? `${worker}/site.view?explore=${key}` : `/site.view?explore=${key}`) )
 
 	case view
 		when "draw"
