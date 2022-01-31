@@ -24,7 +24,9 @@ append base_parms
 		- pulse = 120
 		- secureLink = query.explore ? false : true
 		- editskin = query.explore ? false : true
-		- explorer = {root: "/explore.view?src=/root/", earth: "http://localhost:8083/Apps/totem_index.html", graph: "http://localhost:7474", streets: "http://localhost:3000", process: "http://localhost:5050"}
+		- explore = {root: "/explore.view?src=/root/", earth: "http://localhost:8083/Apps/totem_index.html", graph: "http://localhost:7474", streets: "http://localhost:3000", process: "http://localhost:5050"}
+		- Explore = {}
+		- Object.keys(explore).forEach( key => Explore[key] = key.link(`${worker}/site.view?explore=${key}`) )
 
 	case view
 		when "draw"
@@ -344,11 +346,11 @@ append base_body
 						+ !{$jira}  
 						+ !{$ras}  
 						Explore:  
-						+ [Root](/site.view?explore=root)  
-						+ [Earth](/site.view?explore=earth)  
-						+ [Streets](/site.view?explore=streets)  
-						+ [Process](/site.view?explore=process)  
-						+ [Graph](/site.view?explore=graph)  
+						+ !{Explore.root}  
+						+ !{Explore.earth}  
+						+ !{Explore.streets}  
+						+ !{Explore.process}  
+						+ !{Explore.graph} 
 
 		when "home"
 			border#xSite(
@@ -389,7 +391,7 @@ append base_body
 
 				block site_help
 				tab#center
-					iframe(src=explorer[query.explore]||query.explore,width="100%",height="100%",style="border:none")
+					iframe(src=explore[query.explore]||query.explore,width="100%",height="100%",style="border:none")
 					block site_body
 
 				tab#north(class=toolbar)
