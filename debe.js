@@ -55,7 +55,7 @@ const
 	{ skinContext, renderSkin, renderJade } = SKIN,
 	{ runTask, queues, byAction,
 		sqlThread, errors, paths, cache, site, byTable, userID, dsThread,
-		watchFile, timeIntervals, neoThread, startJob, $master } = TOTEM,
+		watchFile, timeIntervals, neoThread, startJob } = TOTEM,
 	{ JIMP } = $;
 
 /**
@@ -1324,7 +1324,7 @@ as described in the [Notebooks api](/api.view). `,
 			const 
 				foci = {},
 				{ $notebooks } = $libs,
-				repo = "https://github.com/totemstan",
+				repo = ENV.REPO, //"https://github.com/totemstan",
 				toggle = {
 					chain: false
 				};
@@ -1693,7 +1693,7 @@ Keys:
 
 			//site.mods.forEach( mod => site["$"+mod] = site.$repo+"/"+mod );
 			
-			if ( site.sitemap )
+			/*if ( site.sitemap )
 				site.sitemap = site.sitemap.gridify({
 					a:"Site",
 					b:"Usage",
@@ -1701,7 +1701,7 @@ Keys:
 					d:"Follow Us",
 					e:"[Sponsorships](http://totem.hopto.org/likeus)".linkify(),
 					f:"Fork" 
-				});
+				}); */
 			
 			SKIN.config({
 				context: site
@@ -5138,7 +5138,20 @@ size, pixels, scale, step, range, detects, infile, outfile, channel.  This endpo
 		
 		tag: (src,el,tags) => src.tag(el,tags),
 
-		/*
+		explorer: {
+			Root: "/explore.view?src=/root/", 
+			Earth: `http://${site.domain}:8083/Apps/totem_index.html`, 
+			Graph: `http://${site.domain}:7474/neo4j`, 
+			Streets: `http://${site.domain}:3000/osm`, 
+			Process: `http://${site.domain}:5050/nodered`, 
+			Totem: "/totem.brief",  
+			Notebooks: "/notebooks.html", 
+			API: "/api.view", 
+			SkinGuide: "/skinguide.view", 
+			JIRA: site._jira, 
+			RAS: site._ras
+		},
+		
 		sitemap: [
 			{a: "[Terms](http://totem.hopto.org/terms.view)" ,	
 			 b: "[Issues](http://totem.hopto.org/issues.view)", 
@@ -5177,10 +5190,12 @@ size, pixels, scale, step, range, detects, infile, outfile, channel.  This endpo
 			 d: "[Parler](http://Parler.com?goto=totem)"
 			}
 		].gridify({
-			a:"Site",b:"Usage",c:"Corporate",d:"Follow Us",
+			a:"Site",
+			b:"Usage",
+			c:"Corporate",
+			d:"Follow Us",
 			e:"[Sponsorships](http://totem.hopto.org/likeus)".linkify(),
 			f:"Fork" }),
-		*/
 		
 		/**
 		Title ti to fileName fn
@@ -5240,9 +5255,9 @@ size, pixels, scale, step, range, detects, infile, outfile, channel.  This endpo
 		
 		mods: ["totem","enum","jsdb","debe","geohack","atomic","reader","randpr"],
 		
-		jira: ENV.JIRA || "JIRA-undefined",
-		ras: ENV.RAS || "RAS-undefined",
-		repo: ENV.REPO || "REPO-undefined",
+		JIRA: ENV.JIRA || "JIRA.undefined",
+		RAS: ENV.RAS || "RAS.undefined",
+		REPO: ENV.REPO || "REPO.undefined",
 
 		reqts: {   // defaults
 			js:  ["nodejs-12.14.0", "machine learning library-1.0".tag( "https://sc.appdev.proj.coe.ic.gov://acmesds/man" )].join(", "),
@@ -7475,6 +7490,7 @@ switch ( process.argv[2] ) { // unit tests
 	case "D?":
 	case "?":
 		Trace("unit test with 'node debe [D$ || D1 || ...]'");
+		Trace("site context", site);
 		break;
 	
 	/**

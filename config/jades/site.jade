@@ -4,7 +4,6 @@ extends base
 append base_help
 	:markdown
 		# site options:
-
 			- etc = side bar links (!{etc})
 			- dock = folder docking style = left || right || top || bottom (!{dock})
 			- dims = width,height maximum widget dimensions (!{dims})
@@ -12,7 +11,7 @@ append base_help
 			- page = maximum grid rows (!{page})
 			- pulse = grid refresh rate [seconds] (!{pulse})
 			- secureLink = enable the secureLink (!{secureLink})
-			- explore = root||earth||process||streets||graph||URL explorer (!{query.explore})
+			- explore = site explorer (!{Object.keys(explorer).join()})
 
 append base_parms
 	block site_parms
@@ -24,9 +23,8 @@ append base_parms
 		- pulse = 120
 		- secureLink = true
 		- editskin = query.explore ? false : true
-		- explore = {root: "/explore.view?src=/root/", earth: `http://${domain}:8083/Apps/totem_index.html`, graph: `http://${domain}:7474`, streets: `http://${domain}:3000`, process: `http://${domain}:5050`}
 		- Explore = {}
-		- Object.keys(explore).forEach( key => Explore[key] = key.link( explore[key].startsWith("http:") ? `${worker}/site.view?explore=${key}` : `/site.view?explore=${key}`) )
+		- Object.keys(explorer).forEach( key => Explore[key] = key.link( ((explorer[key]||"").startsWith("/") ? "" : worker) + `/site.view?explore=${key}`) )
 
 	case view
 		when "draw"
@@ -94,13 +92,17 @@ append base_body
 
 				tab#west(class=etc)
 					:markdown
-						!{$brief}  
-						[scripts](/scripts.view)  
-						[survey](/survey.view)  
-						[notebooks](/notebooks.html)  					
-						!{$rtp}  
-						!{$jira}  
-						!{$ras}
+						!{Explore.Totem}  
+						!{Explore.Notebooks}  
+						!{Explore.API}  
+						!{Explore.SkinGuide}  
+						!{Explore.JIRA}  
+						!{Explore.RAS}  
+						!{Explore.Root}  
+						!{Explore.Earth}  
+						!{Explore.Streets}  
+						!{Explore.Process}  
+						!{Explore.Graph} 
 
 		when "basic"
 			folder#xSite(dock=dock)
@@ -338,19 +340,17 @@ append base_body
 
 				tab#west(class=etc)
 					:markdown
-						Totem:  
-						+ [Totem](/totem.brief)  
-						+ [Notebooks](/notebooks.html)  
-						+ [API](/api.view)  
-						+ [SkinGuide](/skinguide.view)  
-						+ !{$jira}  
-						+ !{$ras}  
-						Explore:  
-						+ !{Explore.root}  
-						+ !{Explore.earth}  
-						+ !{Explore.streets}  
-						+ !{Explore.process}  
-						+ !{Explore.graph} 
+						!{Explore.Totem}  
+						!{Explore.Notebooks}  
+						!{Explore.API}  
+						!{Explore.SkinGuide}  
+						!{Explore.JIRA}  
+						!{Explore.RAS}  
+						!{Explore.Root}  
+						!{Explore.Earth}  
+						!{Explore.Streets}  
+						!{Explore.Process}  
+						!{Explore.Graph} 
 
 		when "home"
 			border#xSite(
@@ -391,7 +391,7 @@ append base_body
 
 				block site_help
 				tab#center
-					iframe(src=explore[query.explore]||query.explore,width="100%",height="100%",style="border:none")
+					iframe(src=explorer[query.explore]||query.explore,width="100%",height="100%",style="border:none")
 					block site_body
 
 				tab#north(class=toolbar)
@@ -402,12 +402,17 @@ append base_body
 
 				tab#west(class=etc)
 					:markdown
-						[Totem](/totem.brief)  
-						[Notebooks](/notebooks.html)  
-						[API](/api.view)  
-						[SkinGuide](/skinguide.view)  
-						!{$jira}  
-						!{$ras}
+						+ !{Explore.Totem}  
+						+ !{Explore.Notebooks}  
+						+ !{Explore.API}  
+						+ !{Explore.SkinGuide}  
+						+ !{Explore.JIRA}  
+						+ !{Explore.RAS}  
+						+ !{Explore.Root}  
+						+ !{Explore.Earth}  
+						+ !{Explore.Streets}  
+						+ !{Explore.Process}  
+						+ !{Explore.Graph} 
 
 		when "kiss"
 		when "simple"
