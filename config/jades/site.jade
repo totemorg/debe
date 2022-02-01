@@ -23,7 +23,7 @@ append base_parms
 		- northedit = false
 		- Explore = {}
 		- ref = {hostname:$referer.hostname,port:$worker.port,domain:$referer.hostname}
-		- Object.keys(explorer).forEach( key => Explore[key] = key.linkify( "http://${hostname}:${port}/site.view?explore="+explorer[key] ).parse$(ref) )
+		- Object.keys(explorer).forEach( key => Explore[key] = key.linkify( explorer[key].startsWith("/") ? explorer[key] : "http://${hostname}:${port}/site.view?explore="+explorer[key] ).parse$(ref) )
 
 	case view
 		when "draw"
