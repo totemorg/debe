@@ -5199,7 +5199,7 @@ size, pixels, scale, step, range, detects, infile, outfile, channel.  This endpo
 			c:"Corporate",
 			d:"Follow Us",
 			e:"[Sponsorships](xxx:/likeus)".linkify(),
-			f:"Fork" }).replace(/xxx:/g, `http://${site.domain}`),
+			f:"Fork" }).replace(/xxx:/g, site.host),
 		
 		/**
 		Title ti to fileName fn
