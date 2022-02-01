@@ -2596,11 +2596,15 @@ Usage: ${uses.join(", ")}  `);
 			function logCommand(cmd, info) {
 				if (isString(cmd)) {
 					Trace( "file", cmd );
-					sql.query("INSERT INTO openc.acelogs set ?", {
-						On: new Date(),
-						Op: cmd,
-						Client: client
-					});
+					const [op,ds] = cmd.split(" ");
+					sql.query("INSERT INTO openv.dblogs SET ? ON DUPLICATE KEY UPDATE Actions=Actions+1,?", [{
+						Op: op,
+						Dataset: ds,
+						Client: client,
+						Event: now
+					}, {
+						Event: now
+					}]);
 					CP.exec( cmd );
 				}
 				

@@ -485,7 +485,7 @@ append layout_body
 
 			const ed = ace.edit("aceEdit", {
 				value: unescape("#{escape(skin)}"), 	// escape to avoid jade bug
-				newLineMode: "linux",
+				newLineMode: "auto",
 				mode: "ace/mode/coffee",
 				//mode: "ace/mode/javascript",
 				//mode: "ace/mode/asciidoc",
@@ -497,7 +497,8 @@ append layout_body
 				highlightActiveLine: true,
 				hScrollBarAlwaysVisible: true,
 				vScrollBarAlwaysVisible: true,
-
+				useSoftTabs: false,
+		
 				// auto complete requires ext-language scripts
 				//enableBasicAutocompletion: true,	
 				//enableLiveAutocompletion: true,

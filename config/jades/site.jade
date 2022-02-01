@@ -11,7 +11,7 @@ append base_help
 			- page = maximum grid rows (!{page})
 			- pulse = grid refresh rate [seconds] (!{pulse})
 			- secureLink = enable the secureLink (!{secureLink})
-			- explore = site explorer (!{Object.keys(explorer).join()})
+			- explore = site explorer ({Object.keys(explorer).join()})
 
 append base_parms
 
@@ -25,7 +25,7 @@ append base_parms
 		- secureLink = true
 		- northedit = false //query.explore ? false : true
 		- Explore = {}
-		- Object.keys(explorer).forEach( key => Explore[key] = key.link( ((explorer[key]||"").startsWith("/") ? "" : worker) + `/site.view?explore=${key}` )
+		- Object.keys(explorer).forEach( key => Explore[key] = key.link( ((explorer[key]||"").startsWith("/") ? "" : worker) + `/site.view?explore=${key}` ))
 
 	case view
 		when "draw"
@@ -66,55 +66,6 @@ append base_body
 	p.ui-banner= banner
 
 	case view
-		when "test"
-			folder#Fold
-				tab.One
-					p tab1 content
-					grid#test1(path="/demo.db",cols="ID...hide,Name,Counter.n.careful,Source,Description.x,Start")
-
-				tab.Two
-					p tab2 content
-
-		when "min"
-			border#xSite(
-				crush, splash=true,
-				head="Prefs(Locales,Themes),Files(Manage,Uploads,$uploads,Stores,$stores),Options,LikeUs,Help",
-				LikeUs="/likeus.db",
-				Manage="/files.view" )
-
-				block site_help
-				tab#center
-					block site_body
-
-				tab#north(class=toolbar)
-					img(src=logo,width="100%",height="80px")
-
-				tab#west(class=etc)
-					:markdown
-						!{Explore.Totem}  
-						!{Explore.Notebooks}  
-						!{Explore.API}  
-						!{Explore.SkinGuide}  
-						!{Explore.JIRA}  
-						!{Explore.RAS}  
-						!{Explore.Root}  
-						!{Explore.Earth}  
-						!{Explore.Streets}  
-						!{Explore.Process}  
-						!{Explore.Graph} 
-
-		when "basic"
-			folder#xSite(dock=dock)
-				block site_body
-
-		when "insert"
-			border#xSite(head="Options,Help",crush)
-
-				block site_help
-
-				#folder(class=query.name,center,dock=dock)
-					block site_body
-
 		when "tabbed"
 			border#xSite(
 				crush, splash=true,
@@ -350,6 +301,55 @@ append base_body
 						!{Explore.Streets}  
 						!{Explore.Process}  
 						!{Explore.Graph} 
+
+		when "test"
+			folder#Fold
+				tab.One
+					p tab1 content
+					grid#test1(path="/demo.db",cols="ID...hide,Name,Counter.n.careful,Source,Description.x,Start")
+
+				tab.Two
+					p tab2 content
+
+		when "min"
+			border#xSite(
+				crush, splash=true,
+				head="Prefs(Locales,Themes),Files(Manage,Uploads,$uploads,Stores,$stores),Options,LikeUs,Help",
+				LikeUs="/likeus.db",
+				Manage="/files.view" )
+
+				block site_help
+				tab#center
+					block site_body
+
+				tab#north(class=toolbar)
+					img(src=logo,width="100%",height="80px")
+
+				tab#west(class=etc)
+					:markdown
+						!{Explore.Totem}  
+						!{Explore.Notebooks}  
+						!{Explore.API}  
+						!{Explore.SkinGuide}  
+						!{Explore.JIRA}  
+						!{Explore.RAS}  
+						!{Explore.Root}  
+						!{Explore.Earth}  
+						!{Explore.Streets}  
+						!{Explore.Process}  
+						!{Explore.Graph} 
+
+		when "basic"
+			folder#xSite(dock=dock)
+				block site_body
+
+		when "insert"
+			border#xSite(head="Options,Help",crush)
+
+				block site_help
+
+				#folder(class=query.name,center,dock=dock)
+					block site_body
 
 		when "home"
 			border#xSite(
