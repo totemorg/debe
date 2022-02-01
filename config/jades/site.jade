@@ -25,7 +25,7 @@ append base_parms
 		- secureLink = true
 		- northedit = false //query.explore ? false : true
 		- Explore = {}
-		- Object.keys(explorer).forEach( key => Explore[key] = key.link( ((explorer[key]||"").startsWith("/") ? "" : worker) + `/site.view?explore=${key}`) )
+		- Object.keys(explorer).forEach( key => Explore[key] = key.link( ((explorer[key]||"").startsWith("/") ? "" : worker) + `/site.view?explore=${key}` )
 
 	case view
 		when "draw"
