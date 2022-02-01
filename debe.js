@@ -1699,7 +1699,7 @@ Keys:
 					b:"Usage",
 					c:"Corporate",
 					d:"Follow Us",
-					e:"[Sponsorships](http://totem.hopto.org/likeus)".linkify(),
+					e:"[Sponsorships](xxx:/likeus)".linkify(),
 					f:"Fork" 
 				}); */
 			
@@ -5157,40 +5157,40 @@ size, pixels, scale, step, range, detects, infile, outfile, channel.  This endpo
 		},
 		
 		sitemap: [
-			{a: "[Terms](http://totem.hopto.org/terms.view)" ,	
-			 b: "[Issues](http://totem.hopto.org/issues.view)", 
-			 c: "[Employee Portal](http://totem.hopto.org/portal.view)",
+			{a: "[Terms](xxx:/terms.view)" ,	
+			 b: "[Issues](xxx:/issues.view)", 
+			 c: "[Employee Portal](xxx:/portal.view)",
 			 d: "[Facebook](https://facebook.com/?goto=totem)",
-			 e: "[Leaders](http://totem.hopto.org/sponsors?level=leader)",
+			 e: "[Leaders](xxx:/sponsors?level=leader)",
 			 f: "[Federated Repo](http://github.com/totemstan/dockify)"
 			},
-			{a: "[Privacy](http://totem.hopto.org/terms.new)",	
-			 b: "[API](http://totem.hopto.org/api.view)",
-			 c: "[Contact Us](http://totem.hopto.org/contact.view)",
+			{a: "[Privacy](xxx:/terms.new)",	
+			 b: "[API](xxx:/api.view)",
+			 c: "[Contact Us](xxx:/contact.view)",
 			 d: "[Twitter](https://twitter.com/?goto=totem)",
-			 e: "[Corporate](http://totem.hopto.org/sponsors?level=corporate)",
+			 e: "[Corporate](xxx:/sponsors?level=corporate)",
 			 f: "[DEBE Repo](https://github.com/totemstan/debe)"
 			},
-			{a: "[News](http://totem.hopto.org/news.view)",
-			 b: "[Skinning](http://totem.hopto.org/skinguide.view)",
-			 c: "[Career Opportunities](http://totemstan.hopto.org/contact.view)",
+			{a: "[News](xxx:/news.view)",
+			 b: "[Skinning](xxx:/skinguide.view)",
+			 c: "[Career Opportunities](xxx:/contact.view)",
 			 d: "[Instagram](http://instagram.com?goto=totem)",
-			 e: "[Platinum](http://http://totem.hopto.org/sponsors?level=platinum)",
+			 e: "[Platinum](http://xxx:/sponsors?level=platinum)",
 			 f: "[TOTEM Repo](https://github.com/totemstan/totem)"
 			},
 			{a: "[Community](http://totemstan.github.io)",
-			 b: "[Status](/status.view)",
+			 b: "[Status](xxx:/status.view)",
 			 c: "[History](http://intellipedia/swag)",
 			 d: "[Telegram](https://telegram.com?goto=totem)",
-			 e: "[Honorable](http://totem.hopto.org/sponsors?level=member)"
+			 e: "[Honorable](xxx:/sponsors?level=member)"
 			},
-			{b: "[Briefing](/briefs.view?nb=totem)",
+			{b: "[Briefing](xxx:/brief.view?name=totem)",
 			 d: "[SubStack](http://substack.com?goto=totem)"
 			},
-			{b: "[Restart](/restart) ", 
+			{b: "[Restart](xxx:/restart) ", 
 			 d: "[WeChat](http://wechat.com?goto=totem)"
 			},
-			{b: "[Notices](/email.view)",
+			{b: "[Notices](xxx:/email.view)",
 			 d: "[Parler](http://Parler.com?goto=totem)"
 			}
 		].gridify({
@@ -5198,8 +5198,8 @@ size, pixels, scale, step, range, detects, infile, outfile, channel.  This endpo
 			b:"Usage",
 			c:"Corporate",
 			d:"Follow Us",
-			e:"[Sponsorships](http://totem.hopto.org/likeus)".linkify(),
-			f:"Fork" }),
+			e:"[Sponsorships](xxx:/likeus)".linkify(),
+			f:"Fork" }).replace(/xxx:/g, `http://${site.domain}`),
 		
 		/**
 		Title ti to fileName fn
