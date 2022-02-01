@@ -4,7 +4,8 @@ append layout_help
 	:markdown
 		# base options:
 			- tech = skinning tech flow || d3 || world || usa || cubeland || forest || simple || three || reveal || scene || elFinder || isotope || apy || layout || dojo || extjs (!{tech})
-			- edit = edit switch !({query._edit})
+			- edit = edit switch !({flags.edit})
+			- nomenu = menu switch (!{flags.nomenu})
 			- highlight = code highlighting tech (!{highlight})
 			- math = enable embedded math (!{math})
 			- capture = enable browser canvas capture (!{capture})
@@ -413,7 +414,7 @@ append layout_head
 
 append layout_body
 
-	- menu = edit ? "Close".link( `/${name}.view` ) : ["Edit".link( `/${name}.view?_edit=1` ), "Help".link( `/${name}.help` ), "Mod".link( `/${name}.view?_nomod=1` )].join(" || ")
+	- menu = edit ? "Close".link( url.tag({_edit:0}) ) : ["Edit".link( url.tag({_edit:1}) ), "Help".link( `/${name}.help` ), "NoMenu".link( url.tag({_nomenu:1}) )].join(" || ")
 	span!= flags.nomod ? "" : menu
 
 	if edit

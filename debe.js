@@ -68,7 +68,9 @@ Copy({
 	@param {String} ref
 	*/
 	linkify: function (ref) {
-		return ref ? this.link(ref) : this.replace( /\[([^\[\]]*)\]\(([^\)]*)\)/g, (str,lab,url) => lab.link(url) );
+		return ref 
+			? this.link( ref ) 
+			: this.replace( /\[([^\[\]]*)\]\(([^\)]*)\)/g, (str,lab,url) => lab.link(url) );
 	},
 	
 	mailify: function ( label, tags ) {
@@ -5144,16 +5146,17 @@ size, pixels, scale, step, range, detects, infile, outfile, channel.  This endpo
 
 		explorer: {
 			Root: "/explore.view?src=/root/", 
-			Earth: `http://${site.domain}:8083/Apps/totem_index.html`, 
-			Graph: `http://${site.domain}:7474/neo4j`, 
-			Streets: `http://${site.domain}:3000/`, 
-			Process: `http://${site.domain}:1880/`, 
+			Earth: "http://${domain}:8083/Apps/totem_index.html", 
+			Graph: "http://${domain}:7474/neo4j", 
+			Streets: "http://${domain}:3000/", 
+			Process: "http://${domain}:1880/", 
 			Totem: "/brief.view?name=totem",  
 			Notebooks: "/notebooks.html", 
 			API: "/api.view", 
 			SkinGuide: "/skinguide.view", 
-			JIRA: site._jira, 
-			RAS: site._ras
+			JIRA: ENV.JIRA || "JIRA.undefined", 
+			RAS: ENV.RAS || "RAS.undefined",
+			Repo: ENV.REPO || "REPO.undefined"
 		},
 		
 		sitemap: [
@@ -7497,6 +7500,10 @@ switch ( process.argv[2] ) { // unit tests
 		Trace("site context", site);
 		break;
 	
+	case "D$":
+		Debug();
+		break;
+		
 	/**
 	See [Installation and Usage](https://sc.appdev.proj.coe/acmesds/debe)
 	@var D1
@@ -7693,14 +7700,17 @@ clients, users, system health, etc).`
 		
 	case "lab":
 		
-		config({}, sql => {
-			Trace( "Welcome to TOTEM Lab!" );
+		if ( CLUSTER.isMaster )
+			config({}, sql => {
+				Trace( "Welcome to TOTEM Lab!" );
 
-			Debug($libs, cmd => DEBE.replCmd = cmd );
-			//Each( $libs, (key,lib) => ctx[key] = lib );
-			
-			$api();
-		});
+				const 
+					{$api} = Debug($libs, cmd => DEBE.replCmd = cmd );
+
+				//Each( $libs, (key,lib) => ctx[key] = lib );
+
+				$api();
+			});
 }
 
 // UNCLASSIFIED

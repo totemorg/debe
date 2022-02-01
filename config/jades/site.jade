@@ -6,12 +6,11 @@ append base_help
 		# site options:
 			- etc = side bar links (!{etc})
 			- dock = folder docking style = left || right || top || bottom (!{dock})
-			- dims = width,height maximum widget dimensions (!{dims})
+			- dims = width,height frame dimensions (!{dims})
 			- view = site style = cesium || osm || nodered || neo4j || openlayers || home || kiss || min || basic || simple, ... (!{view})
-			- page = maximum grid rows (!{page})
-			- pulse = grid refresh rate [seconds] (!{pulse})
 			- secureLink = enable the secureLink (!{secureLink})
-			- explore = site explorer ({Object.keys(explorer).join()})
+			- explore = url to explore
+			- northedit = place editor in north paine (!{northedit})
 
 append base_parms
 
@@ -20,12 +19,11 @@ append base_parms
 		- dock = "top"
 		- dims = "100%,100%"
 		- view = query.explore ? "explore" : "tabbed"
-		- page = 50
-		- pulse = 120
 		- secureLink = true
-		- northedit = false //query.explore ? false : true
+		- northedit = false
 		- Explore = {}
-		- Object.keys(explorer).forEach( key => Explore[key] = key.link( ((explorer[key]||"").startsWith("/") ? "" : worker) + `/site.view?explore=${key}` ))
+		- ref = {hostname:$referer.hostname,port:$worker.port,domain:$referer.hostname}
+		- Object.keys(explorer).forEach( key => Explore[key] = key.linkify( "http://${hostname}:${port}/site.view?explore="+explorer[key] ).parse$(ref) )
 
 	case view
 		when "draw"
@@ -300,7 +298,8 @@ append base_body
 						!{Explore.Earth}  
 						!{Explore.Streets}  
 						!{Explore.Process}  
-						!{Explore.Graph} 
+						!{Explore.Graph}  
+						!{Explore.Repo}
 
 		when "test"
 			folder#Fold
@@ -390,8 +389,8 @@ append base_body
 
 				block site_help
 				tab#center
-					span!= query._nomod ? "" : "Open".link( explorer[query.explore]||query.explore )
-					iframe(src=explorer[query.explore]||query.explore,width="100%",height="100%",style="border:none")
+					span!= flags.nomenu ? "" : "Open".link( query.explore )
+					iframe(src=query.explore,width="100%",height="100%",style="border:none")
 					block site_body
 
 				tab#north(class=toolbar)
@@ -412,7 +411,8 @@ append base_body
 						!{Explore.Earth}  
 						!{Explore.Streets}  
 						!{Explore.Process}  
-						!{Explore.Graph} 
+						!{Explore.Graph}  
+						!{Explore.Repo}
 
 		when "kiss"
 		when "simple"
@@ -634,7 +634,6 @@ append base_body
 				grid#Search(
 					path="/catalog.db",center,crush,
 					head="Search,Execute,Print,Refresh",
-					page=100,
 					cols="Ref,Name,Link.h,Dated.d,Quality")
 
 				tab#center.home

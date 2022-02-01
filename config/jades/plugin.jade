@@ -14,8 +14,6 @@ extends site
 append site_body
 	- ds = opts.ds
 	- dsCols = opts.cols
-	- dsPage = 20
-	- dsRefresh = ""
 	- dsName = ds.charAt(0).toUpperCase()+ds.substr(1)
 	- dsPath = `/${ds}.db?!Save*`
 	- links = {}
