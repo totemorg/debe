@@ -3,7 +3,9 @@ extends base
 
 append base_help
 	:markdown
-		# site options:
+		# site
+		Provides a level-2 skinning framework with options:
+
 			- etc = side bar links (!{etc})
 			- dock = folder docking style = left || right || top || bottom (!{dock})
 			- dims = width,height frame dimensions (!{dims})
@@ -14,6 +16,8 @@ append base_help
 
 append base_parms
 
+	- tech = "layout"
+	
 	block site_parms
 		- etc = "links || status || pocs"
 		- dock = "top"
@@ -23,15 +27,7 @@ append base_parms
 		- northedit = false
 		- Explore = {}
 		- ref = {hostname:$referer.hostname,port:$worker.port,domain:$referer.hostname}
-		- Object.keys(explorer).forEach( key => Explore[key] = key.linkify( explorer[key].startsWith("/") ? explorer[key] : "http://${hostname}:${port}/site.view?explore="+explorer[key] ).parse$(ref) )
-
-	case view
-		when "draw"
-			- tech = "d3"
-		when "explore"
-			- tech = "layout"
-		default
-			- tech = "layout"
+		- Object.keys(explorer).forEach( key => Explore[key] = key.linkify( (explorer[key].startsWith("/") ? "" : "http://${hostname}:${port}")+"/site.view?explore="+explorer[key] ).parse$(ref) )
 
 append base_head
 	block site_head

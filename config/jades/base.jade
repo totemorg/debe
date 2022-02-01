@@ -2,7 +2,9 @@
 extends layout
 append layout_help
 	:markdown
-		# base options:
+		# base
+		Provides a level-1 skinning framework with options:
+
 			- tech = skinning tech flow || d3 || world || usa || cubeland || forest || simple || three || reveal || scene || elFinder || isotope || apy || layout || dojo || extjs (!{tech})
 			- edit = edit switch !({flags.edit})
 			- nomenu = menu switch (!{flags.nomenu})
@@ -25,7 +27,6 @@ append layout_parms
 	block base_parms
 		// base options
 		- tech = "layout"
-		- edit = parseInt(flags.edit)
 		- highlight = ""
 		- math = false
 		- capture = false
@@ -414,8 +415,11 @@ append layout_head
 
 append layout_body
 
-	- menu = edit ? "Close".link( url.tag({_edit:0}) ) : ["Edit".link( url.tag({_edit:1}) ), "Help".link( `/${name}.help` ), "NoMenu".link( url.tag({_nomenu:1}) )].join(" || ")
-	span!= flags.nomod ? "" : menu
+	- edit = parseInt(flags.edit)
+	- nomenu = parseInt(flags.nomenu)
+	- menu = edit ? "Close".link( url.tag("?",{_edit:0}) ) : ["Edit".link( url.tag("?", {_edit:1}) ), "Help".link( `/${name}.help` ), "NoMenu".link( url.tag("?", {_nomenu:1}) )].join(" || ")
+	
+	span!= nomenu ? "" : menu
 
 	if edit
 		- button = name => "".tag("img",{src:`/clients/icons/actions/${name}.png`,width:15,height:15}).tag("button",{id:name,text:name,value:"on",class:"btn",onclick:`edit_${name}()`})
