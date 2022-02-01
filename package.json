@@ -1,6 +1,6 @@
 {
   "name": "debe",
-  "version": "1.27.0",
+  "version": "1.28.0",
   "description": "built on totem - does everything but eat",
   "main": "debe.js",
   "scripts": {
