@@ -3,21 +3,19 @@
 extends base
 append base_help
 	:markdown
-		# Brief options:
+		# brief options:
 
 			- name = notebook to brief (!{query.name})
 			- proj = project information (!{JSON.stringify(proj)})
 
-extends site
-append site_parms
-	- view = "brief"
-	- banner = "(U) Unclassified"
-	- now = (new Date()).toUTCString()
+append base_parms
+	- tech = "reveal"
 
-append site_body
-
+append base_body
+	- module = query.name || query.notebook || query.nb
+	
 	section#title
-		p.lg= query.name
+		p.lg= module
 		p.lg= proj.Title
 		a(href=run) Notebook
 		|  | 
@@ -27,12 +25,12 @@ append site_body
 		|  | 
 		a(href=ras)= "RAS-"+proj.RAS
 		|  | 
-		a(href="/milestones.view?name=#{query.name}")= "Milestones"
-		p.al!= `${host}:/${query.name}.brief`
+		a(href="/milestones.view?name=#{module}")= "Milestones"
+		p.al!= `${host}:/${module}.brief`
 		p.al!= proj.Lead
 		p.al!= now
 
-	case query.name
+	case module
 		when "agtd"
 		when "demo"
 			section

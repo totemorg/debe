@@ -1,24 +1,19 @@
 extends base
 append base_help
 	:markdown
-		# Render project RTP:
-
+		# RTP project rendering options:
 			- src = path to notebook (!{query.src})
-			- mode = viewing mode run||exam||view||etc (!{query.mode})
-			- name = notebook name (!{query.name})
+			- project = project project (!{query.name})
 			- cols = dataset columns "key.type.label, ..." (!{query.cols})
 			- client = client viewing this notebook (!{client})
 
-		[sample](/run.help?src=/nets.run&name=gtdcsv)  
-		[example](/nets.run?name=gtdcsv)
+		[sample](/run.help?src=/nets.run&project=gtdcsv)  
+		[example](/nets.run?project=gtdcsv)
 
-extends site
-append site_parms
-	- view = "kiss"
-
-append site_body
-	- title = `${name} Research Technology Plan`
-	- folder = `/shares/${name}`
+append base_body
+	- project = query.name || name
+	- title = `${project} Research Technology Plan`
+	- folder = `/shares/${project}`
 
 	h1= title
 	img(src="#{folder}/logo.jpg")

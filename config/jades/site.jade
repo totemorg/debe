@@ -14,6 +14,7 @@ append base_help
 			- explore = site explorer (!{Object.keys(explorer).join()})
 
 append base_parms
+
 	block site_parms
 		- etc = "links || status || pocs"
 		- dock = "top"
@@ -22,15 +23,13 @@ append base_parms
 		- page = 50
 		- pulse = 120
 		- secureLink = true
-		- editskin = query.explore ? false : true
+		- northedit = false //query.explore ? false : true
 		- Explore = {}
 		- Object.keys(explorer).forEach( key => Explore[key] = key.link( ((explorer[key]||"").startsWith("/") ? "" : worker) + `/site.view?explore=${key}`) )
 
 	case view
 		when "draw"
 			- tech = "d3"
-		when "brief"
-			- tech = "reveal"
 		when "explore"
 			- tech = "layout"
 		default
@@ -130,7 +129,7 @@ append base_body
 
 				tab#north(class=toolbar)
 					img(src=logo,width="100%",height="80px")
-					if editskin
+					if northedit
 						- button = name => "".tag("img",{src:`/clients/icons/actions/${name}.png`,width:15,height:15}).tag("button",{id:name,text:name,value:"on",class:"btn",onclick:`edit_${name}()`})
 						- tools = button("save") + button("find") + button("replace") + button("show") 
 						//-
@@ -391,6 +390,7 @@ append base_body
 
 				block site_help
 				tab#center
+					span!= query._nomod ? "" : "Open".link( explorer[query.explore]||query.explore )
 					iframe(src=explorer[query.explore]||query.explore,width="100%",height="100%",style="border:none")
 					block site_body
 
@@ -402,22 +402,21 @@ append base_body
 
 				tab#west(class=etc)
 					:markdown
-						+ !{Explore.Totem}  
-						+ !{Explore.Notebooks}  
-						+ !{Explore.API}  
-						+ !{Explore.SkinGuide}  
-						+ !{Explore.JIRA}  
-						+ !{Explore.RAS}  
-						+ !{Explore.Root}  
-						+ !{Explore.Earth}  
-						+ !{Explore.Streets}  
-						+ !{Explore.Process}  
-						+ !{Explore.Graph} 
+						!{Explore.Totem}  
+						!{Explore.Notebooks}  
+						!{Explore.API}  
+						!{Explore.SkinGuide}  
+						!{Explore.JIRA}  
+						!{Explore.RAS}  
+						!{Explore.Root}  
+						!{Explore.Earth}  
+						!{Explore.Streets}  
+						!{Explore.Process}  
+						!{Explore.Graph} 
 
 		when "kiss"
 		when "simple"
-		when "brief"
-			if editskin
+			if northedit
 				- button = name => "".tag("img",{src:`/clients/icons/actions/${name}.png`,width:15,height:15}).tag("button",{id:name,text:name,value:"on",class:"btn",onclick:`edit_${name}()`})
 				- tools = button("save") + button("find") + button("replace") + button("show") 
 				//-

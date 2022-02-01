@@ -1,16 +1,16 @@
 // UNCLASSIFIED
 
-extends site
-append site_help
+extends base
+append base_help
 	:markdown
-		See also the companion [api reference](/api.jade) and the [programmers ref manual](/shares/prm/totem/index.html).
-append site_parms
-	- view = "tabbed"
-	- dock = "top"
-	- options = {tipsheets: "", blogs: "", embeds: "", workflows:"", plugins:"", odbc:"", immersions:"", finders:"", navigators:"", techpubs:"", briefs:"", visuals:""}
-append site_body
+		# skinguide options:
 
-	case query.options
+			- render = name of section to render (!{query.render})
+
+append base_body
+	- dock = "top"
+	
+	case render
 		when "embeds"
 			post#Simple.Embed(path=hosts.w3,dims="750,500",head="Refresh,Help",wrap)
 
@@ -162,310 +162,276 @@ append site_body
 			#chords.CH(path="/bank.json")
 
 		default
-			tab.Introduction
-				:markdown
-					When a SKIN.view request is made, **#{nick}** uses its [coffee-script Jade compiler](http://jade-lang.com/tutorial/)
-					to render the associated [jade file](/jades/SKIN.jade) or [jade engine](/engines.view?type=jade).
+			folder#SkinGuide(dock=dock)
+				tab.Introduction
+					:markdown
+						When a SKIN.view request is made, **#{nick}** uses its [coffee-script Jade compiler](http://jade-lang.com/tutorial/)
+						to render the associated [jade file](/jades/SKIN.jade) or [jade engine](/engines.view?type=jade).
 
-					A skin can become a framework for other skins by defining SKIN_help, SKIN_head, SKIN_parms and SKIN_body
-					blocks.  A **#{nick}** skin (e.g. [the home skin](/jades/home.jade)) typically extends [the site framework](/jades/site.jade),
-					this extending [the base framework](/jades/base.jade), this extending [the layout framework](/jades/layout.jade).
-					Other **#{nick}** skins (e.g. the [D3 force skin](/xforce.jade)) simply extend [the layout framework](/jades/layout.jade);
-					simplier skins can bypass frameworks altogether.  **#{nick}** skins (e.g. 
-					[the D3 plot](/plot.jade?help=1) or [the notebook skinner](/plugin.jade)) 
-					can accept and interpret query parameters as well.
+						A skin can become a framework for other skins by defining SKIN_help, SKIN_head, SKIN_parms and SKIN_body
+						blocks.  A **#{nick}** skin (e.g. [the home skin](/jades/home.jade)) typically extends [the site framework](/jades/site.jade),
+						this extending [the base framework](/jades/base.jade), this extending [the layout framework](/jades/layout.jade).
+						Other **#{nick}** skins (e.g. the [D3 force skin](/xforce.jade)) simply extend [the layout framework](/jades/layout.jade);
+						simplier skins can bypass frameworks altogether.  **#{nick}** skins (e.g. 
+						[the D3 plot](/plot.jade?help=1) or [the notebook skinner](/plugin.jade)) 
+						can accept and interpret query parameters as well.
 
-					Skins follow the general pattern below:
+						Skins follow the general pattern below:
 
-						extends FRAMEWORK
-						append FRAMEWORK_help
-							:markdown
-								CONTENT
-		
-						append FRAMEWORK_head
-							style.
-								CONTENT
+							extends FRAMEWORK
+							append FRAMEWORK_help
+								:markdown
+									CONTENT
 
-						append FRAMEWORK_parms
-							- PARM = VALUE || JS
-							:
-							- PARM = VALUE || JS
+							append FRAMEWORK_head
+								style.
+									CONTENT
 
-						append FRAMEWORK_body
-							:markdown
-								CONTENT
-
-							TAG(...) CONTENT
-
-							TAG(...).
-								CONTENT
-
-							WIDGET#NAME.TITLE(...)
-								CONTENT
-								tab#NAME.TITLE
+							append FRAMEWORK_parms
+								- PARM = VALUE || JS
 								:
+								- PARM = VALUE || JS
 
-					where `TAG` is any html tag and `(...)` defines its attributes.  A 
-					`folder`, `accordion`, `border`, `grid`, `pivot`, `post`, or `blog` 
-					`WIDGET` uses `tab`s to aggregates sub-widgets.  If `CONTENT` is 
-					supplied to a `WIDGET`, this html content is placed into the widget''s `north pane`.
-					A widget can post content to its `north`, `south`, `east`, and `west`  panes 
-					using its `PANE` = "URL" || "URL, URL, ..." attribute.  Tab `NAME`s are 
-					used by the `border` widget to identify its `PANE` areas; the `folder` and 
-					`accordion` widgets use their tab `TITLE` to define components.  The `CONTENT` 
-					in a `blog` widget can include:
+							append FRAMEWORK_body
+								:markdown
+									CONTENT
+
+								TAG(...) CONTENT
+
+								TAG(...).
+									CONTENT
+
+								WIDGET#NAME.TITLE(...)
+									CONTENT
+									tab#NAME.TITLE
+									:
+
+						where `TAG` is any html tag and `(...)` defines its attributes.  A 
+						`folder`, `accordion`, `border`, `grid`, `pivot`, `post`, or `blog` 
+						`WIDGET` uses `tab`s to aggregates sub-widgets.  If `CONTENT` is 
+						supplied to a `WIDGET`, this html content is placed into the widget''s `north pane`.
+						A widget can post content to its `north`, `south`, `east`, and `west`  panes 
+						using its `PANE` = "URL" || "URL, URL, ..." attribute.  Tab `NAME`s are 
+						used by the `border` widget to identify its `PANE` areas; the `folder` and 
+						`accordion` widgets use their tab `TITLE` to define components.  
 		
-						$VIEW{ SRC ? w=WIDTH & h=HEIGHT & x=KEY$INDEX & y=KEY$INDEX ... }
-						\${ JS }
-						[ LINK ] ( URL )
-						$$ inline TeX $$ || n$$ break TeX $$ || a$$ AsciiMath $$ || m$$ MathML $$
-						TeX := TeX || #VAR || VAR#KEY#KEY...
-						# SECTION
-						ESCAPE || $with || $for || $if:
-							BLOCK
+						The `CONTENT` in a `blog` widget can include:
 
-			tab.Widget.Attributes
-				:markdown
-					### Source Widget Attributes
+							$VIEW{ SRC ? w=WIDTH & h=HEIGHT & x=KEY$INDEX & y=KEY$INDEX ... }
+							\${ JS }
+							[ LINK ] ( URL )
+							$$ inline TeX $$ || n$$ break TeX $$ || a$$ AsciiMath $$ || m$$ MathML $$
+							TeX := TeX || #VAR || VAR#KEY#KEY...
+							# SECTION
+							ESCAPE || $with || $for || $if:
+								BLOCK
 
-						path = "/DS.db?QUERY" || "[{key:value,...},...]" dataset source and optional [QUERY](/api.view)
-						
-						cols = "GROUP(KEY.TYPE.TIP.QUAL, GROUP[KEY, ...], ...), ..."
+				tab.Widget.Attributes
+					:markdown
+						Source Widget Attributes:
 
-					where:
+							path = "/DS.db?QUERY" || "[{key:value,...},...]" dataset source and optional [QUERY](/api.view)
+							cols = "GROUP(KEY.TYPE.TIP.QUAL, GROUP[KEY, ...], ...), ..."
 
-						GROUP(...) GROUP-prefixes its KEYs
+						where:
 
-						GROUP[...] does not prefix its KEYs
+							GROUP(...) GROUP-prefixes its KEYs
+							GROUP[...] does not prefix its KEYs
+							KEY = file name
+							TYPE = data type
+								int | bigint | tinyint | autonum | auto
+								checkbox | boolean  
+								varchar | text  
+								html | longtext | mediumtext  
+								textarea | xtextarea | json  
+								file | svg | zilch | geometry  
+								select (using Ref-Path options from /lookups.db)
+								number | float | double  
+								date | datetime | mediumdate | defaultdate | iso8601long | iso8601short |shortdate | longdate | fulldatetime | monthday | shorttime | longtime | sortabledatetime | universalsortabledatetime | yearmonth  
+							TIP = key description  
+							QUAL = hide | lock | "option|option|..."
 
-						KEY = file name
+						Display Widget Attributes:
 
-						TYPE = data type
-							int | bigint | tinyint | autonum | auto
-							checkbox | boolean  
-							varchar | text  
-							html | longtext | mediumtext  
-							textarea | xtextarea | json  
-							file | svg | zilch | geometry  
-							select (using Ref-Path options from /lookups.db)
-							number | float | double  
-							date | datetime | mediumdate | defaultdate | iso8601long | iso8601short |shortdate | longdate | fulldatetime | monthday | shorttime | longtime | sortabledatetime | universalsortabledatetime | yearmonth  
+							status = determines hover css
+							refresh = data store refresh rate in seconds
+							sorts = "KEY, ..." add sorters
+							plugins = "crbXCRF0" editor(cell/row), selector(boX/Column/Row), Filter(F), disable(0)
+							refresh	manual data store refresher
+							spash	border nprth initially open
+							crush	allow minimization
+							hide	render but dont show
+							top = "MENU" docked to top
+							left = "MENU" docked to left
+							right = "MENU" docked to right
+							bottom = "MENU" docked to bottom
+							head = "MENU" docked to header
+							menu = "MENU" additional items
+								WIDGET, ... GROUP(SOURCE,WIDGET,SPECIAL,ACTION,LOADER,BREAK ...), ...   
+								Search | Print | Refresh | Help | Capture | Save | Status | Delta | Blog | Datasets | Agents
+								Insert | Update | Delete | Select | Execute  
+								$stores | $uploads | $positives | $negatives  
 
-						TIP = key description  
+				tab.Context.Keys
+					:markdown
+						Skinning `KEY`s are inserted using `\\#{KEY}` with or `\\!{KEY}` without html-escaping.  Notebook context keys
+						are inserted using `\\#{key}` ||  `_\\#{key}` 
+						|| `\\#{KEY}` || `\\#{Key}` inserts the url, a url-include directive, a link, or the 
+						full url.
 
-						QUAL = hide | lock | "option|option|..."
-				
-					### Display Widget Attributes
+						### session context keys
+							+ table	= dataset requested (#{table})
+							+ ds = resolved dataset requested (#{ds})
+							+ url = full url requested (#{url})
+							+ action	= request action (#{action})
+							+ agent = user agent (#{agent})
+							+ ipAddress = user IP address (#{ipAddress})
+							+ query	= request query (#{json(query)})
+							+ flags	= request flags (#{json(flags)})
+							+ joined = time session started (#{json(joined)})
+							+ client	= client's name (#{client})
+							+ profile	= client's profile (#{json(profile)})
 
-						status = determines hover css
-						refresh = data store refresh rate in seconds
-						sorts = "KEY, ..." add sorters
-						plugins = "crbXCRF0" editor(cell/row), selector(boX/Column/Row), Filter(F), disable(0)
-						refresh	manual data store refresher
-						spash	border nprth initially open
-						crush	allow minimization
-						hide	render but dont show
-						top = "MENU" docked to top
-						left = "MENU" docked to left
-						right = "MENU" docked to right
-						bottom = "MENU" docked to bottom
-						head = "MENU" docked to header
-						menu = "MENU" additional items
-							WIDGET, ... GROUP(SOURCE,WIDGET,SPECIAL,ACTION,LOADER,BREAK ...), ...   
-							Search | Print | Refresh | Help | Capture | Save | Status | Delta | Blog | Datasets | Agents
-							Insert | Update | Delete | Select | Execute  
-							$stores | $uploads | $positives | $negatives  
+						### site context keys
+							+ domain = hosting domain (#{domain})
+							+ host = full hosting domain (#{host})
+							+ db	= main database (#{db})
+							+ pocs = poc by role hash (#{json(pocs)})
+							+ title	= full site name (#{title})
+							+ nick	= site nick name (#{nick})
+							+ ver	= site version number (#{ver})
+							+ released	= site release date (#{released})
+							+ started = site started date (#{json(started)})
+							+ banner = site classification banner (#{banner})
+							+ cores = number of worker threads (#{cores})
+							+ lock	= session lock (#{json(options)})
+							+ by = by-line (#{by})
+							+ $ras = research acquisition suite (#{$ras})
+							+ $jira = researh project mgt (#{$jira})
+							+ $repo = research s/w repository (#{$repo})
 
-					### Legacy Widget Attributes
-						_cols = "KEY.TYPE.TIP.QUAL, ..."
-						_cols = "KEY*, ..."
-						_cols = "KEY*count, ..."						
-						_cols = "Pivot(NodeID,NodeCount,KEY,KEY, ...), ..."
-						KEY* matches "KEY0, KEY1, ..." if found in the **Parms** dataset  
-						KEY*N returns "KEY0, KEY1, ... KEY[N-1]"  
-						dims = "WIDTH,HEIGHT" widget dimensions
-						region = north | south | east | west | center border region
-						page = number of records to display 
-						icons = path to icon resources
-						start = widget to start skinning defaults to "content"
-						query = parameters to save in query variable
-						key = "ID" name of record key (defaults to "ID")
-						active = folder tab to make active
-						disable disable data entry (auto enabled for _N)
-						notes	include data notepad within help 
-						joins	include data joins within help 						
-						save	save view state (experimental)
-						kiss	display simple linking cues
-						wrap	forces display of header menu  
-						summary = min | max | average | count | sum | util | any | all | prod | nills 
-						calc	allow grid cell expressions and cell shifting
-						TYPE = "#..." action tokens from class img-Action-value0 | 1 | 2 ... 
-						Grids evaluate =prefixed cells as follows:
-							=Font R|G|B|K|O... 
-							=Style 0|1|2... 
-							=EXPRESSION like $f.FUNC( $.KEY ) ...
+						### notebook context keys
+							+ name (#{name})
+							+ run (#{run})
+							+ view (#{view})
+							+ content (#{content})
+							+ proj (#{JSON.stringify(proj)})
+							+ status (#{status})
+							+ archive (#{archive})
+							+ tou (#{tou})
+							+ download (#{download})
+							+ tou (#{tou})
+							+ brief (#{brief})
+							+ pub (#{pub})
+							+ repo (#{repo})
+							+ ras summary (#{ras})
+							+ jira summary (#{jira})
 
-			tab.Context.Keys
-				:markdown
-					Skinning `KEY`s are inserted using `\\#{KEY}` with or `\\!{KEY}` without html-escaping.  Notebook context keys
-					are inserted using `\\#{key}` ||  `_\\#{key}` 
-					|| `\\#{KEY}` || `\\#{Key}` inserts the url, a url-include directive, a link, or the 
-					full url.
+						### data manipulation methods
+							+ get( object list, { { new: "old",...}} )
+							+ get( object list, { where: { key: value, ... } } )
+							+ get( object list, { KEY_starts: "with", KEY_ends: "with", ...  } )
+							+ get( object list, { start: index, len: count } )
+							+ get( object list, { draw: count, mash: list || null } )
+							+ get( object list, [ index || "key", ... ] )
+							+ get( object list, index || "key" )
+							+ gridify( object list, noheader )
+							+ json( list )
+							+ hover( title, jpgShares, htmlShares )
+							+ tag( text, el, {key:value,...} )
+							+ tag( text, href )  
+							+ link({label:url, ...} || label, url)
 
-					### session context keys
-						+ table	= dataset requested (#{table})
-						+ ds = resolved dataset requested (#{ds})
-						+ url = full url requested (#{url})
-						+ action	= request action (#{action})
-						+ agent = user agent (#{agent})
-						+ ipAddress = user IP address (#{ipAddress})
-						+ query	= request query (#{json(query)})
-						+ flags	= request flags (#{json(flags)})
-						+ joined = time session started (#{json(joined)})
-						+ client	= client's name (#{client})
-						+ profile	= client's profile (#{json(profile)})
+				tab.Skinning.Frameworks
+					:markdown
+						The foundational frameworks [layout](/layout.help) => [base](/base.help) => [site](/site.help)
+						are extended by the presentation frameworks [run](/run.help), [exam](/exam.help), 
+						[brief](/brief.help) and [browse](/browse.help).
 
-					### site context keys
-						+ domain = hosting domain (#{domain})
-						+ host = full hosting domain (#{host})
-						+ db	= main database (#{db})
-						+ pocs = poc by role hash (#{json(pocs)})
-						+ title	= full site name (#{title})
-						+ nick	= site nick name (#{nick})
-						+ ver	= site version number (#{ver})
-						+ released	= site release date (#{released})
-						+ started = site started date (#{json(started)})
-						+ banner = site classification banner (#{banner})
-						+ cores = number of worker threads (#{cores})
-						+ lock	= session lock (#{json(options)})
-						+ by = by-line (#{by})
-						+ $ras = research acquisition suite (#{$ras})
-						+ $jira = researh project mgt (#{$jira})
-						+ $repo = research s/w repository (#{$repo})
+				tab.Workflows
 
-					### notebook context keys
-						+ name (#{name})
-						+ run (#{run})
-						+ view (#{view})
-						+ content (#{content})
-						+ proj (#{JSON.stringify(proj)})
-						+ status (#{status})
-						+ archive (#{archive})
-						+ tou (#{tou})
-						+ download (#{download})
-						+ tou (#{tou})
-						+ brief (#{brief})
-						+ pub (#{pub})
-						+ repo (#{repo})
-						+ ras summary (#{ras})
-						+ jira summary (#{jira})
+					folder#WF(dock="left")
+						tab.Introduction
+							:markdown
+								### Models
+								A workflow defines a network of systems.  A system (aka machine, engine or application) can be a 
+								discrete block (triggered or sampled), a state machine, or a petri net.  Each system has a URL identifing 
+								the path to a restful application that sinks and sources event tokens.  The [api](/api.jade) explains
+								the workflow engine interface.  Workflows can be defined using the [workflow editor](/workflow.jade).
 
-					### data manipulation methods
-						+ get( object list, { { new: "old",...}} )
-						+ get( object list, { where: { key: value, ... } } )
-						+ get( object list, { KEY_starts: "with", KEY_ends: "with", ...  } )
-						+ get( object list, { start: index, len: count } )
-						+ get( object list, { draw: count, mash: list || null } )
-						+ get( object list, [ index || "key", ... ] )
-						+ get( object list, index || "key" )
-						+ gridify( object list, noheader )
-						+ json( list )
-						+ hover( title, jpgShares, htmlShares )
-						+ tag( text, el, {key:value,...} )
-						+ tag( text, href )  
-						+ link({label:url, ...} || label, url)
+								Engine stats (event rates, queueing delay, utilization, drops, etc), machine states, and petri tokens are
+								logged as the client steps/advances a workflow with the specified simulation options (number of steps, 
+								step size, stats snapshot period).
 
-			tab.Skinning.Frameworks
+								Workflows are constructed using the system skins, and are compiled, linked and executed at the client
+								using the [workflow editor](/workflow.jade).  A workflow skin will thus look like:
 
-				:markdown
-					The foundational frameworks [layout](/layout.help) => [base](/base.help) => [site](/site.help)
-					are extended by the presentation frameworks [run](/run.help), [exam](/exam.help), 
-					[brief](/brief.help) and [browse](/browse.help).
+									#system.label(inputs="link,link,...",outputs="link,link,...")  
+									#system.label(inputs="link,link,...",outputs="link,link,...")  
+									#system.label(inputs="link,link,...",outputs="link,link,...")  
 
-			tab.Workflows
+								where i/o ports can accept/produce either simple or N-fold threads:
 
-				folder#WF(dock="left")
-					tab.Introduction
-						:markdown
-							### Models
-							A workflow defines a network of systems.  A system (aka machine, engine or application) can be a 
-							discrete block (triggered or sampled), a state machine, or a petri net.  Each system has a URL identifing 
-							the path to a restful application that sinks and sources event tokens.  The [api](/api.jade) explains
-							the workflow engine interface.  Workflows can be defined using the [workflow editor](/workflow.jade).
+									input link = name|N|system|name  
+									output link = name|N
 
-							Engine stats (event rates, queueing delay, utilization, drops, etc), machine states, and petri tokens are
-							logged as the client steps/advances a workflow with the specified simulation options (number of steps, 
-							step size, stats snapshot period).
+								### Threaded Models
+								System i/o ports (and their corresponding i/o event tokens) can be either simple or N-fold threaded.
+								Whereas simple ports are sampled, threaded ports are triggered.  In an algorithm chain of, say, 3 systems, 
+								with 5, 10, and 2 threaded output ports, there are 5*10*2=100 total execution threads that can be shared
+								(hyper-threaded) among K processing cores (if the server implements, say, K=4 processing cores, then 
+								no more than 100/4=25 threads are impacted by a single failing thread).
 
-							Workflows are constructed using the system skins, and are compiled, linked and executed at the client
-							using the [workflow editor](/workflow.jade).  A workflow skin will thus look like:
+								### Application Interface
+								Each system application supports TAUINIT, TAUSTEP, TAUKILL, and TAUREAD (restful PUT, POST, DELETE, GET) to
+								program, advance, deallocate and read an engine given itau, otau and state parameters: 
 
-								#system.label(inputs="link,link,...",outputs="link,link,...")  
-								#system.label(inputs="link,link,...",outputs="link,link,...")  
-								#system.label(inputs="link,link,...",outputs="link,link,...")  
+									itau = [event1, event2, ...] events being sinked to inputs ports 1,2, ... 
+									otau = [event1, event2, ...] events being sourced from output ports 1,2, ...
+									state = {simulation step count, relative simulation time, depth of queue, drops from queue, 
+											engine index, as well as a port reset, port name, and port index when stepping i/o threads}.
 
-							where i/o ports can accept/produce either simple or N-fold threads:
+						tab.Attributes
+							:markdown
+								### All systems [default value]
 
-								input link = name|N|system|name  
-								output link = name|N
+									run [false] autorun simulation with the specified simulation options
+									stats = "name" ["stats"] of simulation options in simoptions.db
+									buffers = N [0] reserved
 
-							### Threaded Models
-							System i/o ports (and their corresponding i/o event tokens) can be either simple or N-fold threaded.
-							Whereas simple ports are sampled, threaded ports are triggered.  In an algorithm chain of, say, 3 systems, 
-							with 5, 10, and 2 threaded output ports, there are 5*10*2=100 total execution threads that can be shared
-							(hyper-threaded) among K processing cores (if the server implements, say, K=4 processing cores, then 
-							no more than 100/4=25 threads are impacted by a single failing thread).
+								### Discrete systems
 
-							### Application Interface
-							Each system application supports TAUINIT, TAUSTEP, TAUKILL, and TAUREAD (restful PUT, POST, DELETE, GET) to
-							program, advance, deallocate and read an engine given itau, otau and state parameters: 
+									inputs = "link, link, ..." [""] input ports
+									outputs = "link, link, ..." [""] output ports
 
-								itau = [event1, event2, ...] events being sinked to inputs ports 1,2, ... 
-								otau = [event1, event2, ...] events being sourced from output ports 1,2, ...
-								state = {simulation step count, relative simulation time, depth of queue, drops from queue, 
-										engine index, as well as a port reset, port name, and port index when stepping i/o threads}.
+								where link = "name|N|system|name" defines an N-threaded or N=0 simple port.
 
-					tab.Attributes
-						:markdown
-							### All systems [default value]
+								### State machines:
 
-								run [false] autorun simulation with the specified simulation options
-								stats = "name" ["stats"] of simulation options in simoptions.db
-								buffers = N [0] reserved
+									routes = "route, route, ..." [""] are the routes for a state machine
 
-							### Discrete systems
+								where route = "fromState | toState | condition | exit | entry" [""] defines from-to machine states, condition code and from state exit-entry code (condition=start to define initial state).
 
-								inputs = "link, link, ..." [""] input ports
-								outputs = "link, link, ..." [""] output ports
+								### Petri nets:
 
-							where link = "name|N|system|name" defines an N-threaded or N=0 simple port.
+									markers	= "transition, transition, ..." [""] are the transitions for a petri net
 
-							### State machines:
+								where:
 
-								routes = "route, route, ..." [""] are the routes for a state machine
+									transition = "fromPlaces || transition || toPlaces" defines from-to places and transition to take-deposit petri net tokens ("n|k|..." initializes each place with n,k,... tokens).
+									places = "place | place | ..." are the places from which to take-deposit petri net tokens.
+									start = "name" ["content"] of widget to open
 
-							where route = "fromState | toState | condition | exit | entry" [""] defines from-to machine states, condition code and from state exit-entry code (condition=start to define initial state).
+						tab.Examples
+							:markdown
+								### STEP/POST example
+								A POST to system X with a state hash of {... reset:1,name:"A"} directs system X to load its 
+								input state variable "A" with the contents of the input job stream itau[0].job.  A POST to system X with a state
+								hash of {... reset:0,name:"B"} directs X to advance its output variable "B" into each 
+								output job stream otau[n].job.
 
-							### Petri nets:
+								### INIT/PUT example
 
-								markers	= "transition, transition, ..." [""] are the transitions for a petri net
+								### FREE/DELETE example
 
-							where:
-
-								transition = "fromPlaces || transition || toPlaces" defines from-to places and transition to take-deposit petri net tokens ("n|k|..." initializes each place with n,k,... tokens).
-								places = "place | place | ..." are the places from which to take-deposit petri net tokens.
-								start = "name" ["content"] of widget to open
-
-					tab.Examples
-						:markdown
-							### STEP/POST example
-							A POST to system X with a state hash of {... reset:1,name:"A"} directs system X to load its 
-							input state variable "A" with the contents of the input job stream itau[0].job.  A POST to system X with a state
-							hash of {... reset:0,name:"B"} directs X to advance its output variable "B" into each 
-							output job stream otau[n].job.
-
-							### INIT/PUT example
-
-							### FREE/DELETE example
-
-							### READ/GET example
+								### READ/GET example
