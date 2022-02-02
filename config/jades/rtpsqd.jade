@@ -2,8 +2,7 @@ extends base
 append base_help
 	:markdown
 		# RTP project rendering options:
-			- src = path to notebook (!{query.src})
-			- project = project project (!{query.name})
+			- project = project project (!{project})
 			- cols = dataset columns "key.type.label, ..." (!{query.cols})
 			- client = client viewing this notebook (!{client})
 
@@ -11,18 +10,18 @@ append base_help
 		[example](/nets.run?project=gtdcsv)
 
 append base_body
-	- project = query.name || name
+	- project = query.project || table
 	- title = `${project} Research Technology Plan`
 	- folder = `/shares/${project}`
+	- secs = {1: "Heilmeirs", 2: "Security", 3: "Risks"}
 
 	h1= title
 	img(src="#{folder}/logo.jpg")
 	iframe(src='/barplot.view',width=600,height=200)
 
 	:markdown
-		This is a RTP doc
+		This is my RTP doc for project #{project}
 
 	each i in [1,2,3]
-		:markdown
-			# [Section #{i}](/faqs.view)  
+		h1!= `${i}.${secs[i]}`.link( `/faqs.view?Seq=${i}` )
 		iframe(src="/faqs.html?Num:=Seq&Question:=Q&Answer:=A&Seq=#{i}",width=1200,height=200,style="border:none")

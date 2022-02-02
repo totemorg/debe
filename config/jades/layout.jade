@@ -6,10 +6,11 @@ block layout_parms
 	- close = "Close".link( `/${name}.view` )
 
 if type == "help"
+	span!= close
+	block layout_help
 	:markdown
-		!{close}
 		# layout
-		Provides a level-0 skinning framework with options:
+		Provides a skinning framework with options:
 
 			- prep = prepare brower (!{prep}) 
 			- cardreader = use card reader (!{cardreader})
@@ -21,8 +22,6 @@ if type == "help"
 			- query = query options (!{JSON.stringify(query)})
 			- flags = flag options (!{JSON.stringify(flags)})
 			- path = source path (!{path})
-
-	block layout_help
 
 else
 	html(lang="en")

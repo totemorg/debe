@@ -1,26 +1,32 @@
 // UNCLASSIFIED
-extends base
-append base_help
+extends site
+
+append site_help
+	block plugin_help
 	:markdown
 		# plugin
-		Provided as level-4 notebook skinning framework with options:
+		Provided a skinning framework on the `site`-framework with options:
 
 			- opts = viewing options (!{JSON.stringify(opts)})
+			- mode = notebook mode (!{mode})
 			- client = client viewing (!{client})
+			- addBrief
+			- addToU
 
 		[sample](/run.help?src=/nets.run&name=gtdcsv)  
 		[example](/nets.run?name=gtdcsv)
 
-extends site
+append site_parms
+	block plugin_parm
+		- addBrief = false
+		- addToU = false
+		- mode = opts.mode
 
 append site_body
 	- ds = opts.ds
-	- dsCols = opts.cols
 	- dsName = ds.charAt(0).toUpperCase()+ds.substr(1)
 	- dsPath = `/${ds}.db?!Save*`
 	- links = {}
-	- addBrief = false
-	- addToU = false
 
 	each val, key in {Export:"bool",Ingest:"bool",Pipe:"doc",Description:"doc",Entry:"json",Exit:"json",Save:"json"}
 		- links[key] = link("+", `/${ds}.mod?${val}=${key}`) + " / " + link("-", `/${ds}.mod?drop=${key}`) + " " + tag(key,"code",{}) + " = "
@@ -28,10 +34,7 @@ append site_body
 	each val, key in {backlog:"int",load:"float",budget:"float",cost:"float",batch:"int",limit:"int",start:"date",end:"date",every:"varchar(8)",on:"int",off:"int",rekey:"doc",watch:"int",propose:"bool",baseline:"varchar(64)",agent:"varchar(16)"}
 		- links[key] = link("+", `/${ds}.mod?${val}=Pipe_${key}`) + " / " + link("-", `/${ds}.mod?drop=Pipe_${key}`) + " " + tag("&"+key+"||Pipe_"+key,"code",{}) + " = "
 
-	//  // +"&$drop:=Save*",
-	// north="/briefs.view?nb=#{ds}",
-	
-	case opts.mode
+	case mode
 		when "debug1"
 			border#brder(splash=true)
 				tab#center
@@ -45,13 +48,13 @@ append site_body
 							grid#dataGrid(
 								path=dsPath,
 								status="started", 
-								cols=dsCols,menu="Agents",blogs="Description" )
+								cols=opts.cols,menu="Agents",blogs="Description" )
 
 		when "debug2"
 			grid#dataGrid(
 				path=dsPath,
 				status="started", 
-				cols=dsCols,menu="Agents",blogs="Description" )
+				cols=opts.cols,menu="Agents",blogs="Description" )
 	
 		when "run"
 			tab(class=dsName)
@@ -60,7 +63,7 @@ append site_body
 					path=dsPath,
 					status="started", 
 					north=addBrief ? "/brief.view?name=#{ds}" : "",
-					cols=dsCols,menu="Agents",blogs="Description" )
+					cols=opts.cols,menu="Agents",blogs="Description" )
 
 					:markdown
 						Run your *#{ds}* notebook by selecting the desired usecase context and clicking *Execute*.  
@@ -82,6 +85,7 @@ append site_body
 						> !{links.Exit} JSON save context on exit  
 						> !{links.Save} JSON store of {at:"AT",...}-events to Save_AT  
 						
+
 			tab.Jobs
 				grid#Jobs(
 					path="/queues.db?Task=#{ds}",
@@ -145,7 +149,7 @@ append site_body
 					id=ds,
 					path=dsPath,
 					status="started", 
-					cols=dsCols,menu="Agents",blogs="Description" )
+					cols=opts.cols,menu="Agents",blogs="Description" )
 
 					:markdown
 						Run your *#{ds}* notebook by selecting the desired usecase context and clicking *Execute*.  

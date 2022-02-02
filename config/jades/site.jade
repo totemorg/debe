@@ -2,32 +2,35 @@
 extends base
 
 append base_help
+	block site_help
 	:markdown
 		# site
-		Provides a level-2 skinning framework with options:
+		Provides a skinning framework on the `base`-framework with options:
 
 			- etc = side bar links (!{etc})
 			- dock = folder docking style = left || right || top || bottom (!{dock})
 			- dims = width,height frame dimensions (!{dims})
-			- view = site style = cesium || osm || nodered || neo4j || openlayers || home || kiss || min || basic || simple, ... (!{view})
+			- view = skinning style = home || kiss || min || basic || simple ... (!{view})
 			- secureLink = enable the secureLink (!{secureLink})
-			- explore = url to explore
+			- explore = url to explore (!{explore})
 			- northedit = place editor in north paine (!{northedit})
+			- name = name on center paine (!{name})
 
 append base_parms
-
 	- tech = "layout"
 	
 	block site_parms
 		- etc = "links || status || pocs"
 		- dock = "top"
 		- dims = "100%,100%"
-		- view = query.explore ? "explore" : "tabbed"
+		- explore = flags.explore || ""
+		- name = flags.name || table
+		- view = flags.view || "tabbed"
 		- secureLink = true
 		- northedit = false
 		- Explore = {}
 		- ref = {hostname:$referer.hostname,port:$worker.port,domain:$referer.hostname}
-		- Object.keys(explorer).forEach( key => Explore[key] = key.linkify( (explorer[key].startsWith("/") ? "" : "http://${hostname}:${port}")+"/site.view?explore="+explorer[key] ).parse$(ref) )
+		- Object.keys(explorer).forEach( key => Explore[key] = key.linkify( (explorer[key].startsWith("/") ? "" : "http://${hostname}:${port}")+"/site.view".tag("?",{_name:key,_explore: explorer[key]}) ).parse$(ref) )
 
 append base_head
 	block site_head
@@ -35,9 +38,8 @@ append base_head
 append base_body
 	- rand = Math.floor( Math.random() * 20 )
 	- logo = `/stash/${domain}/header${rand}.jpg`
-	- name = query.name
 	- tools = [ ((profile.Credit*1e-3).toFixed(0)+"$ "+profile.QoS+"qos"), "".tag("input", {id:"upload",class:"inputfile",type:"file",size:10,value:"/myfiles"})+"upload".tag("label",{for:"upload"})]
-	- toolbar = query.explore ? "" : (tools.join(" || ") + " || " + uses).tag("span").tag("br")
+	- toolbar = explore ? "" : (tools.join(" || ") + " || " + uses).tag("span").tag("br")
 
 	if secureLink
 		script(type="text/javascript",src="/clients/openpgp.min.js")
@@ -67,10 +69,16 @@ append base_body
 				LikeUs="/likeus.db",
 				Manage="/files.view" )
 
-				block site_help
-				tab#center
-					folder#xFolder(dock=dock)
+				p some info
+				tab#center(class=name)
+					if explore
+						span!= flags.nomenu ? "" : "Open".link( explore )
+						iframe(src=explore.tag("?",{_view:"kiss"}),width="100%",height="100%",style="border:none")
 						block site_body
+
+					else
+						folder#xFolder(dock=dock)
+							block site_body
 
 				tab#north(class=toolbar)
 					img(src=logo,width="100%",height="80px")
@@ -295,7 +303,8 @@ append base_body
 						!{Explore.Streets}  
 						!{Explore.Process}  
 						!{Explore.Graph}  
-						!{Explore.Repo}
+						!{Explore.Repo}  
+						!{Explore.Survey}  
 
 		when "test"
 			folder#Fold
@@ -333,7 +342,8 @@ append base_body
 						!{Explore.Streets}  
 						!{Explore.Process}  
 						!{Explore.Graph} 
-
+						!{Explore.Repo}  
+						!{Explore.Survey}  
 		when "basic"
 			folder#xSite(dock=dock)
 				block site_body
@@ -342,8 +352,7 @@ append base_body
 			border#xSite(head="Options,Help",crush)
 
 				block site_help
-
-				#folder(class=query.name,center,dock=dock)
+				#folder(class=name,center,dock=dock)
 					block site_body
 
 		when "home"
@@ -353,9 +362,9 @@ append base_body
 				LikeUs="/likeus.db" )
 
 				block site_help
-				// #post.xBrief(path="/briefs.view?notebook=#{query.name}",dims="600,300")
+				// #post.xBrief(path="/briefs.view?notebook=#{name}",dims="600,300")
 
-				tab#center(class=query.name)
+				tab#center(class=name)
 					block site_body
 
 		when "monster"
@@ -365,7 +374,7 @@ append base_body
 				LikeUs="/likeus.db")
 
 				block site_help
-				// #post.xBrief(path="/briefs.view?notebook=#{query.name}",dims="600,300")
+				// #post.xBrief(path="/briefs.view?notebook=#{name}",dims="600,300")
 
 				//
 					#pivot.Helpful.Links(
@@ -373,251 +382,14 @@ append base_body
 					path="/sidebars.db",
 					cols="Pivot(NodeID,Topic),Special")
 
-				tab#center(class=query.name)
+				tab#center(class=name)
 					block site_body
-
-		when "explore"
-			border#xSite(
-				crush, splash=true,
-				head="Prefs(Locales,Themes),Files(Manage,Uploads,$uploads,Stores,$stores),Options,LikeUs,Help",
-				LikeUs="/likeus.db",
-				Manage="/files.view" )
-
-				block site_help
-				tab#center
-					span!= flags.nomenu ? "" : "Open".link( query.explore )
-					iframe(src=query.explore,width="100%",height="100%",style="border:none")
-					block site_body
-
-				tab#north(class=toolbar)
-					img(src=logo,width="100%",height="80px")
-
-				tab#south
-					p!= sitemap
-
-				tab#west(class=etc)
-					:markdown
-						!{Explore.Totem}  
-						!{Explore.Notebooks}  
-						!{Explore.API}  
-						!{Explore.SkinGuide}  
-						!{Explore.JIRA}  
-						!{Explore.RAS}  
-						!{Explore.Root}  
-						!{Explore.Earth}  
-						!{Explore.Streets}  
-						!{Explore.Process}  
-						!{Explore.Graph}  
-						!{Explore.Repo}
 
 		when "kiss"
 		when "simple"
-			if northedit
-				- button = name => "".tag("img",{src:`/clients/icons/actions/${name}.png`,width:15,height:15}).tag("button",{id:name,text:name,value:"on",class:"btn",onclick:`edit_${name}()`})
-				- tools = button("save") + button("find") + button("replace") + button("show") 
-				//-
-				style.
-					#aceEdit {
-						position: relative;
-						top: 0;
-						right: 0;
-						bottom: 0;
-						left: 0;
-						height: 200px;
-						width: 100%;
-					}
-					.app_editor {
-						height: 300px;
-					}
-					.app_editor_wrapper {
-						background-color: #cccccc;
-						border-bottom: 1px solid #222222;
-					}
-					.app_editor_dragbar {
-						background-color: #222222;
-						width: 100%;
-						height: 4px;
-						cursor: row-resize;
-						opacity: 1;
-					}
-
-				//-
-				script(type="text/javascript",src="/clients/acemin/ace.js")
-				//script(type="text/javascript",src="/clients/acemin/ext-linking.js")
-				script(type="text/javascript",src="/clients/acemin/ext-language_tools.js")
-
-				span!= tools
-
-				//-
-				#aceEdit_wrapper.app_editor_wrapper
-					#aceEdit.app_editor
-					#aceEdit_dragbar.app_editor_dragbar
-
-				//-
-				script.
-					function edit_save() {
-						Ajax({
-							code: ed.getValue()
-						}, "put", `/engines?name=#{table}`, res => {
-							alert("save #{table}");
-							//alert(res);
-						});
-					}
-					function edit_find() {
-						alert("find");
-					}
-					function edit_replace() {
-						alert("replace");
-					}
-					function edit_show() {
-						const 
-							ctx_editor = document.getElementById("aceEdit"),
-							rect = ctx_editor.getBoundingClientRect();
-
-						ctx_editor.style.height = "10px";
-						ctx_editor.style.opacity = 1;
-						ed.resize();
-					}
-
-					const ed = ace.edit("aceEdit", {
-						value: unescape("#{escape(skin)}"), 	// escape to avoid jade bug
-						newLineMode: "linux",
-						mode: "ace/mode/coffee",
-						//mode: "ace/mode/javascript",
-						//mode: "ace/mode/asciidoc",
-						theme: "ace/theme/chaos",
-						selectionStyle: "text",
-						autoScrollEditorIntoView: true,
-						copyWithEmptySelection: true,
-						fontSize: 16,
-						highlightActiveLine: true,
-						hScrollBarAlwaysVisible: true,
-						vScrollBarAlwaysVisible: true,
-
-						// auto complete requires ext-language scripts
-						//enableBasicAutocompletion: true,	
-						//enableLiveAutocompletion: true,
-
-						// code folding
-						foldStyle: "markbegin",
-						showGutter: true,
-						showLineNumbers: true,
-						showFoldWidgets: true 
-
-						// text linking requires ext-linking scripts
-						// https://ourcodeworld.com/articles/read/994/how-to-make-an-ace-editor-instance-resizable-by-the-user-dinamically-with-a-drag-and-drop-bar
-						// https://ourcodeworld.com/articles/read/994/how-to-make-an-ace-editor-instance-resizable-by-the-user-dinamically-with-a-drag-and-drop-bar
-						//enableLinking: true
-					}); 
-
-					ed.on("linkClick", data => {	// text-linking
-						console.log("CLICK", data); 
-						if (data && data.token && data.token.type == "link") 
-							window.open(data.token.value, "_blank");
-
-						function GetWordByPos(str, pos) {	// get only one word from the whole string
-							var left = str.substr(0, pos);
-							var right = str.substr(pos);
-
-							left = left.replace(/^.+ /g, "");
-							right = right.replace(/ .+$/g, "");
-
-							alert("get="+ left + right);
-							return left + right;
-						}
-
-						var pos = data.position.column;
-						var token = data.token.value;
-						var url = GetWordByPos(token,pos);
-						alert('You clicked on '+url);
-					});
-
-					// Global variable to store the ids of the status of the current dragged ace editor.
-					window.draggingAceEditor = {};
-
-					function makeAceEditorResizable(editor) {
-						var id_editor = editor.container.id;
-						var id_dragbar = id_editor + '_dragbar';
-						var id_wrapper =  id_editor + '_wrapper';
-						var wpoffset = 0;
-						window.draggingAceEditor[id_editor] = false;
-
-						var action_mousedown = function(e) {
-							e.preventDefault();
-
-							window.draggingAceEditor[id_editor] = true;
-
-							// Set editor opacity to 0 to make transparent so our wrapper div shows
-							document.getElementById(id_editor).style.opacity = 0;
-
-							document.addEventListener("mousemove", action_document_mousemove);
-						};
-
-						var action_document_mousemove = function(e) {
-							e.preventDefault();
-							var _editor = document.getElementById(id_editor);
-							var rect = _editor.getBoundingClientRect();
-
-							var rsl = {
-								top: rect.top + document.body.scrollTop
-							};
-
-							var top_offset = rsl.top - wpoffset;
-
-							var actualY = e.pageY - wpoffset;
-
-							// editor height
-							var eheight = actualY - top_offset;
-
-							// Set wrapper height
-							document.getElementById(id_wrapper).style.height = eheight;
-
-							// Set dragbar opacity while dragging (set to 0 to not show)
-							document.getElementById(id_dragbar).style.opacity =  0.15;
-						};
-
-						document.getElementById(id_dragbar).addEventListener("mousedown", action_mousedown);
-
-						var action_mouseup = function(e) {
-							if (window.draggingAceEditor[id_editor]) {
-								var ctx_editor = document.getElementById(id_editor);
-
-								var rect = ctx_editor.getBoundingClientRect();
-
-								var rsl = {
-									top: rect.top + document.body.scrollTop
-								};
-
-								var actualY = e.pageY - wpoffset;
-								var top_offset = rsl.top - wpoffset;
-								var eheight = actualY - top_offset;
-
-								document.removeEventListener("mousemove", action_document_mousemove);
-
-								// Set dragbar opacity back to 1
-								document.getElementById(id_dragbar).style.opacity = 1;
-
-								// Set height on actual editor element, and opacity back to 1
-								ctx_editor.style.height = eheight + "px";
-								ctx_editor.style.opacity = 1;
-
-								// Trigger ace editor resize()
-								editor.resize();
-
-								window.draggingAceEditor[id_editor] = true;
-							}
-
-							else {
-								//editor.resize();
-							}
-						};
-
-						document.addEventListener("mouseup", action_mouseup);
-					}
-
-					makeAceEditorResizable(ed);
-			block site_help
-			block site_body
+			if explore
+				span!= flags.nomenu ? "" : "Open".link( explore )
+				iframe(src=explore.tag("?",{_view:"kiss"}),width="100%",height="100%",style="border:none")
 
 		when "search"
 			border#xSite(
@@ -644,7 +416,7 @@ append base_body
 				Manage="/files.view")
 
 				block site_help
-				// #post.xBrief(path="/briefs.view?notebook=#{query.name}",dims="600,300")
+				// #post.xBrief(path="/briefs.view?notebook=#{name}",dims="600,300")
 
 				tab#center.home
 					block site_body

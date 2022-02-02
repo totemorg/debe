@@ -5170,7 +5170,8 @@ size, pixels, scale, step, range, detects, infile, outfile, channel.  This endpo
 			SkinGuide: "/skinguide.view", 
 			JIRA: ENV.JIRA || "JIRA.undefined", 
 			RAS: ENV.RAS || "RAS.undefined",
-			Repo: ENV.REPO || "REPO.undefined"
+			Repo: ENV.REPO || "REPO.undefined",
+			Survey: "/survey.view"
 		},
 		
 		sitemap: [
@@ -7525,20 +7526,21 @@ switch ( mode = process.argv[2] ) { // unit tests
 			{dogs,$libs} = DEBE,
 			{$api} = $libs;
 
-		config({cores:0}, sql => {
+		config({cores:1}, sql => {
 		
-			if ( CLUSTER.isMaster )
-			switch (mode) {
-				case "D$":
-					Debug( );
-					break;
+			if ( CLUSTER.isMaster ) {
+				switch (mode) {
+					case "D$":
+						Debug( );
+						break;
 
-				case "lab":
-					Debug( $libs );
-					break;
+					case "lab":
+						Debug( $libs );
+						break;
+				}
+
+				$api();
 			}
-
-			$api();
 		});
 
 		break;
