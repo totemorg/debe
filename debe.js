@@ -7509,7 +7509,6 @@ To connect to ${site.Nick} from Windows:
 
 }
 
-if ( CLUSTER.isMaster )
 switch ( mode = process.argv[2] ) { // unit tests
 	case "D?":
 	case "?":
@@ -7528,6 +7527,7 @@ switch ( mode = process.argv[2] ) { // unit tests
 
 		config({cores:0}, sql => {
 		
+			if ( CLUSTER.isMaster )
 			switch (mode) {
 				case "D$":
 					Debug( );
