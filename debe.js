@@ -1323,6 +1323,8 @@ as described in the [Notebooks api](/api.view). `,
 		}
 
 		function initLAB(cb) {
+			// notebooks
+			
 			const 
 				foci = {},
 				{ $notebooks } = $libs,
@@ -1330,6 +1332,8 @@ as described in the [Notebooks api](/api.view). `,
 				toggle = {
 					chain: false
 				};
+			
+			cb();
 			
 			sql.getTables( "app", books => {	// config notebook i/f
 				books.forEach( book => {
@@ -1603,8 +1607,18 @@ Keys:
 							return toggle.chain ? $me : null;
 						});
 				});
-				cb();
 			});
+
+			// watchdogs
+			
+			const
+				{dogs} = DEBE;
+			
+			Each( dogs, (name,dog) => {
+				$libs["$$"+name] = function () { Log("Dogging",name); sqlThread(sql => dog(sql)); } 
+			});
+			
+			site.watchDogs = Object.keys(dogs).map( key => key ).join(", ");			
 		}
 		
 		/*
@@ -5453,6 +5467,8 @@ size, pixels, scale, step, range, detects, infile, outfile, channel.  This endpo
 	//blindTesting : false		//< Enable for double-blind testing 
 }, TOTEM, ".");
 
+//DEBE.$libs.$debe = DEBE;
+
 /**
 Process an bySOAP session peer-to-peer request.  Currently customized for Hydra-peer and 
 could/should be revised to support more generic peer-to-peer bySOAP interfaces.
@@ -7493,7 +7509,8 @@ To connect to ${site.Nick} from Windows:
 
 }
 
-switch ( process.argv[2] ) { // unit tests
+if ( CLUSTER.isMaster )
+switch ( mode = process.argv[2] ) { // unit tests
 	case "D?":
 	case "?":
 		Trace("unit test with 'node debe [D$ || D1 || ...]'");
@@ -7501,7 +7518,29 @@ switch ( process.argv[2] ) { // unit tests
 		break;
 	
 	case "D$":
-		Debug();
+	case "lab":
+		
+		Trace(`Welcome to TOTEM ${mode}!`);
+			  
+		const
+			{dogs,$libs} = DEBE,
+			{$api} = $libs;
+
+		config({cores:0}, sql => {
+		
+			switch (mode) {
+				case "D$":
+					Debug( );
+					break;
+
+				case "lab":
+					Debug( $libs );
+					break;
+			}
+
+			$api();
+		});
+
 		break;
 		
 	/**
@@ -7510,6 +7549,7 @@ switch ( process.argv[2] ) { // unit tests
 	@memberof UnitTest
 	*/
 
+	case "D1":
 	case "admin":
 		const
 			{ ingestFile } = require("../geohack");
@@ -7698,19 +7738,18 @@ clients, users, system health, etc).`
 		});
 		break;
 		
-	case "lab":
+	case "xxxlab":
 		
-		if ( CLUSTER.isMaster )
-			config({}, sql => {
-				Trace( "Welcome to TOTEM Lab!" );
+		config({}, sql => {
+			Trace( "Welcome to TOTEM Lab!" );
 
-				const 
-					{$api} = Debug($libs, cmd => DEBE.replCmd = cmd );
+			const 
+				{$api} = Debug($libs, cmd => DEBE.replCmd = cmd );
 
-				//Each( $libs, (key,lib) => ctx[key] = lib );
+			//Each( $libs, (key,lib) => ctx[key] = lib );
 
-				$api();
-			});
+			$api();
+		});
 }
 
 // UNCLASSIFIED
