@@ -59,6 +59,73 @@ append base_body
 
 	//-
 	case project
+		when "gtd"
+		when "agtd"
+			section
+				div.al
+					:markdown
+						Welcome to the AGTD Harvestor [1] test / demostration portals:
+							[System Requirements and Demos Briefing](/artifacts/agtd/AGTD_System_Requirements_WWW.ppsx)
+							[This Test Portal](/brief.view?nb=demo)
+							[Repo Artifact](#{Lookups.repos.agtd}/raw/master/AGTD_System_Requirements_WWW.ppsx)
+
+						Before accessing AGTD repo artificats, you must first 
+						<a href="https://github.com/phortitude/">signin to the AGTD repo</a>.
+						If you do not yet have an AGTD repo signin, please request an account from one of our 
+						<a href="mailto:#{Lookups.pocs.agtd}&subject=please add me to AGTD repo">
+							project scientist
+						</a>.
+
+						When running your tests from a MSPPT portal, zoom into your test inset (e.g. the Word Cloud), 
+						then click a Demo link of interest.  The "Word Cloud 26 Demo", for example, uses 26 scrapped documents to 
+						demonstrate how we expect the item harvestor to implement its requirement to validate its scrapped results.  
+						Each test will download a small javascript to your browser. 
+						To customize your tests, you may click the Notebook link beside any Demo link.  
+
+						The AGTD Harvestor is also evaluating your SBU as a potential test portal [1]:
+							<a href="file:///#{Lookups.paths.sbu}\AGTD\System Requirements Briefing.ppsx">
+								System Requirements and Demos
+							</a> [2] or
+							<a href="/brief.view?nb=demo">
+								This Testing Portal
+							</a> [3].
+
+						[1] As the prototype AGTD Harvestor is NON OPERATIONAL, you may need to contact our 
+						<a href="mailto:#{Lookups.pocs.agtd}&subject=please make the prototype AGTD Harvestor available for testing">
+							project scientists
+						</a> to request that the Harvestor be enabled for your tests.
+
+						[2] Due to SBU issues, this interface is available only from your IE browser.  Links within this briefing
+						will prompt for your PIN (often hidden behind the main window).  Please submit your remedy tickets to your Enterprise Service Center to 
+						correct these problems.
+
+						[3] Due to SBU service issues, this interface is available only from your Chrome browser. Please submit your remedy tickets to your Enterprise Service Center to 
+						correct these problems.
+
+						[4] If you have been officially asked to serve as an AGTD tester, please complete your Word Cloud test described above,
+						then snapshot your screen and submit this snapshot to our 
+						<a href="mailto:#{Lookups.pocs.agtd}&subject=please evaluate my AGTD Harvestor test results">
+							project scientist
+						</a>.
+			section
+				h4 Demos
+				br
+				a(href="/demo.blog?key=Description&name=google%20search") Title Mutations
+				|  | 
+				a(href="/demo.view?name=Google%20Search") Notebook
+				br
+				a(href="/conf.blog?key=Description&name=family&subs=true") Dead Links
+				|  | 
+				a(href="/conf.view?name=family") Notebook
+				br
+				a(href="/proxies.html") Google Backdoor Traps
+				|  | 
+				a(href="/proxies.view") Notebook
+				br
+				a(href="/demo.blog?key=Description&name=moderate%20wordcloud&subs=false") Scrape Validations
+				|  | 
+				a(href="/demo.view?name=moderate%20wordcloud") Notebook
+		
 		when "browse"
 			section
 				iframe(src="/fan.view?src=info&w=4000&h=800",width=2000,height=800)
