@@ -1647,7 +1647,7 @@ Keys:
 				if ( false ) startNews(sql);
 
 				startMail( err => {
-					if (true)
+					if (false)
 					sendMail({		// notify admin service started
 						to: "brian.d.james@comcast.net", //site.pocs.admin,
 						subject: site.nick + " started", 
@@ -5164,7 +5164,7 @@ size, pixels, scale, step, range, detects, infile, outfile, channel.  This endpo
 			Graph: "http://${domain}:7474/neo4j", 
 			Streets: "http://${domain}:3000/", 
 			Process: "http://${domain}:1880/", 
-			Totem: "/brief.view?name=totem",  
+			Totem: "/brief.view?_project=totem",  
 			Notebooks: "/notebooks.html", 
 			API: "/api.view", 
 			SkinGuide: "/skinguide.view", 

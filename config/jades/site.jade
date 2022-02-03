@@ -5,7 +5,7 @@ append base_help
 	block site_help
 	:markdown
 		# site
-		Provides a skinning framework on the `base`-framework with options:
+		Provides a skinning framework with options:
 
 			- etc = side bar links (!{etc})
 			- dock = folder docking style = left || right || top || bottom (!{dock})
@@ -14,7 +14,7 @@ append base_help
 			- secureLink = enable the secureLink (!{secureLink})
 			- explore = url to explore (!{explore})
 			- northedit = place editor in north paine (!{northedit})
-			- name = name on center paine (!{name})
+			- project = name of project (!{project})
 
 append base_parms
 	- tech = "layout"
@@ -24,13 +24,13 @@ append base_parms
 		- dock = "top"
 		- dims = "100%,100%"
 		- explore = flags.explore || ""
-		- name = flags.name || table
+		- project = flags.project || table
 		- view = flags.view || "tabbed"
 		- secureLink = true
 		- northedit = false
 		- Explore = {}
-		- ref = {hostname:$referer.hostname,port:$worker.port,domain:$referer.hostname}
-		- Object.keys(explorer).forEach( key => Explore[key] = key.linkify( (explorer[key].startsWith("/") ? "" : "http://${hostname}:${port}")+"/site.view".tag("?",{_name:key,_explore: explorer[key]}) ).parse$(ref) )
+		- ref = {hostname:referer.hostname,port:$worker.port,domain:referer.hostname}
+		- Object.keys(explorer).forEach( key => Explore[key] = key.linkify( (explorer[key].startsWith("/") ? "" : "http://${hostname}:${port}")+"/site.view".tag("?",{_project:key,_explore: explorer[key]}) ).parse$(ref) )
 
 append base_head
 	block site_head
@@ -41,7 +41,7 @@ append base_body
 	- tools = [ ((profile.Credit*1e-3).toFixed(0)+"$ "+profile.QoS+"qos"), "".tag("input", {id:"upload",class:"inputfile",type:"file",size:10,value:"/myfiles"})+"upload".tag("label",{for:"upload"})]
 	- toolbar = explore ? "" : (tools.join(" || ") + " || " + uses).tag("span").tag("br")
 
-	if secureLink
+	if secureLink && !explore
 		script(type="text/javascript",src="/clients/openpgp.min.js")
 		script(type="text/javascript",src="/uis/uilink.js")
 		link(rel='stylesheet',href='/uis/uilink.css')
@@ -70,7 +70,7 @@ append base_body
 				Manage="/files.view" )
 
 				p some info
-				tab#center(class=name)
+				tab#center(class=project)
 					if explore
 						span!= flags.nomenu ? "" : "Open".link( explore )
 						iframe(src=explore.tag("?",{_view:"kiss"}),width="100%",height="100%",style="border:none")
@@ -352,7 +352,7 @@ append base_body
 			border#xSite(head="Options,Help",crush)
 
 				block site_help
-				#folder(class=name,center,dock=dock)
+				#folder(class=project,center,dock=dock)
 					block site_body
 
 		when "home"
@@ -362,9 +362,9 @@ append base_body
 				LikeUs="/likeus.db" )
 
 				block site_help
-				// #post.xBrief(path="/briefs.view?notebook=#{name}",dims="600,300")
+				// #post.xBrief(path="/briefs.view?notebook=#{project}",dims="600,300")
 
-				tab#center(class=name)
+				tab#center(class=project)
 					block site_body
 
 		when "monster"
@@ -382,7 +382,7 @@ append base_body
 					path="/sidebars.db",
 					cols="Pivot(NodeID,Topic),Special")
 
-				tab#center(class=name)
+				tab#center(class=project)
 					block site_body
 
 		when "kiss"

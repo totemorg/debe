@@ -1,11 +1,12 @@
 extends base
 append base_help
+	block explore_help
 	:markdown
-		# Explore files and json stores with options:
+		# explore
+		Explore files and json stores with options:
 
-			- name = notebook (!{query.name})
 			- src = path to json source (!{query.src})
-			- json = name of json store (!{query.json})
+			- json = path to json store (!{query.json})
 
 		[sample](/explore.help?json=Save_baseline$&src=/nets.json?name=gtdcsv)  
 		[example](/explore.view?json=Save_baseline$&src=/nets.json?name=gtdcsv)

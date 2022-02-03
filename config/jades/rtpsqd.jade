@@ -1,16 +1,17 @@
 extends base
 append base_help
 	:markdown
-		# RTP project rendering options:
-			- project = project project (!{project})
-			- cols = dataset columns "key.type.label, ..." (!{query.cols})
-			- client = client viewing this notebook (!{client})
+		# rtpsqd
+		Provides a project RTP with options:
 
-		[sample](/run.help?src=/nets.run&project=gtdcsv)  
-		[example](/nets.run?project=gtdcsv)
+			- project = project project (!{project})
+			- client = client viewing this RTP (!{client})
+
+		[nets sample](/nets.help?src=/nets.run&project=gtdcsv)  
+		[nets example](/nets.rtp)
 
 append base_body
-	- project = query.project || table
+	- project = flags.project || table
 	- title = `${project} Research Technology Plan`
 	- folder = `/shares/${project}`
 	- secs = {1: "Heilmeirs", 2: "Security", 3: "Risks"}

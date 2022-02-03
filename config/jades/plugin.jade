@@ -5,7 +5,7 @@ append site_help
 	block plugin_help
 	:markdown
 		# plugin
-		Provided a skinning framework on the `site`-framework with options:
+		Provided a skinning framework with options:
 
 			- opts = viewing options (!{JSON.stringify(opts)})
 			- mode = notebook mode (!{mode})
@@ -13,17 +13,17 @@ append site_help
 			- addBrief
 			- addToU
 
-		[sample](/run.help?src=/nets.run&name=gtdcsv)  
-		[example](/nets.run?name=gtdcsv)
+		[sample](/plugin.help)  
+		[example](/plugin.run)
 
 append site_parms
 	block plugin_parm
 		- addBrief = false
 		- addToU = false
-		- mode = opts.mode
+		- mode = opts ? opts.mode : "noopts"
 
 append site_body
-	- ds = opts.ds
+	- ds = opts ? opts.ds : "noopts"
 	- dsName = ds.charAt(0).toUpperCase()+ds.substr(1)
 	- dsPath = `/${ds}.db?!Save*`
 	- links = {}
@@ -35,6 +35,10 @@ append site_body
 		- links[key] = link("+", `/${ds}.mod?${val}=Pipe_${key}`) + " / " + link("-", `/${ds}.mod?drop=Pipe_${key}`) + " " + tag("&"+key+"||Pipe_"+key,"code",{}) + " = "
 
 	case mode
+		when "noopts"
+			script.
+				alert("plugin should be used by Totem");
+
 		when "debug1"
 			border#brder(splash=true)
 				tab#center

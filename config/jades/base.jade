@@ -4,7 +4,7 @@ append layout_help
 	block base_help
 	:markdown
 		# base
-		Provides a skinning framework on the `layout`-framework with options:
+		Provides a skinning framework with options:
 
 			- tech = skinning tech flow || d3 || world || usa || cubeland || forest || simple || three || reveal || scene || elFinder || isotope || apy || layout || dojo || extjs (!{tech})
 			- edit = edit switch !({flags.edit})
@@ -642,7 +642,7 @@ append layout_body
 
 		when "reveal"
 			header
-				p.rd.ar.sm #{banner} || #{client} || 
+				p.R.ar.sm #{banner} || #{client} || 
 					a(href="/briefs.view?notebook=#{name}", title="Open in new window") Open
 					|  || 
 					a(href="/tutorial.view?print-pdf=1", title="Print this tutorial") Print
@@ -653,7 +653,7 @@ append layout_body
 				img.ir(src="/stash/#{domain}/header0.jpg",width="50%",height="5%")
 			footer
 				block reveal_help
-				p.rd.al.sm #{banner}
+				p.R.al.sm #{banner}
 			//
 				footer
 				img.ac(src="/stash/#{domain}/footer.jpg",width="90%",height="1%")
@@ -662,7 +662,7 @@ append layout_body
 					a(href="/skinguide.view") Skinning
 					|  || 
 					a(href="/api.view") API
-			.reveal(style="width:100%;height:100%;")
+			.reveal(style="width:100%;height:90%;")
 				// .progress // .control // .status-background // .pause-overlay
 				.slides
 					block base_body
