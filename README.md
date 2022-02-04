@@ -54,22 +54,22 @@ Clone **TOTEM** from one of its repos:
 	git clone https://sc.appdev.proj.coe/acmesds/totem
 	git clone https://gitlab.west.nga.ic.gov/acmesds/totem
 
-then install its dependencies:
+## Dependencies
 
-+ **ENUMS** [WWW](https://github.com/totemstan/enums)  [COE](https://sc.appdev.proj.coe/acmesds/enums)  [SBU](https://gitlab.west.nga.ic.gov/acmesds/enums)  
-+ **SECLINK** [WWW](https://github.com/totemstan/securelink)  [COE](https://sc.appdev.proj.coe/acmesds/securelink)  [SBU](https://gitlab.west.nga.ic.gov/acmesds/securelink)  
-+ **SOCKETIO** [WWW](https://github.com/totemstan/socketio)  [COE](https://sc.appdev.proj.coe/acmesds/socketio)  [SBU](https://gitlab.west.nga.ic.gov/acmesds/socketio)  
-+ **JSDB** [WWW](https://github.com/totemstan/jsdb)  [COE](https://sc.appdev.proj.coe/acmesds/jsdb)  [SBU](https://gitlab.west.nga.ic.gov/acmesds/jsdb)  
-+ **GEOHACK** [WWW](https://github.com/totemstan/geohack)  [COE](https://sc.appdev.proj.coe/acmesds/geohack)  [SBU](https://gitlab.west.nga.ic.gov/acmesds/geohack)  
-+ **ATOMIC** [WWW](https://github.com/totemstan/atomic)  [COE](https://sc.appdev.proj.coe/acmesds/atomic)  [SBU](https://gitlab.west.nga.ic.gov/acmesds/atomic)  
-+ **TOTEM** [WWW](https://github.com/totemstan/totem)  [COE](https://sc.appdev.proj.coe/acmesds/totem)  [SBU](https://gitlab.west.nga.ic.gov/acmesds/totem)  
-+ **RANDPR** [WWW](https://github.com/totemstan/randpr)  [COE](https://sc.appdev.proj.coe/acmesds/randpr)  [SBU](https://gitlab.west.nga.ic.gov/acmesds/randpr)  
-+ **MAN** [WWW](https://github.com/totemstan/man)  [COE](https://sc.appdev.proj.coe/acmesds/man)  [SBU](https://gitlab.west.nga.ic.gov/acmesds/man)  
-+ **READER** [WWW](https://github.com/totemstan/reader)  [COE](https://sc.appdev.proj.coe/acmesds/reader)  [SBU](https://gitlab.west.nga.ic.gov/acmesds/reader)  
-+ **PIPE** [WWW](https://github.com/totemstan/pipe)  [COE](https://sc.appdev.proj.coe/acmesds/pipe)  [SBU](https://gitlab.west.nga.ic.gov/acmesds/pipe)  
-+ **BLOG** [WWW](https://github.com/totemstan/blog)  [COE](https://sc.appdev.proj.coe/acmesds/blog)  [SBU](https://gitlab.west.nga.ic.gov/acmesds/blog)  
-+ **SKIN** [WWW](https://github.com/totemstan/skin)  [COE](https://sc.appdev.proj.coe/acmesds/skin)  [SBU](https://gitlab.west.nga.ic.gov/acmesds/skin)  
-+ **DOGS** [WWW](https://github.com/totemstan/dogs)  [COE](https://sc.appdev.proj.coe/acmesds/dogs)  [SBU](https://gitlab.west.nga.ic.gov/acmesds/dogs)  
+	**ENUMS** [WWW](https://github.com/totemstan/enums)  [COE](https://sc.appdev.proj.coe/acmesds/enums)  [SBU](https://gitlab.west.nga.ic.gov/acmesds/enums)  
+	**SECLINK** [WWW](https://github.com/totemstan/securelink)  [COE](https://sc.appdev.proj.coe/acmesds/securelink)  [SBU](https://gitlab.west.nga.ic.gov/acmesds/securelink)  
+	**SOCKETIO** [WWW](https://github.com/totemstan/socketio)  [COE](https://sc.appdev.proj.coe/acmesds/socketio)  [SBU](https://gitlab.west.nga.ic.gov/acmesds/socketio)  
+	**JSDB** [WWW](https://github.com/totemstan/jsdb)  [COE](https://sc.appdev.proj.coe/acmesds/jsdb)  [SBU](https://gitlab.west.nga.ic.gov/acmesds/jsdb)  
+	**GEOHACK** [WWW](https://github.com/totemstan/geohack)  [COE](https://sc.appdev.proj.coe/acmesds/geohack)  [SBU](https://gitlab.west.nga.ic.gov/acmesds/geohack)  
+	**ATOMIC** [WWW](https://github.com/totemstan/atomic)  [COE](https://sc.appdev.proj.coe/acmesds/atomic)  [SBU](https://gitlab.west.nga.ic.gov/acmesds/atomic)  
+	**TOTEM** [WWW](https://github.com/totemstan/totem)  [COE](https://sc.appdev.proj.coe/acmesds/totem)  [SBU](https://gitlab.west.nga.ic.gov/acmesds/totem)  
+	**RANDPR** [WWW](https://github.com/totemstan/randpr)  [COE](https://sc.appdev.proj.coe/acmesds/randpr)  [SBU](https://gitlab.west.nga.ic.gov/acmesds/randpr)  
+	**MAN** [WWW](https://github.com/totemstan/man)  [COE](https://sc.appdev.proj.coe/acmesds/man)  [SBU](https://gitlab.west.nga.ic.gov/acmesds/man)  
+	**READER** [WWW](https://github.com/totemstan/reader)  [COE](https://sc.appdev.proj.coe/acmesds/reader)  [SBU](https://gitlab.west.nga.ic.gov/acmesds/reader)  
+	**PIPE** [WWW](https://github.com/totemstan/pipe)  [COE](https://sc.appdev.proj.coe/acmesds/pipe)  [SBU](https://gitlab.west.nga.ic.gov/acmesds/pipe)  
+	**BLOG** [WWW](https://github.com/totemstan/blog)  [COE](https://sc.appdev.proj.coe/acmesds/blog)  [SBU](https://gitlab.west.nga.ic.gov/acmesds/blog)  
+	**SKIN** [WWW](https://github.com/totemstan/skin)  [COE](https://sc.appdev.proj.coe/acmesds/skin)  [SBU](https://gitlab.west.nga.ic.gov/acmesds/skin)  
+	**DOGS** [WWW](https://github.com/totemstan/dogs)  [COE](https://sc.appdev.proj.coe/acmesds/dogs)  [SBU](https://gitlab.west.nga.ic.gov/acmesds/dogs)  
 
 ## Federated Installation
 
@@ -126,18 +126,8 @@ follow the **ENUMS** deep copy conventions (
 [SBU](https://gitlab.west.nga.ic.gov/acmesds/enum)
 ).
 
-## Env vars
+## Env Vars
 
-	MYSQL_HOST = domain name
-	MYSQL_USER = user name
-	MYSQL_PASS = user password
-	TXMAIL_HOST = DOMAIN:PORT
-	TXMAIL_USER = ACCOUNT:PASSWORD
-	RXMAIL_HOST = DOMAIN:PORT
-	RXMAIL_USER = ACCOUNT:PASSWORD
-	SERVICE_PASS = passphrase to server pki cert
-	SERVICE_WORKER_URL = http(s)://DOMAIN:PORT
-	SERVICE_MASTER_URL = http(s)://DOMAIN:PORT
 	HOSTNAME = name of host machine
 	REPO = http://DOMAIN:ACCOUNT
 	JIRA = http://DOMAIN
