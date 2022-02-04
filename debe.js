@@ -17,14 +17,9 @@ const
 
 // 3rd party modules
 const	 
-	MAIL = require('nodemailer'),		// MAIL mail sender
 	JSMIN = require("uglify-js"), 		//< code minifier
 	HMIN = require("html-minifier"), 	//< html minifier
-	IMAP = require('imap'),				// IMAP mail receiver
 	//PDF = require('pdffiller'), 		// pdf form processing
-	SMTP = require('nodemailer-smtp-transport'),
-	//RSS = require('feed'),				// RSS / ATOM news feeder
-	//RSS = require('feed-read'), 		// RSS / ATOM news reader
 			
 	ODOC = require("officegen"), 		//< office doc generator
 	LANG = require('i18n-abide'), 		//< I18 language translator
@@ -47,15 +42,17 @@ const
 
 const 
 	{ exec } = CP,
-	{ Copy,Each,Log,Debug,
-	 isKeyed,isString,isFunction,isError,isArray,isObject,isEmpty,
+	{ Copy,Each,Log,Debug,Stream, Fetch,
+	 isKeyed,isString,isFunction,isError,isArray,isObject,isEmpty,typeOf,
 	 getList, getURL,
-	 typeOf,Stream, Fetch } = ENUMS,
+	 txmailCon, rxmailCon,
+	} = ENUMS,
 	{ readers, scanner } = READ,
 	{ skinContext, renderSkin, renderJade } = SKIN,
 	{ runTask, queues, byAction,
 		sqlThread, errors, paths, cache, site, byTable, userID, dsThread,
-		watchFile, timeIntervals, neoThread, startJob } = TOTEM,
+		watchFile, timeIntervals, neoThread, startJob 
+	} = TOTEM,
 	{ JIMP } = $;
 
 /**
@@ -1046,8 +1043,6 @@ as described in the [Notebooks api](/api.view). `,
 	*/
 	sendMail: (opts,cb) => {
 	
-		const {txMail} = DEBE;
-		
 		Trace(">>>sendmail", opts);
 		
 		//return;
@@ -1059,7 +1054,7 @@ as described in the [Notebooks api](/api.view). `,
 			}]; */
 
 			//Trace(">>>sendmail", opts);
-			txMail.sendMail( opts, (err,info) => {
+			txmailCon.sendMail( opts, (err,info) => {
 				//Trace(">>>email", err,info);
 				if ( cb ) cb(info);
 			});
@@ -1149,7 +1144,7 @@ as described in the [Notebooks api](/api.view). `,
 			
 					: null,
 
-				txMail = DEBE.txMail = txHost 
+				txmailCon = DEBE.txmailCon = txHost 
 					? MAIL.createTransport({
 						host: txHost,
 						port: parseInt(txPort),
@@ -1184,7 +1179,7 @@ as described in the [Notebooks api](/api.view). `,
 						}
 					}; 
 
-			//txMail.sendMail({to:"brian.d.james@comcast.net",text:"greetings!"});
+			//txmailCon.sendMail({to:"brian.d.james@comcast.net",text:"greetings!"});
 			
 			if (rxMail)					// Establish server's email inbox	
 				rxMail.connect( err => {  // login cb
@@ -1615,7 +1610,7 @@ Keys:
 				{dogs} = DEBE;
 			
 			Each( dogs, (name,dog) => {
-				$libs["$$"+name] = function () { Log("Dogging",name); sqlThread(sql => dog(sql)); } 
+				$libs["$dog"+name] = function () { Log("Dogging",name); sqlThread(sql => dog(sql)); } 
 			});
 			
 			site.watchDogs = Object.keys(dogs).map( key => key ).join(", ");			
@@ -2611,7 +2606,7 @@ Usage: ${uses.join(", ")}  `);
 
 			function logCommand(cmd, info) {
 				if (isString(cmd)) {
-					Trace( "file", cmd );
+					Trace( "file logger", cmd );
 					const [op,ds] = cmd.split(" ");
 					sql.query("INSERT INTO openv.dblogs SET ? ON DUPLICATE KEY UPDATE Actions=Actions+1,?", [{
 						Op: op,
@@ -2625,7 +2620,7 @@ Usage: ${uses.join(", ")}  `);
 				}
 				
 				else {
-					Trace( "file", cmd.name);
+					Trace( "file logger", cmd.name);
 					cmd(info);
 				}
 
@@ -2672,6 +2667,9 @@ Usage: ${uses.join(", ")}  `);
 						cmd: cmd,
 						query: query,
 						//body: body,
+						uphexsnip: Buffer.from( (body["upload[]"]||"").substr(0,8)).toString("hex"),
+						upesc: escape( (body["upload[]"]||"" ).substr(0,8)),
+						uplen: (body["upload[]"]||"").length,
 						path: path,
 						tar: target,
 						tars: targets,
@@ -2904,7 +2902,7 @@ Usage: ${uses.join(", ")}  `);
 							});
 
 						else 		// nav folder
-							Fetch( "file:"+parent , files => {
+							Fetch( "file:"+target , files => {
 								sendFolder(res, files.map( file => {
 									const 
 										[x,name,type] = file.match(/(.*)\.(.*)/) || ["",file,""];
@@ -2947,7 +2945,7 @@ Usage: ${uses.join(", ")}  `);
 							res( parent );
 
 						else
-							Fetch( "file:"+parent, txt => res( txt ) );
+							Fetch( "file:"+target, txt => res( txt ) );
 
 						break;
 
@@ -3042,31 +3040,34 @@ Usage: ${uses.join(", ")}  `);
 						break;
 
 					case "upload":
-						Trace("up", {
-							tar: atob(body.target),
-							fnname: body.filename,
-							bcon: body["upload[]"].constructor,
-							upath: atob(body["upload_path[]"])
-						});
 						var
 							name = body.filename,
-							type = name.split(".").pop();
+							type = name.split(".").pop(),
+							data = body["upload[]"],
+							tarFile = "."+atob(body["upload_path[]"])+name;
 
+						Trace("upload", {
+							tar: atob(body.target),
+							fnname: body.filename,
+							path: atob(body["upload_path[]"]),
+							tarFile: tarFile,
+							type: body.mimeType
+						});
 						res({
-							added: [ "."+atob(body["upload_path[]"])+name].map( tar => logCommand( function uploadFile(tar) {
-								FS.writeFile( tar, body["upload[]"].toString(), "utf8", err => Trace("upload", err||"ok") );
+							added: [tarFile].map( tar => logCommand( function uploadFile(info) {
+								FS.writeFile( tarFile, data, "utf-8", err => Trace("upload", err||"ok") );
 							}, {
 								ts: now,
 								mime: `application/"${type}`,	// mime type
 								dirs: 0, 						// place inside tree too												
-								size: body["upload[]"].length,
+								size: data.length,
 								hash: btoa(parent+name), 		// hash name
-								name: name, 					// keys name
+								name: name, 					// file name
 								phash: parentHash, 				// parent hash name
-								read: isRead,						// read state
-								write: isWrite,						// write state
-								locked: isLocked,						// lock state
-								isowner: isOwner						// has ownership
+								read: isRead,					// read state
+								write: isWrite,					// write state
+								locked: isLocked,				// lock state
+								isowner: isOwner				// has ownership
 							}))
 						});
 						break;
@@ -3180,7 +3181,7 @@ Usage: ${uses.join(", ")}  `);
 											else 
 												try {
 													const
-														[x, url] = FS.readFileSync( src, "utf8").match( /URL=(.*)/ ) || ["",""],
+														[x, url] = FS.readFileSync( src, "utf-8").match( /URL=(.*)/ ) || ["",""],
 														{href} = URL(url,referer);
 
 													return cache[src] = url ? file.substr(0,file.indexOf(".url")).tag( href ) : "?"+file;
@@ -3412,7 +3413,7 @@ Usage: ${uses.join(", ")}  `);
 									hits = JSON.stringify(hits);
 
 								res(hits);						
-								//FS.writeFile( save, JSON.stringify(hits), "utf8", err => {} );
+								//FS.writeFile( save, JSON.stringify(hits), "utf-8", err => {} );
 							});
 
 						else
@@ -3424,13 +3425,13 @@ Usage: ${uses.join(", ")}  `);
 						//req.type = "html";
 						res( "claim results "+"here".link(save.substr(1)) );
 
-						FS.writeFileSync(save,"","utf8", err => {});
+						FS.writeFileSync(save,"","utf-8", err => {});
 
 						getList( path, {batch: 100, keys: ["file"]}, recs => {
 							if ( recs )
 								recs.forEach( rec => {
 									Fetch( `http:/read?file=${rec}`, txt => {
-										FS.appendFile(save, txt, "utf8", err => {});
+										FS.appendFile(save, txt, "utf-8", err => {});
 									});
 								});
 
@@ -3443,7 +3444,7 @@ Usage: ${uses.join(", ")}  `);
 					default:
 						if ( reader = readers[Type] ) 
 							reader( path, txt => {
-								//FS.writeFile(save,txt,"utf8",err => {});
+								//FS.writeFile(save,txt,"utf-8",err => {});
 								res(txt);
 							});	
 
@@ -3499,7 +3500,7 @@ at the specified keys = KEY,...
 					Trace(matches);
 					matches.forEach( match => {
 
-						FS.readFile( match.file, "utf8", (err,text) => {
+						FS.readFile( match.file, "utf-8", (err,text) => {
 							if (!err) 
 								sql.query("SELECT * FROM app.?? WHERE ? LIMIT 1", ["gtd",{evid: match.evid}], (err,recs) => {
 									//Trace(err);
@@ -4370,7 +4371,7 @@ save = CLIENT.HOST.CASE to save
 
 				Trace("SAVE MATLAB",query.save,plugin,id,results);
 
-				FS.readFile(results, "utf8", function (err,json) {
+				FS.readFile(results, "utf-8", function (err,json) {
 
 					sql.query("UPDATE ?? SET ? WHERE ?", [plugin, {Save: json}, {ID: id}], err => {
 						Trace("save",err);
@@ -6221,7 +6222,7 @@ function getPlugin(req,res) {
 								},
 								pre = "\n"+(prefix[type] || ">>");
 
-							FS.readFile( "."+paths.tou, "utf8", (err, terms) => {
+							FS.readFile( "."+paths.tou, "utf-8", (err, terms) => {
 								if (err) 
 									cb( errors.noLicense );
 
@@ -6240,7 +6241,7 @@ function getPlugin(req,res) {
 						sql.query( "SELECT Code,Minified FROM openv.engines WHERE ? LIMIT 1", { Name: name }, (err,engs) => {
 							//Trace(">>eng", engs[0]);
 							if ( eng = engs[0] )
-								FS.readFile( `./notebooks/${name}.d/source`, "utf8", (err, srcCode) => {
+								FS.readFile( `./notebooks/${name}.d/source`, "utf-8", (err, srcCode) => {
 									if (!err) eng.Code = srcCode;
 
 									if ( pub = pubs[0] )	// already licensed so simply distribute
@@ -6571,11 +6572,11 @@ function publishPlugin(req,res) {
 						e6Tmp = "./pubmin/e6/" + product,
 						e5Tmp = "./pubmin/e5/" + product;
 
-					FS.writeFile(e6Tmp, code, "utf8", err => {
+					FS.writeFile(e6Tmp, code, "utf-8", err => {
 						CP.exec( `babel ${e6Tmp} -o ${e5Tmp} --presets /local/nodejs/lib/node_modules/@babel/preset-env`, (err,log) => {
 							Trace("PUBLISH BABEL", err?"failed":errors.ok );
 							try {
-								FS.readFile(e5Tmp, "utf8", (err,e5code) => {
+								FS.readFile(e5Tmp, "utf-8", (err,e5code) => {
 									if ( err ) 
 										cb( null );
 
@@ -6606,7 +6607,7 @@ function publishPlugin(req,res) {
 
 					var pyTmp = "./temps/py/" + product;
 
-					FS.writeFile(pyTmp, code.replace(/\t/g,"  ").replace(/^\n/gm,""), "utf8", err => {
+					FS.writeFile(pyTmp, code.replace(/\t/g,"  ").replace(/^\n/gm,""), "utf-8", err => {
 						CP.exec(`pyminifier -O ${pyTmp}`, (err,minCode) => {
 							//Trace("pymin>>>>", err);
 
@@ -6639,7 +6640,7 @@ function publishPlugin(req,res) {
 						mTmp = "./temps/matsrc/" + product,
 						pyTmp = "./temps/matout/" + product;
 
-					FS.writeFile(mTmp, code.replace(/\t/g,"  "), "utf8", err => {
+					FS.writeFile(mTmp, code.replace(/\t/g,"  "), "utf-8", err => {
 						CP.execFile("python", ["matlabtopython.py", "smop", mTmp, "-o", pyTmp], err => {	
 							//Trace("matmin>>>>", err);
 
@@ -6647,7 +6648,7 @@ function publishPlugin(req,res) {
 								cb( err );
 
 							else
-								FS.readFile( pyTmp, "utf8", (err,pyCode) => {
+								FS.readFile( pyTmp, "utf-8", (err,pyCode) => {
 									if (err) 
 										cb( err );
 
@@ -6683,7 +6684,7 @@ function publishPlugin(req,res) {
 
 		function getResource( file ) {	
 			try {
-				return FS.readFileSync( `./notebooks/resource/${file}`, "utf8").replace( /\r\n/g, "\n");
+				return FS.readFileSync( `./notebooks/resource/${file}`, "utf-8").replace( /\r\n/g, "\n");
 			}
 			catch (err) {
 				return null;
@@ -6796,7 +6797,7 @@ function publishPlugin(req,res) {
 
 						/*
 						if  ( readme = mod.readme )
-							FS.writeFile( path+".md", readme, "utf8" );
+							FS.writeFile( path+".md", readme, "utf-8" );
 						*/
 
 						if ( code ) 
@@ -6834,10 +6835,10 @@ function publishPlugin(req,res) {
 
 								else  // convert code to requested type
 									//CP.execFile("python", ["matlabtopython.py", "smop", fromFile, "-o", toFile], err => {
-									FS.writeFile( fromFile, code, "utf8", err => {
+									FS.writeFile( fromFile, code, "utf-8", err => {
 										CP.exec( `sh ${from}to${to}.sh ${fromFile} ${toFile}`, (err, out) => {
 											if (!err) 
-												FS.readFile( toFile, "utf8", (err,code) => {
+												FS.readFile( toFile, "utf-8", (err,code) => {
 													rec.Code = code;
 													if (!err)
 														sql.query( 
@@ -6957,7 +6958,7 @@ gatewaybrokeringtype:i:0
 rdgiskdcproxy:i:0
 kdcproxyname:s:
 `, 
-							 "utf8", err => {} );
+							 "utf-8", err => {} );
 
 				CP.exec( [
 							`cp -r ./artifacts/temp/* ./artifacts/${name}`,
@@ -6979,7 +6980,7 @@ Prop3=19,11
 URL=https://totem.west.ile.nga.ic.gov/${name}.${type}
 IDList=
 `,
-							"utf8",
+							"utf-8",
 							err => {} );
 					});	
 

@@ -26,7 +26,7 @@ append base_parms
 		- explore = flags.explore || ""
 		- project = flags.project || table
 		- view = flags.view || "tabbed"
-		- secureLink = true
+		- secureLink = !explore
 		- northedit = false
 		- Explore = {}
 		- ref = {hostname:referer.hostname,port:$worker.port,domain:referer.hostname}
@@ -38,10 +38,12 @@ append base_head
 append base_body
 	- rand = Math.floor( Math.random() * 20 )
 	- logo = `/stash/${domain}/header${rand}.jpg`
-	- tools = [ ((profile.Credit*1e-3).toFixed(0)+"$ "+profile.QoS+"qos"), "".tag("input", {id:"upload",class:"inputfile",type:"file",size:10,value:"/myfiles"})+"upload".tag("label",{for:"upload"})]
-	- toolbar = explore ? "" : (tools.join(" || ") + " || " + uses).tag("span").tag("br")
+	- credit = ((profile.Credit*1e-3).toFixed(0)+"$ "+profile.QoS+"qos")
+	- upload = ("upload".tag("label",{for:"uploadInput"})+"".tag("input", {id:"uploadInput",name:"bodyKey",class:"inputfile",type:"file",size:10})+"send".tag("button")).tag("form",{enctype:"multipart/form-data",action:"/upload",method:"post"})
+	- tools = [ credit, upload, uses]
+	- toolbar = explore ? "" : tools.join(" || ").tag("span").tag("br")
 
-	if secureLink && !explore
+	if secureLink
 		script(type="text/javascript",src="/clients/openpgp.min.js")
 		script(type="text/javascript",src="/uis/uilink.js")
 		link(rel='stylesheet',href='/uis/uilink.css')
