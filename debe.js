@@ -1466,7 +1466,7 @@ as described in the [Notebooks api](/api.view). `,
 							},
 							run: query => openBrowser("run",query),
 							open: query => openBrowser("run",query),
-							xpdf: query => openBrowser("xpdf",query),
+							pdf: query => openBrowser("_pdf",query),
 							brief: query => openBrowser("brief",query),
 							usage: query => openBrowser("usage",query),
 							view: query => openBrowser("view",query),
@@ -5044,11 +5044,12 @@ size, pixels, scale, step, range, detects, infile, outfile, channel.  This endpo
 	*/			
 	"byType.": {
 		// doc generators
-		xpdf: savePage,
-		xjpg: savePage,
-		xgif: savePage,
-		xrtp: savePage,
-		xrun: savePage,
+		_pdf: savePage,
+		_jpg: savePage,
+		_gif: savePage,
+		_rtp: savePage,
+		_run: savePage,
+		_html: savePage,
 		
 		// skins
 		proj: renderSkin,
@@ -5835,14 +5836,14 @@ function fileUpload(req, res) {
 */
 function savePage(req,res) {
 	const
-		{ type,query,table} = req,
+		{ type,query,table,url} = req,
 		master = "http://localhost:8080", //site.master,	
 		Type = type.substr(1),
 		name = table,
 		xsrc = `${master}/${name}.${Type}`.tag("?", query),
-		xtar = `./uploads/${name}.pdf`,
+		xtar = `/uploads/${name}.pdf`,
 		src = `${master}/${name}.view`.tag("?", query),
-		tar = `./uploads/${name}.${Type}`;	
+		tar = `/uploads/${name}.${Type}`;	
 
 	if (type == "help")
 	return res("Save a web page and stage its delivery");
@@ -5859,25 +5860,25 @@ function savePage(req,res) {
 			CP.execFile( "node", ["phantomjs", "rasterize.js", url, docf, res], function (err,stdout) { 
 				if (err) Trace(err,stdout);
 			});  */
-			res( "Claim your results "+"here".link(tar) );
+			res( "Claim your file".link(tar) );
 			
-			CP.exec(`phantomjs rasterize.js ${src} ${tar}`, (err,log) => {
+			CP.exec(`phantomjs rasterize.js ${src} .${tar}`, (err,log) => {
 				Trace(err || `SAVED ${url}` );
 			});
 			break;
 
 		case "html":
-			res( "Claim your results "+"here".link(tar) );
+			res( "Claim your file".link(tar) );
 			Fetch( src, html => {
-				FS.writeFile(tar, html, err => {
+				FS.writeFile( `.${tar}`, html, err => {
 					Trace(err || `SAVED ${url}` );
 				});
 			});
 			break;	
 			
 		default:
-			res( "Claim your results "+"here".link(xtar) );
-			CP.exec(`phantomjs rasterize.js ${xsrc} ${xtar}`, (err,log) => {
+			res( "Claim your file".link(xtar) );
+			CP.exec(`phantomjs rasterize.js ${xsrc} .${xtar}`, (err,log) => {
 				Trace(err || `SAVED ${url}` );
 			});
 			
