@@ -46,15 +46,11 @@ test connections, and provides several *FILE* areas:
 
 for supervised/unsupervised file sharing.
 
-## Local Installation
+## Installation
 
-Clone **TOTEM** from one of its repos:
-
-	git clone https://github.com/totemstan/totem
-	git clone https://sc.appdev.proj.coe/acmesds/totem
-	git clone https://gitlab.west.nga.ic.gov/acmesds/totem
-
-## Dependencies
+Follow the desired [Forked || Federated installation](https://github.com/totemstan/acmesds)
+to install **TOTEM** with its necessary OS upgrades (tools, compute frameworks, etc) and
+module dependencies
 
 	**ENUMS** [WWW](https://github.com/totemstan/enums)  [COE](https://sc.appdev.proj.coe/acmesds/enums)  [SBU](https://gitlab.west.nga.ic.gov/acmesds/enums)  
 	**SECLINK** [WWW](https://github.com/totemstan/securelink)  [COE](https://sc.appdev.proj.coe/acmesds/securelink)  [SBU](https://gitlab.west.nga.ic.gov/acmesds/securelink)  
@@ -70,14 +66,6 @@ Clone **TOTEM** from one of its repos:
 	**BLOG** [WWW](https://github.com/totemstan/blog)  [COE](https://sc.appdev.proj.coe/acmesds/blog)  [SBU](https://gitlab.west.nga.ic.gov/acmesds/blog)  
 	**SKIN** [WWW](https://github.com/totemstan/skin)  [COE](https://sc.appdev.proj.coe/acmesds/skin)  [SBU](https://gitlab.west.nga.ic.gov/acmesds/skin)  
 	**DOGS** [WWW](https://github.com/totemstan/dogs)  [COE](https://sc.appdev.proj.coe/acmesds/dogs)  [SBU](https://gitlab.west.nga.ic.gov/acmesds/dogs)  
-
-## Federated Installation
-
-Simply install and start its federated docker image (
-[WWW](https://github.com/totemstan/dockify) 
-[COE](https://sc.appdev.proj.coe/acmesds/dockify)
-[SBU](https://gitlab.west.nga.ic.gov/acmesds/dockify)
-).
 
 ## Setup 
 
