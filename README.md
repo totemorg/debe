@@ -117,7 +117,7 @@ follow the **ENUMS** deep copy conventions (
 <dd><p>Provides UI interfaces to the <a href="https://github.com/totemstan/totem">barebone TOTEM web service</a> 
 to support notebooks and other entities.  This module documented 
 in accordance with <a href="https://jsdoc.app/">jsdoc</a>.</p>
-<h3 id="env-vars">Env Vars</h3>
+<h3 id="env-dependencies">Env Dependencies</h3>
 <pre><code>HOSTNAME = name of host machine
 REPO = http://DOMAIN:ACCOUNT
 JIRA = http://DOMAIN
@@ -125,7 +125,8 @@ RAS = http://DOMAIN
 BY = https://DOMAIN
 </code></pre>
 <h3 id="module-dependencies">Module Dependencies</h3>
-<p><em>ENUMS*</em> <a href="https://github.com/totemstan/enums">WWW</a>  <a href="https://sc.appdev.proj.coe/acmesds/enums">COE</a>  <a href="https://gitlab.west.nga.ic.gov/acmesds/enums">SBU</a><br><em>SECLINK*</em> <a href="https://github.com/totemstan/securelink">WWW</a>  <a href="https://sc.appdev.proj.coe/acmesds/securelink">COE</a>  <a href="https://gitlab.west.nga.ic.gov/acmesds/securelink">SBU</a><br><em>SOCKETIO*</em> <a href="https://github.com/totemstan/socketio">WWW</a>  <a href="https://sc.appdev.proj.coe/acmesds/socketio">COE</a>  <a href="https://gitlab.west.nga.ic.gov/acmesds/socketio">SBU</a><br><em>JSDB*</em> <a href="https://github.com/totemstan/jsdb">WWW</a>  <a href="https://sc.appdev.proj.coe/acmesds/jsdb">COE</a>  <a href="https://gitlab.west.nga.ic.gov/acmesds/jsdb">SBU</a><br><em>GEOHACK*</em> <a href="https://github.com/totemstan/geohack">WWW</a>  <a href="https://sc.appdev.proj.coe/acmesds/geohack">COE</a>  <a href="https://gitlab.west.nga.ic.gov/acmesds/geohack">SBU</a><br><em>ATOMIC*</em> <a href="https://github.com/totemstan/atomic">WWW</a>  <a href="https://sc.appdev.proj.coe/acmesds/atomic">COE</a>  <a href="https://gitlab.west.nga.ic.gov/acmesds/atomic">SBU</a><br><em>TOTEM*</em> <a href="https://github.com/totemstan/totem">WWW</a>  <a href="https://sc.appdev.proj.coe/acmesds/totem">COE</a>  <a href="https://gitlab.west.nga.ic.gov/acmesds/totem">SBU</a><br><em>RANDPR*</em> <a href="https://github.com/totemstan/randpr">WWW</a>  <a href="https://sc.appdev.proj.coe/acmesds/randpr">COE</a>  <a href="https://gitlab.west.nga.ic.gov/acmesds/randpr">SBU</a><br><em>MAN*</em> <a href="https://github.com/totemstan/man">WWW</a>  <a href="https://sc.appdev.proj.coe/acmesds/man">COE</a>  <a href="https://gitlab.west.nga.ic.gov/acmesds/man">SBU</a><br><em>READER*</em> <a href="https://github.com/totemstan/reader">WWW</a>  <a href="https://sc.appdev.proj.coe/acmesds/reader">COE</a>  <a href="https://gitlab.west.nga.ic.gov/acmesds/reader">SBU</a><br><em>PIPE*</em> <a href="https://github.com/totemstan/pipe">WWW</a>  <a href="https://sc.appdev.proj.coe/acmesds/pipe">COE</a>  <a href="https://gitlab.west.nga.ic.gov/acmesds/pipe">SBU</a><br><em>BLOG*</em> <a href="https://github.com/totemstan/blog">WWW</a>  <a href="https://sc.appdev.proj.coe/acmesds/blog">COE</a>  <a href="https://gitlab.west.nga.ic.gov/acmesds/blog">SBU</a><br><em>SKIN*</em> <a href="https://github.com/totemstan/skin">WWW</a>  <a href="https://sc.appdev.proj.coe/acmesds/skin">COE</a>  <a href="https://gitlab.west.nga.ic.gov/acmesds/skin">SBU</a><br><em>DOGS</em>* <a href="https://github.com/totemstan/dogs">WWW</a>  <a href="https://sc.appdev.proj.coe/acmesds/dogs">COE</a>  <a href="https://gitlab.west.nga.ic.gov/acmesds/dogs">SBU</a></p>
+<p>are
+<em>ENUMS*</em> <a href="https://github.com/totemstan/enums">WWW</a>  <a href="https://sc.appdev.proj.coe/acmesds/enums">COE</a>  <a href="https://gitlab.west.nga.ic.gov/acmesds/enums">SBU</a><br><em>SECLINK*</em> <a href="https://github.com/totemstan/securelink">WWW</a>  <a href="https://sc.appdev.proj.coe/acmesds/securelink">COE</a>  <a href="https://gitlab.west.nga.ic.gov/acmesds/securelink">SBU</a><br><em>SOCKETIO*</em> <a href="https://github.com/totemstan/socketio">WWW</a>  <a href="https://sc.appdev.proj.coe/acmesds/socketio">COE</a>  <a href="https://gitlab.west.nga.ic.gov/acmesds/socketio">SBU</a><br><em>JSDB*</em> <a href="https://github.com/totemstan/jsdb">WWW</a>  <a href="https://sc.appdev.proj.coe/acmesds/jsdb">COE</a>  <a href="https://gitlab.west.nga.ic.gov/acmesds/jsdb">SBU</a><br><em>GEOHACK*</em> <a href="https://github.com/totemstan/geohack">WWW</a>  <a href="https://sc.appdev.proj.coe/acmesds/geohack">COE</a>  <a href="https://gitlab.west.nga.ic.gov/acmesds/geohack">SBU</a><br><em>ATOMIC*</em> <a href="https://github.com/totemstan/atomic">WWW</a>  <a href="https://sc.appdev.proj.coe/acmesds/atomic">COE</a>  <a href="https://gitlab.west.nga.ic.gov/acmesds/atomic">SBU</a><br><em>TOTEM*</em> <a href="https://github.com/totemstan/totem">WWW</a>  <a href="https://sc.appdev.proj.coe/acmesds/totem">COE</a>  <a href="https://gitlab.west.nga.ic.gov/acmesds/totem">SBU</a><br><em>RANDPR*</em> <a href="https://github.com/totemstan/randpr">WWW</a>  <a href="https://sc.appdev.proj.coe/acmesds/randpr">COE</a>  <a href="https://gitlab.west.nga.ic.gov/acmesds/randpr">SBU</a><br><em>MAN*</em> <a href="https://github.com/totemstan/man">WWW</a>  <a href="https://sc.appdev.proj.coe/acmesds/man">COE</a>  <a href="https://gitlab.west.nga.ic.gov/acmesds/man">SBU</a><br><em>READER*</em> <a href="https://github.com/totemstan/reader">WWW</a>  <a href="https://sc.appdev.proj.coe/acmesds/reader">COE</a>  <a href="https://gitlab.west.nga.ic.gov/acmesds/reader">SBU</a><br><em>PIPE*</em> <a href="https://github.com/totemstan/pipe">WWW</a>  <a href="https://sc.appdev.proj.coe/acmesds/pipe">COE</a>  <a href="https://gitlab.west.nga.ic.gov/acmesds/pipe">SBU</a><br><em>BLOG*</em> <a href="https://github.com/totemstan/blog">WWW</a>  <a href="https://sc.appdev.proj.coe/acmesds/blog">COE</a>  <a href="https://gitlab.west.nga.ic.gov/acmesds/blog">SBU</a><br><em>SKIN*</em> <a href="https://github.com/totemstan/skin">WWW</a>  <a href="https://sc.appdev.proj.coe/acmesds/skin">COE</a>  <a href="https://gitlab.west.nga.ic.gov/acmesds/skin">SBU</a><br><em>DOGS</em>* <a href="https://github.com/totemstan/dogs">WWW</a>  <a href="https://sc.appdev.proj.coe/acmesds/dogs">COE</a>  <a href="https://gitlab.west.nga.ic.gov/acmesds/dogs">SBU</a></p>
 </dd>
 </dl>
 
@@ -262,7 +263,7 @@ Provides UI interfaces to the [barebone TOTEM web service](https://github.com/to
 to support notebooks and other entities.  This module documented 
 in accordance with [jsdoc](https://jsdoc.app/).
 
-### Env Vars
+### Env Dependencies
 
 	HOSTNAME = name of host machine
 	REPO = http://DOMAIN:ACCOUNT
@@ -271,6 +272,8 @@ in accordance with [jsdoc](https://jsdoc.app/).
 	BY = https://DOMAIN
 
 ### Module Dependencies
+
+are
 *ENUMS** [WWW](https://github.com/totemstan/enums)  [COE](https://sc.appdev.proj.coe/acmesds/enums)  [SBU](https://gitlab.west.nga.ic.gov/acmesds/enums)  
 *SECLINK** [WWW](https://github.com/totemstan/securelink)  [COE](https://sc.appdev.proj.coe/acmesds/securelink)  [SBU](https://gitlab.west.nga.ic.gov/acmesds/securelink)  
 *SOCKETIO** [WWW](https://github.com/totemstan/socketio)  [COE](https://sc.appdev.proj.coe/acmesds/socketio)  [SBU](https://gitlab.west.nga.ic.gov/acmesds/socketio)  

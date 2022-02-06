@@ -579,7 +579,7 @@ Provides UI interfaces to the [barebone TOTEM web service](https://github.com/to
 to support notebooks and other entities.  This module documented 
 in accordance with [jsdoc]{@link https://jsdoc.app/}.
 
-### Env Vars
+### Env Dependencies
 
 	HOSTNAME = name of host machine
 	REPO = http://DOMAIN:ACCOUNT
@@ -589,6 +589,7 @@ in accordance with [jsdoc]{@link https://jsdoc.app/}.
 
 ### Module Dependencies
 
+are
 **ENUMS** [WWW](https://github.com/totemstan/enums)  [COE](https://sc.appdev.proj.coe/acmesds/enums)  [SBU](https://gitlab.west.nga.ic.gov/acmesds/enums)  
 **SECLINK** [WWW](https://github.com/totemstan/securelink)  [COE](https://sc.appdev.proj.coe/acmesds/securelink)  [SBU](https://gitlab.west.nga.ic.gov/acmesds/securelink)  
 **SOCKETIO** [WWW](https://github.com/totemstan/socketio)  [COE](https://sc.appdev.proj.coe/acmesds/socketio)  [SBU](https://gitlab.west.nga.ic.gov/acmesds/socketio)  
