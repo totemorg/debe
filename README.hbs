@@ -49,8 +49,8 @@ for supervised/unsupervised file sharing.
 ## Installation
 
 Follow the desired [Forked || Federated installation](https://github.com/totemstan/acmesds)
-to install **TOTEM** with its necessary OS upgrades (tools, compute frameworks, etc) and
-module dependencies
+to install **TOTEM**, including OS upgrades (tools, compute frameworks, etc) and
+module dependencies:
 
 	**ENUMS** [WWW](https://github.com/totemstan/enums)  [COE](https://sc.appdev.proj.coe/acmesds/enums)  [SBU](https://gitlab.west.nga.ic.gov/acmesds/enums)  
 	**SECLINK** [WWW](https://github.com/totemstan/securelink)  [COE](https://sc.appdev.proj.coe/acmesds/securelink)  [SBU](https://gitlab.west.nga.ic.gov/acmesds/securelink)  
