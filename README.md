@@ -1,5 +1,4 @@
-# DEBE [WWW](https://github.com/totemstan/debe)  [COE](https://sc.appdev.proj.coe/acmesds/debe)  [SBU](https://gitlab.west.nga.ic.gov/acmesds/debe)
-
+# DEBE [WWW](https://github.com/totemstan/debe)  [COE](https://sc.appdev.proj.coe/acmesds/debe)  [SBU](https://gitlab.west.nga.ic.gov/acmesds/deb)
 
 Extends the **TOTEM** web service to provide the following endpoints:
 
