@@ -48,9 +48,8 @@ for supervised/unsupervised file sharing.
 
 ## Installation
 
-Follow the desired [Forked || Federated installation](https://github.com/totemstan/acmesds)
-to install **TOTEM**, including OS upgrades (tools, compute frameworks, etc) and
-module dependencies.
+See [TOTEM installation](https://github.com/totemstan/acmesds)
+to install **TOTEM**.
 
 ## Setup 
 
@@ -360,10 +359,8 @@ config({
     * [~defaultDocs](#module_DEBE..defaultDocs)
     * [~licenseOnDownload](#module_DEBE..licenseOnDownload)
     * [~filterFlag.](#module_DEBE..filterFlag.)
-        * [.traps.](#module_DEBE..filterFlag..traps.)
-            * [.browse()](#module_DEBE..filterFlag..traps..browse)
-            * [.view()](#module_DEBE..filterFlag..traps..view)
-        * [.select()](#module_DEBE..filterFlag..select)
+        * [.flagTrap.](#module_DEBE..filterFlag..flagTrap.)
+            * [.browse()](#module_DEBE..filterFlag..flagTrap..browse)
         * [.blog()](#module_DEBE..filterFlag..blog)
         * [.$()](#module_DEBE..filterFlag..$)
     * [~filterType.](#module_DEBE..filterType.)
@@ -552,34 +549,19 @@ Filters via request flags
 **Kind**: inner property of [<code>DEBE</code>](#module_DEBE)  
 
 * [~filterFlag.](#module_DEBE..filterFlag.)
-    * [.traps.](#module_DEBE..filterFlag..traps.)
-        * [.browse()](#module_DEBE..filterFlag..traps..browse)
-        * [.view()](#module_DEBE..filterFlag..traps..view)
-    * [.select()](#module_DEBE..filterFlag..select)
+    * [.flagTrap.](#module_DEBE..filterFlag..flagTrap.)
+        * [.browse()](#module_DEBE..filterFlag..flagTrap..browse)
     * [.blog()](#module_DEBE..filterFlag..blog)
     * [.$()](#module_DEBE..filterFlag..$)
 
-<a name="module_DEBE..filterFlag..traps."></a>
+<a name="module_DEBE..filterFlag..flagTrap."></a>
 
-#### filterFlag..traps.
+#### filterFlag..flagTrap.
 **Kind**: static property of [<code>filterFlag.</code>](#module_DEBE..filterFlag.)  
+<a name="module_DEBE..filterFlag..flagTrap..browse"></a>
 
-* [.traps.](#module_DEBE..filterFlag..traps.)
-    * [.browse()](#module_DEBE..filterFlag..traps..browse)
-    * [.view()](#module_DEBE..filterFlag..traps..view)
-
-<a name="module_DEBE..filterFlag..traps..browse"></a>
-
-##### traps..browse()
-**Kind**: static method of [<code>traps.</code>](#module_DEBE..filterFlag..traps.)  
-<a name="module_DEBE..filterFlag..traps..view"></a>
-
-##### traps..view()
-**Kind**: static method of [<code>traps.</code>](#module_DEBE..filterFlag..traps.)  
-<a name="module_DEBE..filterFlag..select"></a>
-
-#### filterFlag..select()
-**Kind**: static method of [<code>filterFlag.</code>](#module_DEBE..filterFlag.)  
+##### flagTrap..browse()
+**Kind**: static method of [<code>flagTrap.</code>](#module_DEBE..filterFlag..flagTrap.)  
 <a name="module_DEBE..filterFlag..blog"></a>
 
 #### filterFlag..blog()
