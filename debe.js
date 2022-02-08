@@ -4305,7 +4305,7 @@ desired ring = [ [lat,lon], ....]
 		@param {Object} req Totem session request
 		@param {Function} res Totem session response
 		*/
-		agent: (req,res) => {
+		/*agent: (req,res) => {
 			const
 				{sql,query,type} = req,
 				{push,pull,flush,load,save,args} = query;
@@ -4402,7 +4402,7 @@ save = CLIENT.HOST.CASE to save
 			else
 				res( errors.badAgent );
 
-		},
+		}, */
 
 		/**
 		Endpoint to send notice to all clients
