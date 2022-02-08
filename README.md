@@ -396,7 +396,6 @@ config({
         * [.ingest(req, res)](#module_DEBE..byTable..ingest)
         * [.decode(req, res)](#module_DEBE..byTable..decode)
         * [.restart(req, res)](#module_DEBE..byTable..restart)
-        * [.agent(req, res)](#module_DEBE..byTable..agent)
         * [.alert(req, res)](#module_DEBE..byTable..alert)
         * [.stop(req, res)](#module_DEBE..byTable..stop)
         * [.devstatus(req, res)](#module_DEBE..byTable..devstatus)
@@ -766,7 +765,6 @@ Default area navigator.
     * [.ingest(req, res)](#module_DEBE..byTable..ingest)
     * [.decode(req, res)](#module_DEBE..byTable..decode)
     * [.restart(req, res)](#module_DEBE..byTable..restart)
-    * [.agent(req, res)](#module_DEBE..byTable..agent)
     * [.alert(req, res)](#module_DEBE..byTable..alert)
     * [.stop(req, res)](#module_DEBE..byTable..stop)
     * [.devstatus(req, res)](#module_DEBE..byTable..devstatus)
@@ -977,18 +975,6 @@ Endpoint to return release information about requested license.
 
 #### byTable..restart(req, res)
 Endpoint to restart totem if authorized.
-
-**Kind**: static method of [<code>byTable.</code>](#module_DEBE..byTable.)  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| req | <code>Object</code> | Totem session request |
-| res | <code>function</code> | Totem session response |
-
-<a name="module_DEBE..byTable..agent"></a>
-
-#### byTable..agent(req, res)
-Endpoint to send notice to outsource jobs to agents.
 
 **Kind**: static method of [<code>byTable.</code>](#module_DEBE..byTable.)  
 
