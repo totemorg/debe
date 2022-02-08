@@ -879,30 +879,6 @@ Usage:
 			validateLicense(pub, cb);
 	},
 	
-	/*
-	pipeSuper: {		//<  pipe supervisor by pipe type
-		stream: pipeExport,
-		export: pipeExport,
-		csv: pipeCsv,
-		nitf: pipeImage,
-		png: pipeImage,
-		jpg: pipeImage,
-		json: pipeJson,
-		exe: pipeJson,
-		txt: pipeDoc,
-		xls: pipeDoc,
-		html: pipeDoc,
-		odt: pipeDoc,
-		odp: pipeDoc,
-		ods: pipeDoc,
-		pdf: pipeDoc,
-		xml: pipeDoc,
-		nb: pipeBook,
-		db: pipeBook,
-		"": pipeBook,
-		aoi: pipeAOI
-	}, */
-	
 	/**
 	Route table to a database according to security requirements.
 	*/
@@ -1619,7 +1595,7 @@ Keys:
 				{dogs} = DEBE;
 			
 			Each( dogs, (name,dog) => {
-				$libs["$dog"+name] = function () { Log("Dogging",name); sqlThread(sql => dog(sql)); } 
+				$libs["$"+name+"dog"] = function () { Log("Dogging",name); sqlThread(sql => dog(sql)); } 
 			});
 			
 			site.watchDogs = Object.keys(dogs).map( key => key ).join(", ");			
@@ -1801,7 +1777,7 @@ Keys:
 		
 		/**
 		*/
-		"traps.": {  // TRAP=name flags can modify the request flags
+		"flagTrap.": {  // TRAP=name flags can modify the request flags
 			/*
 			save: function (req) {  //< _save=name retains query in named engine
 				var 
@@ -1831,16 +1807,18 @@ Keys:
 
 			/**
 			*/
+			/*
 			view: function (req) {   //< ?_view=name correlates named view to request dataset
 				req.sql.query("INSERT INTO openv.viewers SET ?", {
 					Viewer: req.flags.view,
 					Dataset: req.table
 				});	
-			}
+			} */
 		},
 		
 		/**
 		*/
+		/*
 		select: (recs,req,res) => {
 			const
 				{ flags } = req,
@@ -1854,7 +1832,7 @@ Keys:
 			recs.forEach( rec => opts.push( rec[select].tag("option",{value:rec[select]}) ));
 			res( opts.join("").tag("select",{id:id,src:"/test.txt",onchange: `alert(${id}.getAttribute("src"))` }) );
 											 	// `window.open("/nb.mod?"+_Client_Type.value+"="+${id}.value)`}) );			
-		},
+		},*/
 		
 		/**
 		*/
@@ -2141,7 +2119,7 @@ Usage: ${uses.join(", ")}  `);
 		@param {Function} res Totem session response
 		*/
 		html: (recs,req,res) => { //< dataset.html converts to html
-			res( recs.gridify({},{border: "1"}) );
+			res( recs.gridify ? recs.gridify({},{border: "1"}) : recs );
 		},
 
 		// MS office doc types
@@ -5167,7 +5145,7 @@ size, pixels, scale, step, range, detects, infile, outfile, channel.  This endpo
 	"site.": { 		//< initial site context
 		by: "NGA/R".link( ENV.BY || "http://BY.undefined" ),
 		
-		tag: (src,el,tags) => src.tag(el,tags),
+		//tag: (src,el,tags) => src.tag(el,tags),
 
 		explorer: {
 			Root: "/explore.view?src=/root/", 

@@ -259,7 +259,26 @@ Array.prototype.Extend = function (con) {
 			case "/":
 			case "?":
 			case "&":   // tag a url
-				var rtn = this;
+				const
+					[path,search] = this.split("?"),
+					parms = search ? search.split("&") : [],
+					keys = {};
+				
+				var rtn = path;
+
+				parms.forEach( parm => {
+					const
+						[lhs,rhs] = parm.split("=");
+					keys[lhs] = rhs;
+				});
+				
+				if (at)
+					Each(Copy(at,keys), (key,val) => {
+						rtn += el + key + "=" + val;
+						el = "&";
+					});
+				
+				/*var rtn = this;
 
 				if (rtn.indexOf("?") >= 0) el = "&";
 				
@@ -268,17 +287,19 @@ Array.prototype.Extend = function (con) {
 						rtn += el + key + "=" + val;
 						el = "&";
 					}
-				});
+				});*/
 
 				return rtn;	
 
 			case "[]":
 			case "()":
 				var rtn = this+el.substr(0,1), sep="";
-				Each(at, (key,val) => {
-					rtn += sep + key + ":" + JSON.stringify(val);
-					sep = ",";
-				});
+				
+				if (at)
+					Each(at, (key,val) => {
+						rtn += sep + key + ":" + JSON.stringify(val);
+						sep = ",";
+					});
 				return rtn+el.substr(-1);
 
 			case ":":
