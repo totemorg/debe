@@ -1318,7 +1318,6 @@ as described in the [Notebooks api](/api.view). `,
 			
 			cb();
 			
-			if (0)
 			sqlThread( sql => {
 				sql.getTables( "app", books => {	// config notebook i/f
 					books.forEach( book => {
@@ -1698,6 +1697,8 @@ as described in the [Notebooks api](/api.view). `,
 					e:"[Sponsorships](xxx:/likeus)".linkify(),
 					f:"Fork" 
 				}); */
+			
+			JSDB.config();
 			
 			$.config({}, $ => {
 				const 
@@ -7508,7 +7509,7 @@ switch ( mode = process.argv[2] ) { // unit tests
 			{dogs,$libs} = DEBE,
 			{$api} = $libs;
 
-		config({cores:0}, sql => {
+		config({}, sql => {
 		
 			if ( isMaster ) {
 				switch (mode) {
