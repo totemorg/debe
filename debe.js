@@ -53,7 +53,8 @@ const
 		sqlThread, errors, paths, cache, site, byTable, userID, dsThread,
 		watchFile, timeIntervals, neoThread, startJob 
 	} = TOTEM,
-	{ JIMP } = $;
+	{ JIMP } = $,
+	{ isMaster } = CLUSTER;
 
 /**
 @module DEBE.String
@@ -689,7 +690,7 @@ config({
 */
 
 const
-	{ sendMail, Trace, routeTable, $libs, config,
+	{ sendMail, Trace, routeTable, $libs, config, initialize,
 	 	licenseOnDownload, defaultDocs } = DEBE = module.exports = Copy({
 	
 	Trace: (msg, ...args) => `debe>>>${msg}`.trace( args ),
@@ -1028,7 +1029,7 @@ as described in the [Notebooks api](/api.view). `,
 	*/
 	sendMail: (opts,cb) => {
 	
-		Trace(">>>sendmail", opts);
+		Trace("sendmail", opts);
 		
 		//return;
 		if (opts.to) {
@@ -1066,8 +1067,9 @@ as described in the [Notebooks api](/api.view). `,
 	@param {Object} sql MySQL connector
 	@param {Function} init callback(sql) when service init completed
 	*/
-	initialize: (sql,init) => {	//< initialize service
+	initialize: init => {	//< initialize service
 		
+		/*
 		function startNews(sql, engine) {
 			
 			var
@@ -1095,11 +1097,11 @@ as described in the [Notebooks api](/api.view). `,
 						email:  "tbd@undefined",
 						link:   paths.host
 					}],
-					/*contributor: [{
+					/ *contributor: [{
 						name:   FLEX.TITLE,
 						email:  site.email.SOURCE,
 						link:   paths.host
-					}],*/
+					}],* /
 					date:           feature.found
 					//image:          posts[key].image
 				});
@@ -1202,7 +1204,8 @@ as described in the [Notebooks api](/api.view). `,
 				
 			if (cb) cb(null);
 		}
-				
+		*/
+		
 		function initSES(cb) {	// init sessions
 			Trace(`INIT SESSIONS`);
 
@@ -1270,7 +1273,7 @@ as described in the [Notebooks api](/api.view). `,
 				.boolean('info')
 				.describe('info','display site info')
 				.check( argv => {
-					Trace(site);
+					//Log(site);
 				})
 
 				/*
@@ -1315,277 +1318,280 @@ as described in the [Notebooks api](/api.view). `,
 			
 			cb();
 			
-			sql.getTables( "app", books => {	// config notebook i/f
-				books.forEach( book => {
-					function logRun(data) {
-						console.log(book+">", data);
-						
-						sqlThread( sql => {
-							sql.query("INSERT INTO openv.mods SET ?", {
-								Name: book,
-								Made: new Date(),
-								Mod: DEBE.replCmd + " => " + data
+			if (0)
+			sqlThread( sql => {
+				sql.getTables( "app", books => {	// config notebook i/f
+					books.forEach( book => {
+						function logRun(data) {
+							console.log(book+">", data);
+
+							sqlThread( sql => {
+								sql.query("INSERT INTO openv.mods SET ?", {
+									Name: book,
+									Made: new Date(),
+									Mod: DEBE.replCmd + " => " + data
+								});
 							});
-						});
-					}
-					
-					function openBrowser(type,query) {
-						CP.exec( `firefox ${site.master}/${book}.${type}`.tag("?",query||{})+"", err => logRun(err||errors.ok) );
-						return toggle.chain ? $me : null;
-					}
-					
-					function logCommand( cmd, log ) {
-						CP.exec( cmd, log );
-						return toggle.chain ? $me : null;
-					}
+						}
 
-					$notebooks.push(book);
-					
-					const 
-						$book = "$"+book,
-						$ds = "app."+book,
-						$engine = {Name:book},
-						$me = $libs[$book] = Copy({
-							help: query => exec( `firefox ${repo}/artifacts/tree/master/${book}` ),
-							
-							insert: vals => sqlThread( sql => 
-								sql.query( isString(vals) 
-									? `INSERT INTO ?? SET ${vals}`
-									: "INSERT INTO ?? SET ?",
-									[ $ds, vals ], err => logRun( err || errors.ok ) )),
-							
-							delete: usecase => sqlThread( sql => 
-								sql.query(
-									isString(usecase)
-									? `DELETE FROM ?? WHERE ${usecase}`
-									: "DELETE FROM ?? WHERE ?",
-									[$ds, {Name:usecase}], err => logRun( err || errors.ok ) )),
-							
-							update: (usecase,vals) => sqlThread( sql => 
-								sql.query(
-									isString(usecase)
-									? `UPDATE ?? SET ? WHERE ${usecase}`
-									: "UPDATE ?? SET ? WHERE ?",
-									[$ds, vals, {Name:usecase}], err => logRun( err || errors.ok ) )),
-							
-							blog: (pat,sub) => {
-								const 
-									index = foci[book],
-									[usecase,key] = index.split("?"),
-									Key = key || "Description",
-									fix = {},
-									Pat = new RegExp( pat
-											.replace("$","\\$")
-											.replace("*","\\{.*\\}") );
-								
-								if ( usecase )
-									$me( usecase, ctx => {
-										console.log(Key, ":", Pat, "=>", sub);
+						function openBrowser(type,query) {
+							CP.exec( `firefox ${site.master}/${book}.${type}`.tag("?",query||{})+"", err => logRun(err||errors.ok) );
+							return toggle.chain ? $me : null;
+						}
 
-										fix[Key] = ctx[Key].replace(Pat,sub);
-										$me( usecase, fix );
+						function logCommand( cmd, log ) {
+							CP.exec( cmd, log );
+							return toggle.chain ? $me : null;
+						}
+
+						$notebooks.push(book);
+
+						const 
+							$book = "$"+book,
+							$ds = "app."+book,
+							$engine = {Name:book},
+							$me = $libs[$book] = Copy({
+								help: query => exec( `firefox ${repo}/artifacts/tree/master/${book}` ),
+
+								insert: vals => sqlThread( sql => 
+									sql.query( isString(vals) 
+										? `INSERT INTO ?? SET ${vals}`
+										: "INSERT INTO ?? SET ?",
+										[ $ds, vals ], err => logRun( err || errors.ok ) )),
+
+								delete: usecase => sqlThread( sql => 
+									sql.query(
+										isString(usecase)
+										? `DELETE FROM ?? WHERE ${usecase}`
+										: "DELETE FROM ?? WHERE ?",
+										[$ds, {Name:usecase}], err => logRun( err || errors.ok ) )),
+
+								update: (usecase,vals) => sqlThread( sql => 
+									sql.query(
+										isString(usecase)
+										? `UPDATE ?? SET ? WHERE ${usecase}`
+										: "UPDATE ?? SET ? WHERE ?",
+										[$ds, vals, {Name:usecase}], err => logRun( err || errors.ok ) )),
+
+								blog: (pat,sub) => {
+									const 
+										index = foci[book],
+										[usecase,key] = index.split("?"),
+										Key = key || "Description",
+										fix = {},
+										Pat = new RegExp( pat
+												.replace("$","\\$")
+												.replace("*","\\{.*\\}") );
+
+									if ( usecase )
+										$me( usecase, ctx => {
+											console.log(Key, ":", Pat, "=>", sub);
+
+											fix[Key] = ctx[Key].replace(Pat,sub);
+											$me( usecase, fix );
+										});
+
+									else
+										console.log( '${$book}.blog("LEAD$KEY*POST", "UPDATE")' );
+								},
+
+								plot: ( ...args) => {
+									const 
+										names = ["x","y"],
+										keys = {};
+
+									args.forEach( (arg,i) => {
+										const
+											name = names[i % names.length];
+
+										if ( isString(arg) ) 
+											keys[name] = arg;
+
+										else {
+											$me( `?Save$.${name}`, arg );
+											keys[name] = `Save$.${name}`;
+										}
 									});
 
-								else
-									console.log( '${$book}.blog("LEAD$KEY*POST", "UPDATE")' );
-							},
-							
-							plot: ( ...args) => {
-								const 
-									names = ["x","y"],
-									keys = {};
-								
-								args.forEach( (arg,i) => {
-									const
-										name = names[i % names.length];
-									
-									if ( isString(arg) ) 
-										keys[name] = arg;
-									
-									else {
-										$me( `?Save$.${name}`, arg );
-										keys[name] = `Save$.${name}`;
-									}
-								});
-								
-								$me( "?Description", "$plot{" + "".tag("?",keys) + "}" );
-								//return $me;
-							},
-							chain: query => toggle.chain = !toggle.chain,
-							edit: query => logCommand( `code ./notebooks/${book}.js`, logRun ),
-							focus: index => {
-								if (index) 
-									return foci[book] = index;
-								
-								else
-									return foci[book];
-							},
-							keys: (query,cb) => {
-								sqlThread( sql => {
-									switch ( (query||"").toLowerCase()) {
-										case "cases": 
-											sql.query("SELECT Name FROM ??", [$ds], (err,recs) => (cb||$log)(recs.get("Name").Name));
-											break;
-													  
-										case "save":
-										case "!context":
-										case "!ctx":
-											sql.getKeys( $ds, "Field LIKE 'Save%'", keys => (cb||$log)(keys) );
-											break;
-										
-										case "!save":
-										case "context":
-										case "ctx":
-											sql.getKeys( $ds, "Field NOT LIKE 'Save%'", keys => (cb||$log)(keys) );
-											break;
-											
-										case "all":
-										case "":
-											sql.getKeys( $ds, "", keys => (cb||$log)(keys) );
-											break;
-											
-										default:
-											sql.getKeys( $ds, {Type:query}, ({Field}) => (cb||$log)(Field) );
-									}
-								});											
-							},
-							run: query => openBrowser("run",query),
-							open: query => openBrowser("run",query),
-							pdf: query => openBrowser("_pdf",query),
-							brief: query => openBrowser("brief",query),
-							usage: query => openBrowser("usage",query),
-							view: query => openBrowser("view",query),
-							tou: query => openBrowser("tou",query),
-							rtp: query => openBrowser("rtp",query),
-							pub: query => openBrowser("pub",query),
-							publish: query => openBrowser("pub",query),
-							stores: query => openBrowser("stores",query)
-						}, (index, cb) => {
-							function runNotebook(ctx) {
-								console.log( `Running ${book}` );
-								
-								sqlThread( sql => {
-									runPlugin({
-										sql: sql,
-										table: book,
-										query: ctx,
-										type: "exe"
-									}, stat => logRun(stat) );
-								});
-							}
-							
-							if ( index )
-								if ( isString(index) ) {
-									const
-										[usecase,query] = (index || foci[book]).split("?"),
-										$usecase = {Name: usecase || "noFocus"};
-
-									if ( query ) 
-										if ( isFunction(cb || runNotebook) )
-											sqlThread( sql => {		// run notebook in requested context
-												const
-													[store,key] = query.split("$");
-
-												if ( query.indexOf("$") >= 0 )
-													sql.query(
-														`SELECT json_extract(${store}, '$${key}') AS ${store} FROM ?? WHERE ? LIMIT 1`,
-														[ $ds, $usecase ], (err,recs) => {
-
-															if ( err ) 
-																Trace(err);
-
-															else
-															if ( ctx = recs[0] ) {
-																ctx[store] = JSON.parse(ctx[store]);
-																(cb||runNotebook)( ctx );
-															}
-
-														});
-
-												else
-													sql.query(
-														`SELECT ${store.split('&').join(',')} FROM ?? WHERE ? LIMIT 1`,
-														[ $ds, $usecase ], (err,recs) => {
-
-															if ( err ) 
-																Trace(err);
-
-															else
-															if ( ctx = recs[0] )
-																(cb||runNotebook)( ctx );
-
-														}); 
-											});
-
-										else 
-											sqlThread( sql => {		// update notebook context with specifed hash
-												const
-													[store,key] = query.split("$"),
-													val = JSON.stringify(cb);
-
-												if ( query.indexOf("$") >= 0 )
-													sql.query(
-														`UPDATE ?? SET ${store} = json_set(${store}, '$${key}', cast(? AS JSON)) WHERE ?`, 
-														[ $ds, val, $usecase ],
-														err => logRun(err || errors.ok) );
-
-												else
-													sql.query(
-														`UPDATE ?? SET ${store} = ? WHERE ?`,
-														[ $ds, val, $usecase ],
-														err => logRun(err || errors.ok) );
-											});
+									$me( "?Description", "$plot{" + "".tag("?",keys) + "}" );
+									//return $me;
+								},
+								chain: query => toggle.chain = !toggle.chain,
+								edit: query => logCommand( `code ./notebooks/${book}.js`, logRun ),
+								focus: index => {
+									if (index) 
+										return foci[book] = index;
 
 									else
-									if ( isFunction(cb || runNotebook) )
-										sqlThread( sql => {		// run notebook
-											sql.getContext( $ds, $usecase, cb || runNotebook );
-										});
+										return foci[book];
+								},
+								keys: (query,cb) => {
+									sqlThread( sql => {
+										switch ( (query||"").toLowerCase()) {
+											case "cases": 
+												sql.query("SELECT Name FROM ??", [$ds], (err,recs) => (cb||$log)(recs.get("Name").Name));
+												break;
 
-									else
-										sqlThread( sql => {	// update notebook context
-											sql.query(
-												"UPDATE ?? SET ? WHERE ?",
-												[ $ds, cb, $usecase ],
-												err => logRun(err || errors.ok) );												
-										});
+											case "save":
+											case "!context":
+											case "!ctx":
+												sql.getKeys( $ds, "Field LIKE 'Save%'", keys => (cb||$log)(keys) );
+												break;
 
+											case "!save":
+											case "context":
+											case "ctx":
+												sql.getKeys( $ds, "Field NOT LIKE 'Save%'", keys => (cb||$log)(keys) );
+												break;
+
+											case "all":
+											case "":
+												sql.getKeys( $ds, "", keys => (cb||$log)(keys) );
+												break;
+
+											default:
+												sql.getKeys( $ds, {Type:query}, ({Field}) => (cb||$log)(Field) );
+										}
+									});											
+								},
+								run: query => openBrowser("run",query),
+								open: query => openBrowser("run",query),
+								pdf: query => openBrowser("_pdf",query),
+								brief: query => openBrowser("brief",query),
+								usage: query => openBrowser("usage",query),
+								view: query => openBrowser("view",query),
+								tou: query => openBrowser("tou",query),
+								rtp: query => openBrowser("rtp",query),
+								pub: query => openBrowser("pub",query),
+								publish: query => openBrowser("pub",query),
+								stores: query => openBrowser("stores",query)
+							}, (index, cb) => {
+								function runNotebook(ctx) {
+									console.log( `Running ${book}` );
+
+									sqlThread( sql => {
+										runPlugin({
+											sql: sql,
+											table: book,
+											query: ctx,
+											type: "exe"
+										}, stat => logRun(stat) );
+									});
 								}
 
-								else
-								if ( isFunction(index) )
-									sqlThread( sql => {
-										sql.getKeys( $ds, "Field NOT LIKE 'Save%'", ({Field}) => {
-											sql.query( "SELECT Name FROM ??", [$ds], (err,recs) => {
-												index({ 
-													keys: Field,
-													cases: err ? null : recs.get("Name").Name
+								if ( index )
+									if ( isString(index) ) {
+										const
+											[usecase,query] = (index || foci[book]).split("?"),
+											$usecase = {Name: usecase || "noFocus"};
+
+										if ( query ) 
+											if ( isFunction(cb || runNotebook) )
+												sqlThread( sql => {		// run notebook in requested context
+													const
+														[store,key] = query.split("$");
+
+													if ( query.indexOf("$") >= 0 )
+														sql.query(
+															`SELECT json_extract(${store}, '$${key}') AS ${store} FROM ?? WHERE ? LIMIT 1`,
+															[ $ds, $usecase ], (err,recs) => {
+
+																if ( err ) 
+																	Log(err);
+
+																else
+																if ( ctx = recs[0] ) {
+																	ctx[store] = JSON.parse(ctx[store]);
+																	(cb||runNotebook)( ctx );
+																}
+
+															});
+
+													else
+														sql.query(
+															`SELECT ${store.split('&').join(',')} FROM ?? WHERE ? LIMIT 1`,
+															[ $ds, $usecase ], (err,recs) => {
+
+																if ( err ) 
+																	Log(err);
+
+																else
+																if ( ctx = recs[0] )
+																	(cb||runNotebook)( ctx );
+
+															}); 
+												});
+
+											else 
+												sqlThread( sql => {		// update notebook context with specifed hash
+													const
+														[store,key] = query.split("$"),
+														val = JSON.stringify(cb);
+
+													if ( query.indexOf("$") >= 0 )
+														sql.query(
+															`UPDATE ?? SET ${store} = json_set(${store}, '$${key}', cast(? AS JSON)) WHERE ?`, 
+															[ $ds, val, $usecase ],
+															err => logRun(err || errors.ok) );
+
+													else
+														sql.query(
+															`UPDATE ?? SET ${store} = ? WHERE ?`,
+															[ $ds, val, $usecase ],
+															err => logRun(err || errors.ok) );
+												});
+
+										else
+										if ( isFunction(cb || runNotebook) )
+											sqlThread( sql => {		// run notebook
+												sql.getContext( $ds, $usecase, cb || runNotebook );
+											});
+
+										else
+											sqlThread( sql => {	// update notebook context
+												sql.query(
+													"UPDATE ?? SET ? WHERE ?",
+													[ $ds, cb, $usecase ],
+													err => logRun(err || errors.ok) );												
+											});
+
+									}
+
+									else
+									if ( isFunction(index) )
+										sqlThread( sql => {
+											sql.getKeys( $ds, "Field NOT LIKE 'Save%'", ({Field}) => {
+												sql.query( "SELECT Name FROM ??", [$ds], (err,recs) => {
+													index({ 
+														keys: Field,
+														cases: err ? null : recs.get("Name").Name
+													});
 												});
 											});
 										});
-									});
+
+									else
+										runNotebook(Copy( index, $engine ));
 
 								else
-									runNotebook(Copy( index, $engine ));
+									sqlThread( sql => {
+										sql.getKeys( $ds, "", ({Field}) => { 
+											console.log(`
+	Usage:
+		${$book}( "USECASE?STORE$KEY" || "USECASE?KEY || "USECASE" || || ...", {SETKEY:NEWVAUE, ...} )
+		${$book}( "USECASE?STORE$KEY" || "USECASE?KEY || "USECASE" || || ...", CTX => { ... } ) 
+		${$book}( "USECASE" || {...}, RESULTS => { ... } ) 
+		${$book}( {keys:[...], cases:[...]} => { ... } )  
 
-							else
-								sqlThread( sql => {
-									sql.getKeys( $ds, "", ({Field}) => { 
-										console.log(`
-Usage:
-	${$book}( "USECASE?STORE$KEY" || "USECASE?KEY || "USECASE" || || ...", {SETKEY:NEWVAUE, ...} )
-	${$book}( "USECASE?STORE$KEY" || "USECASE?KEY || "USECASE" || || ...", CTX => { ... } ) 
-	${$book}( "USECASE" || {...}, RESULTS => { ... } ) 
-	${$book}( {keys:[...], cases:[...]} => { ... } )  
-
-Keys:
-	${Field.join(",")}
-` );
+	Keys:
+		${Field.join(",")}
+	` );
+										});
 									});
-								});
-							
-							return toggle.chain ? $me : null;
-						});
+
+								return toggle.chain ? $me : null;
+							});
+					});
 				});
 			});
 
@@ -1595,7 +1601,7 @@ Keys:
 				{dogs} = DEBE;
 			
 			Each( dogs, (name,dog) => {
-				$libs["$"+name+"dog"] = function () { Log("Dogging",name); sqlThread(sql => dog(sql)); } 
+				$libs["$"+name+"_dog"] = function () { Log("Dogging",name); sqlThread(sql => dog(sql)); } 
 			});
 			
 			site.watchDogs = Object.keys(dogs).map( key => key ).join(", ");			
@@ -1613,19 +1619,14 @@ Keys:
 			{lookups} = SKIN,
 			{pocs,host} = site;
 		
-		sql.query("SELECT Ref AS `Key`,group_concat(DISTINCT Path SEPARATOR '|') AS `Select` FROM openv.lookups GROUP BY Ref", [], (err,recs) => {
-			recs.forEach( rec => {
-				lookups[rec.Key] = rec.Select;
-			});
-		});
-		
 		initLAB( () => {  // init $lab notebooks
 		initENV( () => {  // init environment
 		initSES( () => {  // init sessions
 			
-			if ( CLUSTER.isMaster ) {
+			if ( isMaster ) {
 				if ( false ) startNews(sql);
 
+				if (false)
 				startMail( err => {
 					if (false)
 					sendMail({		// notify admin service started
@@ -1635,12 +1636,11 @@ Keys:
 					} );
 				});
 
-				// reset file watchers
-				/*
+				if (false)
 				sql.query( "SELECT File FROM openv.watches WHERE substr(File,1,1) = '/' GROUP BY File", [] )
 				.on("result", link => {
 					ENDPTS.autorun.set( link.File );
-				});	*/
+				});
 
 				if ( false ) {	// clear graph database
 					sql.query("DELETE FROM openv.nlpactors");
@@ -1699,21 +1699,11 @@ Keys:
 					f:"Fork" 
 				}); */
 			
-			SKIN.config({
-				context: site
-				// route: routeTable
-			});
-			
-			$.config({		// matrix manipulator
-				sqlThread: sqlThread,
-				runTask: runTask,
-				//fetch: fetch
-			}, $ => {
+			$.config({}, $ => {
+				const 
+					{saveKeys,scripts} = $;
 				
 				sqlThread( sql => {
-					const 
-						{saveKeys,scripts} = $;
-
 					/*
 					sql.getFields("openv._stats", {}, keys => {		//  init shared file stats
 						keys.forEach( key => saveKeys[key] = true );
@@ -1739,24 +1729,28 @@ Keys:
 							});
 					});
 				});
-
 			});
 
 			ATOM.config({		// plugin/notebook/engine manager
-				//ipcFeed: feedPlugin,
-				//ipcSave: savePlugin,
-				sqlThread: sqlThread,
 				cores: 0,
 				node: ENV.HOSTNAME,
 				"$libs.": $libs
 			});
 
 			READ.config({
-				jimp: JIMP,
-				sqlThread: sqlThread
+				jimp: JIMP
 			});
 			
-			init(sql);
+			if ( init ) sqlThread( sql => {
+				sql.query("SELECT Ref AS `Key`,group_concat(DISTINCT Path SEPARATOR '|') AS `Select` FROM openv.lookups GROUP BY Ref", [], (err,recs) => {
+					recs.forEach( rec => {
+						lookups[rec.Key] = rec.Select;
+					});
+				});
+		
+				init(sql);
+			});
+			
 			//site.repos.forEach( x => site[x+"$"] = lab => (lab||x).tag(site.repo+"/"+x) );
 			//site.views.forEach( x => site[x+"$"] = lab => (lab||x).tag(site.view+"/"+x+".view") );
 
@@ -2000,7 +1994,6 @@ Keys:
 			res({
 				data: Recs
 			});
-			Trace(Recs);
 		},
 		
 		/**
@@ -5845,12 +5838,12 @@ function savePage(req,res) {
 		case "gif":
 			/*
 			CP.execFile( "node", ["phantomjs", "rasterize.js", url, docf, res], function (err,stdout) { 
-				if (err) Trace(err,stdout);
+				if (err) Log(err,stdout);
 			});  */
 			res( "Claim your file".link(tar) );
 			
 			CP.exec(`phantomjs rasterize.js ${src} .${tar}`, (err,log) => {
-				Trace(err || `SAVED ${url}` );
+				Log(err || `SAVED ${url}` );
 			});
 			break;
 
@@ -5858,7 +5851,7 @@ function savePage(req,res) {
 			res( "Claim your file".link(tar) );
 			Fetch( src, html => {
 				FS.writeFile( `.${tar}`, html, err => {
-					Trace(err || `SAVED ${url}` );
+					Log(err || `SAVED ${url}` );
 				});
 			});
 			break;	
@@ -5866,7 +5859,7 @@ function savePage(req,res) {
 		default:
 			res( "Claim your file".link(xtar) );
 			CP.exec(`phantomjs rasterize.js ${xsrc} .${xtar}`, (err,log) => {
-				Trace(err || `SAVED ${url}` );
+				Log(err || `SAVED ${url}` );
 			});
 			
 	}
@@ -6091,7 +6084,7 @@ function getPlugin(req,res) {
 	}
 
 	function genLicense(code, secret) {  //< callback cb(minifiedCode, license)
-		Trace(">>>release passphrase", secret);
+		Trace("release passphrase", secret);
 		if (secret)
 			return CRYPTO.createHmac("sha256", secret).update(code).digest("hex");
 
@@ -6135,7 +6128,7 @@ function getPlugin(req,res) {
 					inLoopback = endservice == "loopback",
 					valid = users.parseJSON([]).concat( inLoopback ? partner : [] ).any( partner );
 
-				Trace(">>>release fetched users", users, partner, valid);
+				Trace("release fetched users", users, partner, valid);
 
 				if (valid) // signal valid
 					returnLicense(pub);
@@ -6890,7 +6883,7 @@ function publishPlugin(req,res) {
 
 		FS.mkdir( `./artifacts/${name}`, err => {
 			if ( err ) 
-				Trace(err);
+				Log(err);
 			
 			else { // prime the notebook
 				// make a login link
@@ -7515,9 +7508,9 @@ switch ( mode = process.argv[2] ) { // unit tests
 			{dogs,$libs} = DEBE,
 			{$api} = $libs;
 
-		config({cores:1}, sql => {
+		config({cores:0}, sql => {
 		
-			if ( CLUSTER.isMaster ) {
+			if ( isMaster ) {
 				switch (mode) {
 					case "D$":
 						Debug( );
@@ -7542,6 +7535,7 @@ switch ( mode = process.argv[2] ) { // unit tests
 
 	case "D1":
 	case "admin":
+	case "start":
 		const
 			{ ingestFile } = require("../geohack");
 		
@@ -7607,7 +7601,7 @@ assessments from our worldwide reporting system, please contact ${poc}.
 						}
 					});
 				}
-			}
+			} 
 		}, sql => {
 			Trace( 
 `Yowzers - this does everything but eat!  An encrypted service, a database, a jade UI for clients,
@@ -7631,7 +7625,7 @@ clients, users, system health, etc).`
 					res("here i go again");
 
 					Fetch(ENV.WFS_TEST, data => {
-						Trace(data);
+						Log(data);
 					});
 				}
 			}
