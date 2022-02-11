@@ -722,10 +722,24 @@ const
 	/**
 	*/
 	$libs: {   // share these modules with engines
-			
+		
+		/**
+		*/
 		$site: site,
 		
+		/**
+		*/
 		$notebooks: [],
+		
+		/**
+		*/
+		$fetch: (ref,cb) => {
+			if (ref)
+				Fetch( ref, cb || console.log );
+			
+			else
+				console.log(ENUMS.sites);
+		},
 		
 		/**
 		*/
@@ -972,7 +986,7 @@ Usage:
 		Pipe: `
 Place data source into a [buffered, regulated, enumerated, event or named *Pipe*](/pipeapi.view):
 	"PROTOCOL://HOST/ENDPOINT ? QUERY"
-	"/FILE.TYPE ? _batch=N & _limit=N & _start=DATE & _end=DATA & _every=sec||min||hr||... & _util=N & _on=N & _off=N & _watch=N & _propose=N & _basline=N,...N & _agent=X & REKEY=EVAL||KEY"
+	"/FILE.TYPE ? _batch=N & _limit=N & _start=DATE & _end=DATE & _every=sec||min||hr||... & _util=N & _on=N & _off=N & _watch=N & _propose=N & _basline=N,...N & _agent=X & _rekey=EVAL||KEY"
 	{ "KEY" :  [N, ...] || "MATHJS" , noClobber:N, noRun:N } || { "$" : "MATHJS" } 
 	[ EVENT, ... ]
 	".CASE.NOTEBOOK"
@@ -4599,8 +4613,7 @@ Respond with system configuration information on requested module mod = NAME or 
 
 			else 
 				Fetch( "http:/config?mod=man", man => {
-				Fetch( "http:/config?mod=enum", en => {
-				Fetch( "http:/config?mod=flex", flex => {
+				Fetch( "http:/config?mod=enums", en => {
 				Fetch( "http:/config?mod=totem", totem => {
 				Fetch( "http:/config?mod=debe", debe => {
 					res({
@@ -4610,7 +4623,7 @@ Respond with system configuration information on requested module mod = NAME or 
 						totem: totem,
 						debe: debe
 					});
-				}); }); }); }); });
+				}); }); }); });
 		},
 
 		/**
@@ -4858,7 +4871,7 @@ Respond with system configuration information on requested module mod = NAME or 
 									totem: "/shares/prm/totem/index.html",
 									atomic: "/shares/prm/atomic/index.html",
 									man: "/shares/prm/man/index.html",
-									flex: "/shares/prm/flex/index.html",
+									//flex: "/shares/prm/flex/index.html",
 									geohack: "/shares/geohack/man/index.html"
 								}
 							},
@@ -5165,7 +5178,7 @@ size, pixels, scale, step, range, detects, infile, outfile, channel.  This endpo
 			 e: "[Leaders](xxx:/sponsors?level=leader)",
 			 f: "[Federated Repo](http://github.com/totemstan/dockify)"
 			},
-			{a: "[Privacy](xxx:/terms.new)",	
+			{a: "[Privacy](xxx:/privacy.new)",	
 			 b: "[API](xxx:/api.view)",
 			 c: "[Contact Us](xxx:/contact.view)",
 			 d: "[Twitter](https://twitter.com/?goto=totem)",
@@ -5200,7 +5213,7 @@ size, pixels, scale, step, range, detects, infile, outfile, channel.  This endpo
 			c:"Corporate",
 			d:"Follow Us",
 			e:"[Sponsorships](xxx:/likeus)".linkify(),
-			f:"Fork" }).replace(/xxx:/g, site.host),
+			f:"Fork" }).replace(/xxx:/g, ""),
 		
 		/**
 		Title ti to fileName fn

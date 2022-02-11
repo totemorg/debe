@@ -274,7 +274,6 @@ append base_body
 						[download a file from the shares area](/shares/welcome.pdf)  
 						[return flare json file from data area](/data/flare.json)
 
-
 		tab.Datasets
 			folder#Datasets(dock="left")
 				tab.Endpoints
@@ -305,7 +304,7 @@ append base_body
 							KEY !exp= PATTERN  
 							KEY !bin= PATTERN  
 
-						Indexing and excluding:
+						Indexing:
 
 							KEY
 							STORE$KEY
@@ -327,16 +326,28 @@ append base_body
 							_nav = open | tree | rename | size ,root/A/B/... folder navigation  
 							_$STORE = MATHJS constructor
 
-						Misc:
+						Task regulating:
+
+							_every 	= sec||min||hr||...  
+							_start	= DATE  
+							_end	= DATE  
+							_watch	= NUM  
+							_limit	= INT  
+							_on		= NUM  
+							_off	= NUM  						
+							_util	= NUM  
+
+						File reading:
+
+							_keys  = TO:FROM & ...
+							_limit = INT
+							_batch = INT
+							
+						Legacy:
 
 							_lock	= enable record locking  
 							_view = name of view to correlate with daataset  
 							_blog	= KEY blog markdown in record KEY
-
-						Filtering:
-
-							_limit = number of records to return  
-							_offset = record position to start returning records  
 							_score = minimum search score required  
 							_filters = [{property:KEY,value:PATTERN}, ...]
 
