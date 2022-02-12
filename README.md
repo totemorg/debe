@@ -129,6 +129,13 @@ BY = https://DOMAIN
 <a name="DEBE.module_String"></a>
 
 ## String
+
+* [String](#DEBE.module_String)
+    * [~linkify(ref)](#DEBE.module_String..linkify) ⇐ <code>Array</code>
+    * [~mailify()](#DEBE.module_String..mailify)
+    * [~align()](#DEBE.module_String..align)
+    * [~trimGoogle()](#DEBE.module_String..trimGoogle)
+
 <a name="DEBE.module_String..linkify"></a>
 
 ### String~linkify(ref) ⇐ <code>Array</code>
@@ -141,6 +148,18 @@ Returns a ref-joined list of links
 | --- | --- |
 | ref | <code>String</code> | 
 
+<a name="DEBE.module_String..mailify"></a>
+
+### String~mailify()
+**Kind**: inner method of [<code>String</code>](#DEBE.module_String)  
+<a name="DEBE.module_String..align"></a>
+
+### String~align()
+**Kind**: inner method of [<code>String</code>](#DEBE.module_String)  
+<a name="DEBE.module_String..trimGoogle"></a>
+
+### String~trimGoogle()
+**Kind**: inner method of [<code>String</code>](#DEBE.module_String)  
 <a name="DEBE.module_Array"></a>
 
 ## Array
@@ -232,7 +251,7 @@ Returns a tree = {name,weight,nodes} from records having been sorted on keys=[ke
 
 ### Array~joinify(cb)
 Joins a list with an optional callback cb(head,list) to join the current list 
-	with the current head.
+with the current head.
 
 **Kind**: inner method of [<code>Array</code>](#DEBE.module_Array)  
 
@@ -243,11 +262,11 @@ Joins a list with an optional callback cb(head,list) to join the current list
 **Example**  
 ```js
 [	a: null,
-			g1: [ b: null, c: null, g2: [ x: null ] ],
-			g3: [ y: null ] ].joinify()
+		g1: [ b: null, c: null, g2: [ x: null ] ],
+		g3: [ y: null ] ].joinify()
 
-	returning a string
-		"a,g1(b,c,g2(x)),g3(y)"
+returning a string
+	"a,g1(b,c,g2(x)),g3(y)"
 ```
 <a name="DEBE.module_Data"></a>
 
@@ -344,6 +363,8 @@ config({
 
 * [DEBE](#module_DEBE)
     * [~$libs](#module_DEBE..$libs)
+        * [.$site](#module_DEBE..$libs.$site)
+        * [.$notebooks](#module_DEBE..$libs.$notebooks)
         * [.$](#module_DEBE..$libs.$)
         * [.$log](#module_DEBE..$libs.$log)
         * [.$task](#module_DEBE..$libs.$task)
@@ -352,6 +373,7 @@ config({
         * [.$neo](#module_DEBE..$libs.$neo)
         * [.$copy](#module_DEBE..$libs.$copy)
         * [.$each](#module_DEBE..$libs.$each)
+        * [.$fetch()](#module_DEBE..$libs.$fetch)
         * [.$get()](#module_DEBE..$libs.$get)
         * [.$ran()](#module_DEBE..$libs.$ran)
         * [.$api()](#module_DEBE..$libs.$api)
@@ -450,6 +472,8 @@ config({
 **Kind**: inner property of [<code>DEBE</code>](#module_DEBE)  
 
 * [~$libs](#module_DEBE..$libs)
+    * [.$site](#module_DEBE..$libs.$site)
+    * [.$notebooks](#module_DEBE..$libs.$notebooks)
     * [.$](#module_DEBE..$libs.$)
     * [.$log](#module_DEBE..$libs.$log)
     * [.$task](#module_DEBE..$libs.$task)
@@ -458,10 +482,19 @@ config({
     * [.$neo](#module_DEBE..$libs.$neo)
     * [.$copy](#module_DEBE..$libs.$copy)
     * [.$each](#module_DEBE..$libs.$each)
+    * [.$fetch()](#module_DEBE..$libs.$fetch)
     * [.$get()](#module_DEBE..$libs.$get)
     * [.$ran()](#module_DEBE..$libs.$ran)
     * [.$api()](#module_DEBE..$libs.$api)
 
+<a name="module_DEBE..$libs.$site"></a>
+
+#### $libs.$site
+**Kind**: static property of [<code>$libs</code>](#module_DEBE..$libs)  
+<a name="module_DEBE..$libs.$notebooks"></a>
+
+#### $libs.$notebooks
+**Kind**: static property of [<code>$libs</code>](#module_DEBE..$libs)  
 <a name="module_DEBE..$libs.$"></a>
 
 #### $libs.$
@@ -510,6 +543,10 @@ See [enums](https://github.com/totemstan/enums/)
 See [enums](https://github.com/totemstan/enums/)
 
 **Kind**: static property of [<code>$libs</code>](#module_DEBE..$libs)  
+<a name="module_DEBE..$libs.$fetch"></a>
+
+#### $libs.$fetch()
+**Kind**: static method of [<code>$libs</code>](#module_DEBE..$libs)  
 <a name="module_DEBE..$libs.$get"></a>
 
 #### $libs.$get()
@@ -1030,6 +1067,8 @@ Endpoint to send emergency message to all clients then halt totem
 <a name="module_DEBE..byTable..config"></a>
 
 #### byTable..config(req, res)
+Configure DEBE/TOTEM.
+
 **Kind**: static method of [<code>byTable.</code>](#module_DEBE..byTable.)  
 
 | Param | Type | Description |

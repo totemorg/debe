@@ -60,21 +60,25 @@ const
 @module DEBE.String
 */
 Copy({
-	/**
-	Returns a ref-joined list of links
-	@extends Array
-	@param {String} ref
-	*/
+/**
+Returns a ref-joined list of links
+@extends Array
+@param {String} ref
+*/
 	linkify: function (ref) {
 		return ref 
 			? this.link( ref ) 
 			: this.replace( /\[([^\[\]]*)\]\(([^\)]*)\)/g, (str,lab,url) => lab.link(url) );
 	},
 	
+/**
+*/
 	mailify: function ( label, tags ) {
 		return this ? label.link( "mailto:"+this.tag("?", tags || {}) ) : "missing email list";
 	},
 	
+/**
+*/
 	align: function (hits,y,s) {
 		var
 			s0 = (a,b) => (a=="?" || b == "?") ? -2 : (a==b) ? 1 : -1 ,
@@ -100,6 +104,8 @@ Copy({
 		hits = hits.sort( (a,b) => b.score-a.score );
 	},
 	
+/**
+*/
 	trimGoogle: function () {
 		return this
 			.replace(/(.*) -- (.*)/, (str,L,R) => R)
@@ -115,10 +121,10 @@ Copy({
 @module DEBE.Array
 */
 Copy({  // array prototypes
-	/**
-	Creates an html table from an array.
-	@param {Boolean} noheader switch to enable header processing
-	*/
+/**
+Creates an html table from an array.
+@param {Boolean} noheader switch to enable header processing
+*/
 	gridify: function (rehead,style) {	//< dump dataset as html table
 		function join(recs,sep) { 
 			switch (recs.constructor) {
@@ -210,11 +216,11 @@ Copy({  // array prototypes
 		return  table( this );
 	},
 	
-	/**
-	Groups each "x.y.z. ...." spec in the list.
+/**
+Groups each "x.y.z. ...." spec in the list.
 
-	@param {string} dot item seperator
-	*/
+@param {string} dot item seperator
+*/
 	groupify: function (dot) {
 		var src = {};
 		this.forEach( key => src[key] = key.split(dot).pop() ); 
@@ -222,14 +228,14 @@ Copy({  // array prototypes
 		return [].joinify( Copy(src, {} ,dot) );
 	},
 
-	/**
-	Blogs each string in the list.
+/**
+Blogs each string in the list.
 
-	@see totem:blogify
-	@param {List} keys list of keys to blog
-	@param {String} ds Name of dataset being blogged
-	@param {Function} cb callback(recs) blogified version of records
-	*/
+@see totem:blogify
+@param {List} keys list of keys to blog
+@param {String} ds Name of dataset being blogged
+@param {Function} cb callback(recs) blogified version of records
+*/
 	blogify: function ( req, key, ds, cb ) {
 		const 
 			{ sql, flags, client, profile, table, type, host } = req,
@@ -312,11 +318,11 @@ Copy({  // array prototypes
 		});
 	},
 
-	/**
-	Merge changes when doing table deltas from their baseline versions.
-	@param {Array} Recs Source records to merge into this records
-	@param {String} idx Key name to use for detecting record changes
-	**/
+/**
+Merge changes when doing table deltas from their baseline versions.
+@param {Array} Recs Source records to merge into this records
+@param {String} idx Key name to use for detecting record changes
+**/
 	merge: function (Recs,idx) {
 
 		function changed(rec,Rec) {
@@ -362,10 +368,10 @@ Copy({  // array prototypes
 		return recs;
 	},
 
-	/**
-	Returns a schema of the array using the specified src path.
-	@param {String} src path to source
-	*/
+/**
+Returns a schema of the array using the specified src path.
+@param {String} src path to source
+*/
 	schemaify: function (src) {
 		function nodeify(store, path, cb) {	// return list of nodes from store node
 
@@ -461,14 +467,14 @@ Copy({  // array prototypes
 			);
 	},
 
-	/**
-	Returns a tree = {name,weight,nodes} from records having been sorted on keys=[key,...]
-	@param {Number} idx starting index (0 on first call)
-	@param {Number} kids number of leafs following starting index (this.length on first call)
-	@param {Number} level current depth (0 on first call)
-	@param {Array} keys pivot keys
-	@param {String} wt key name that contains leaf weight (defaults to "size")
-	*/
+/**
+Returns a tree = {name,weight,nodes} from records having been sorted on keys=[key,...]
+@param {Number} idx starting index (0 on first call)
+@param {Number} kids number of leafs following starting index (this.length on first call)
+@param {Number} level current depth (0 on first call)
+@param {Array} keys pivot keys
+@param {String} wt key name that contains leaf weight (defaults to "size")
+*/
 	treeify: function (idx,kids,level,keys,wt) {
 		var	
 			recs = this,
@@ -517,19 +523,19 @@ Copy({  // array prototypes
 		return tar;
 	},
 
-	/**
-	Joins a list with an optional callback cb(head,list) to join the current list 
-	with the current head.
+/**
+Joins a list with an optional callback cb(head,list) to join the current list 
+with the current head.
 
-	@param {Function} cb
-	@example
-		[	a: null,
-			g1: [ b: null, c: null, g2: [ x: null ] ],
-			g3: [ y: null ] ].joinify()
+@param {Function} cb
+@example
+	[	a: null,
+		g1: [ b: null, c: null, g2: [ x: null ] ],
+		g3: [ y: null ] ].joinify()
 
-	returning a string
-		"a,g1(b,c,g2(x)),g3(y)"
-	*/
+returning a string
+	"a,g1(b,c,g2(x)),g3(y)"
+*/
 	joinify: function (src) {
 		var 
 			rtn = [];
@@ -695,9 +701,9 @@ const
 	
 	Trace: (msg, ...args) => `debe>>>${msg}`.trace( args ),
 		
-	/**
-	Inspect doc - kludge i/f to support nlp project
-	*/
+/**
+Inspect doc - kludge i/f to support nlp project
+*/
 	linkInspect: (doc,to,cb) => {
 		
 		Trace("sendmail", doc,to);
@@ -719,20 +725,20 @@ const
 			
 	},
 	
-	/**
-	*/
+/**
+*/
 	$libs: {   // share these modules with engines
 		
-		/**
-		*/
+/**
+*/
 		$site: site,
 		
-		/**
-		*/
+/**
+*/
 		$notebooks: [],
 		
-		/**
-		*/
+/**
+*/
 		$fetch: (ref,cb) => {
 			if (ref)
 				Fetch( ref, cb || console.log );
@@ -741,8 +747,8 @@ const
 				console.log(ENUMS.sites);
 		},
 		
-		/**
-		*/
+/**
+*/
 		$get: (src,index,cb) => {
 			switch (src.constructor.name) {
 				case "Array":
@@ -760,29 +766,29 @@ Usage:
 			}
 		},
 		
-		/**
-		See [man]{@link https://github.com/totemstan/man/}
-		*/
+/**
+See [man]{@link https://github.com/totemstan/man/}
+*/
 		$: $,
-		/**
-		See [man]{@link https://github.com/totemstan/man/}
-		*/
+/**
+See [man]{@link https://github.com/totemstan/man/}
+*/
 		$ran: opts => new RAN(opts),
-		/**
-		See [debe]{@link https://github.com/totemstan/debe/}
-		*/
+/**
+See [debe]{@link https://github.com/totemstan/debe/}
+*/
 		$log: console.log,
-		/**
-		See [debe]{@link https://github.com/totemstan/debe/}
-		*/
+/**
+See [debe]{@link https://github.com/totemstan/debe/}
+*/
 		$task: runTask,
-		/**
-		See [man]{@link https://github.com/totemstan/man/}
-		*/
+/**
+See [man]{@link https://github.com/totemstan/man/}
+*/
 		$jimp: JIMP,
-		/**
-		See [jsdb]{@link https://github.com/totemstan/jsdb/}
-		*/
+/**
+See [jsdb]{@link https://github.com/totemstan/jsdb/}
+*/
 		$sql: sqlThread,
 		
 		$select: (url,cb) => dsThread( {
@@ -806,29 +812,29 @@ Usage:
 			client: "$lab"
 		}, req => byAction.delete(req, cb||$log) ),
 		
-		/**
-		See [jsdb]{@link https://github.com/totemstan/jsdb/}
-		*/
+/**
+See [jsdb]{@link https://github.com/totemstan/jsdb/}
+*/
 		$neo: neoThread,
-		/**
-		See [enums]{@link https://github.com/totemstan/enums/}
-		*/
+/**
+See [enums]{@link https://github.com/totemstan/enums/}
+*/
 		$copy: Copy,
-		/**
-		See [enums]{@link https://github.com/totemstan/enums/}
-		*/
+/**
+See [enums]{@link https://github.com/totemstan/enums/}
+*/
 		$each: Each,
-		/**
-		*/
+/**
+*/
 		$api: () => {
 			CP.exec( `firefox ${site.master}/labapi.view` );
 			return null;
 		}
 	},
 	
-	/**
-	License notebook engine code.
-	*/
+/**
+License notebook engine code.
+*/
 	licenseCode: ( sql, code, pub, cb ) => {  //< callback cb(pub) or cb(null) on error
 
 		function validateLicense(pub, cb) {
@@ -894,9 +900,9 @@ Usage:
 			validateLicense(pub, cb);
 	},
 	
-	/**
-	Route table to a database according to security requirements.
-	*/
+/**
+Route table to a database according to security requirements.
+*/
 	"tableRoutes.": {  //< sql table re-routers
 		profiles: req => "openv.profiles",
 		sessions: req => "openv.sessions",
@@ -966,9 +972,9 @@ Usage:
 
 	// blogContext: BLOG,		//< blogging / skinning context
 	
-	/**
-	Default doc for reserved notebook keys
-	*/
+/**
+Default doc for reserved notebook keys
+*/
 	defaultDocs: {	// default plugin docs (db key comments)
 		nodoc: "no documentation provided",
 
@@ -1035,12 +1041,12 @@ as described in the [Notebooks api](/api.view). `,
 
 	},
 	
-	/**
-	*/
+/**
+*/
 	licenseOnDownload: true,
 			
-	/**
-	*/
+/**
+*/
 	sendMail: (opts,cb) => {
 	
 		Trace("sendmail", opts);
@@ -1076,11 +1082,11 @@ as described in the [Notebooks api](/api.view). `,
 			}
 	},
 
-	/**
-	Initialize DEBE on startup.
-	@param {Object} sql MySQL connector
-	@param {Function} init callback(sql) when service init completed
-	*/
+/**
+Initialize DEBE on startup.
+@param {Object} sql MySQL connector
+@param {Function} init callback(sql) when service init completed
+*/
 	initialize: init => {	//< initialize service
 		
 		/*
@@ -1779,13 +1785,13 @@ as described in the [Notebooks api](/api.view). `,
 		counts: {State: ""}
 	},
 
-	/**
-	Filters via request flags
-	*/
+/**
+Filters via request flags
+*/
 	"filterFlag." : {  
 		
-		/**
-		*/
+/**
+*/
 		"flagTrap.": {  // TRAP=name flags can modify the request flags
 			/*
 			save: function (req) {  //< _save=name retains query in named engine
@@ -1825,8 +1831,6 @@ as described in the [Notebooks api](/api.view). `,
 			} */
 		},
 		
-		/**
-		*/
 		/*
 		select: (recs,req,res) => {
 			const
@@ -1843,8 +1847,8 @@ as described in the [Notebooks api](/api.view). `,
 											 	// `window.open("/nb.mod?"+_Client_Type.value+"="+${id}.value)`}) );			
 		},*/
 		
-		/**
-		*/
+/**
+*/
 		blog: (recs,req,res) => {  //< renders dataset records
 			const 
 				{ flags, table, query } = req,
@@ -1863,8 +1867,8 @@ as described in the [Notebooks api](/api.view). `,
 				res(recs);
 		},
 		
-		/**
-		*/
+/**
+*/
 		$: (recs,req,res) => {
 			const { flags } = req;
 			var rtn = recs;
@@ -1989,16 +1993,16 @@ as described in the [Notebooks api](/api.view). `,
 		
 	},
 											 
-	/**
-	Filter dataset recs on specifed req-res thread
-	*/	
+/**
+Filter dataset recs on specifed req-res thread
+*/	
 	"filterType." : { 
 		
-		/**
-		@param {Array} recs Records to filter
-		@param {Object} req Totem session request
-		@param {Function} res Totem session response
-		*/
+/**
+@param {Array} recs Records to filter
+@param {Object} req Totem session request
+@param {Function} res Totem session response
+*/
 		dbx: (recs, req, res) => {
 			var Recs = [];
 			recs.forEach( rec => {
@@ -2011,11 +2015,11 @@ as described in the [Notebooks api](/api.view). `,
 			});
 		},
 		
-		/**
-		@param {Array} recs Records to filter
-		@param {Object} req Totem session request
-		@param {Function} res Totem session response
-		*/
+/**
+@param {Array} recs Records to filter
+@param {Object} req Totem session request
+@param {Function} res Totem session response
+*/
 		db: (recs, req, res) => {	
 			res({ 
 				success: true,
@@ -2044,20 +2048,20 @@ as described in the [Notebooks api](/api.view). `,
 			}); */
 		},
 		
-		/**
-		@param {Array} recs Records to filter
-		@param {Object} req Totem session request
-		@param {Function} res Totem session response
-		*/
+/**
+@param {Array} recs Records to filter
+@param {Object} req Totem session request
+@param {Function} res Totem session response
+*/
 		kml: (recs,req,res) => {  //< dataset.kml converts to kml
 			res( TOKML({}) );
 		},
 		
-		/**
-		@param {Array} recs Records to filter
-		@param {Object} req Totem session request
-		@param {Function} res Totem session response
-		*/
+/**
+@param {Array} recs Records to filter
+@param {Object} req Totem session request
+@param {Function} res Totem session response
+*/
 		flat: (recs,req,res) => { //< dataset.flat flattens records
 			recs.forEach( (rec,n) => {
 				var rtns = new Array();
@@ -2067,11 +2071,11 @@ as described in the [Notebooks api](/api.view). `,
 			res( recs );
 		},
 		
-		/**
-		@param {Array} recs Records to filter
-		@param {Object} req Totem session request
-		@param {Function} res Totem session response
-		*/
+/**
+@param {Array} recs Records to filter
+@param {Object} req Totem session request
+@param {Function} res Totem session response
+*/
 		txt: (recs,req,res) => { //< dataset.txt convert to text
 			var head = recs[0], cols = [], cr = String.fromCharCode(13), txt="", list = ",";
 
@@ -2121,45 +2125,45 @@ Usage: ${uses.join(", ")}  `);
 			
 		}, */
 		
-		/**
-		@param {Array} recs Records to filter
-		@param {Object} req Totem session request
-		@param {Function} res Totem session response
-		*/
+/**
+@param {Array} recs Records to filter
+@param {Object} req Totem session request
+@param {Function} res Totem session response
+*/
 		html: (recs,req,res) => { //< dataset.html converts to html
 			res( recs.gridify ? recs.gridify({},{border: "1"}) : recs );
 		},
 
 		// MS office doc types
-		/**
-		@param {Array} recs Records to filter
-		@param {Object} req Totem session request
-		@param {Function} res Totem session response
-		*/
+/**
+@param {Array} recs Records to filter
+@param {Object} req Totem session request
+@param {Function} res Totem session response
+*/
 		xdoc: genDoc,
-		/**
-		@param {Array} recs Records to filter
-		@param {Object} req Totem session request
-		@param {Function} res Totem session response
-		*/
+/**
+@param {Array} recs Records to filter
+@param {Object} req Totem session request
+@param {Function} res Totem session response
+*/
 		xxls: genDoc,
-		/**
-		@param {Array} recs Records to filter
-		@param {Object} req Totem session request
-		@param {Function} res Totem session response
-		*/
+/**
+@param {Array} recs Records to filter
+@param {Object} req Totem session request
+@param {Function} res Totem session response
+*/
 		xpps: genDoc,
-		/**
-		@param {Array} recs Records to filter
-		@param {Object} req Totem session request
-		@param {Function} res Totem session response
-		*/
+/**
+@param {Array} recs Records to filter
+@param {Object} req Totem session request
+@param {Function} res Totem session response
+*/
 		xppt: genDoc,
-		/**
-		@param {Array} recs Records to filter
-		@param {Object} req Totem session request
-		@param {Function} res Totem session response
-		*/
+/**
+@param {Array} recs Records to filter
+@param {Object} req Totem session request
+@param {Function} res Totem session response
+*/
 		tree: (recs,req,res) => { //< dataset.tree treeifies records sorted with _sort=keys
 			var 
 				flags = req.flags,
@@ -2175,11 +2179,11 @@ Usage: ${uses.join(", ")}  `);
 			else
 				res( new Error("missing sorts=key,... flag") );
 		},
-		/**
-		@param {Array} recs Records to filter
-		@param {Object} req Totem session request
-		@param {Function} res Totem session response
-		*/
+/**
+@param {Array} recs Records to filter
+@param {Object} req Totem session request
+@param {Function} res Totem session response
+*/
 		schema: (recs,req,res) => { //< dataset.schema 
 			var 
 				flags = req.flags,
@@ -2213,16 +2217,16 @@ Usage: ${uses.join(", ")}  `);
 		*/
 	},
 
-	/**
-	/AREA/FILE-endpoint routers
-	*/
+/**
+/AREA/FILE-endpoint routers
+*/
 	"byArea.": {
 		all: null, 
-		/**
-		Default area navigator.
-		@param {Object} req Totem session request
-		@param {Function} res Totem session response		
-		*/
+/**
+Default area navigator.
+@param {Object} req Totem session request
+@param {Function} res Totem session response		
+*/
 		root: (req,res) => {
 			function sendFolder(res,recs) {
 				//Trace("sending",cwd, recs);
@@ -3228,17 +3232,17 @@ Usage: ${uses.join(", ")}  `);
 
 	},
 
-	/**
-	/TABLE-endpoint routers
-	*/
+/**
+/TABLE-endpoint routers
+*/
 	"byTable.": {
 		// nlp
 
-		/**
-		Search for a file
-		@param {Object} req Totem session request
-		@param {Function} res Totem session response		
-		*/
+/**
+Search for a file
+@param {Object} req Totem session request
+@param {Function} res Totem session response		
+*/
 		search: (req,res) => {
 			const
 				{ sql, query, type } = req,
@@ -3300,11 +3304,11 @@ Usage: ${uses.join(", ")}  `);
 				res( new Error("missing find parameter") );
 		},
 
-		/**
-		Search of multiple files 
-		@param {Object} req Totem session request
-		@param {Function} res Totem session response		
-		*/
+/**
+Search of multiple files 
+@param {Object} req Totem session request
+@param {Function} res Totem session response		
+*/
 		searches: (req,res) => {
 			const 
 				{ sql, query, type } = req,
@@ -3452,11 +3456,11 @@ Usage: ${uses.join(", ")}  `);
 
 		},
 
-		/**
-		Word statistics
-		@param {Object} req Totem session request
-		@param {Function} res Totem session response		
-		*/
+/**
+Word statistics
+@param {Object} req Totem session request
+@param {Function} res Totem session response		
+*/
 		words: (req,res) => {
 			const
 				{ sql, query, type } = req,
@@ -3532,11 +3536,11 @@ at the specified keys = KEY,...
 
 		// image tiles
 
-		/**
-		WMS
-		@param {Object} req Totem session request
-		@param {Function} res Totem session response		
-		*/
+/**
+WMS
+@param {Object} req Totem session request
+@param {Function} res Totem session response		
+*/
 		wms: (req,res) => {
 
 			const
@@ -3558,11 +3562,11 @@ at the specified keys = KEY,...
 				Fetch(url.tag("?", query), rtn => Trace("wms returned", rtn) );
 		},
 
-		/**
-		WFS
-		@param {Object} req Totem session request
-		@param {Function} res Totem session response		
-		*/
+/**
+WFS
+@param {Object} req Totem session request
+@param {Function} res Totem session response		
+*/
 		wfs: (req,res) => {  //< Respond with ess-compatible image catalog
 			const
 				{ sql, query, type } = req,
@@ -3716,11 +3720,11 @@ desired ring = [ [lat,lon], ....]
 				res( "" );
 		},
 
-		/**
-		Provide image tips.
-		@param {Object} req Totem session request
-		@param {Function} res Totem session response		
-		*/
+/**
+Provide image tips.
+@param {Object} req Totem session request
+@param {Function} res Totem session response		
+*/
 		tips: (req, res) => {
 			const
 				{sql, log, query, type} = req;
@@ -3765,11 +3769,11 @@ desired ring = [ [lat,lon], ....]
 
 		// web links
 
-		/**
-		Track web links.
-		@param {Object} req Totem session request
-		@param {Function} res Totem session response		
-		*/
+/**
+Track web links.
+@param {Object} req Totem session request
+@param {Function} res Totem session response		
+*/
 		follow: (req,res) => {  // follow a link
 			const {sql,query,type} = req;
 
@@ -3789,11 +3793,11 @@ desired ring = [ [lat,lon], ....]
 
 		// quizes
 
-		/**
-		Proctor quizes.
-		@param {Object} req Totem session request
-		@param {Function} res Totem session response		
-		*/
+/**
+Proctor quizes.
+@param {Object} req Totem session request
+@param {Function} res Totem session response		
+*/
 		proctor: (req,res) => {  //< grade quiz results
 			const 
 				{sql, query, client, type} = req;
@@ -3864,25 +3868,25 @@ desired ring = [ [lat,lon], ....]
 
 		// files
 
-		/**
-		Upload files to upload area
-		@param {Object} req Totem session request
-		@param {Function} res Totem session response		
-		*/
+/**
+Upload files to upload area
+@param {Object} req Totem session request
+@param {Function} res Totem session response		
+*/
 		uploads: fileUpload,
 		
-		/**
-		Upload files to stores area
-		@param {Object} req Totem session request
-		@param {Function} res Totem session response		
-		*/
+/**
+Upload files to stores area
+@param {Object} req Totem session request
+@param {Function} res Totem session response		
+*/
 		stores: fileUpload, 
 
-		/**
-		Update like-us stats
-		@param {Object} req Totem session request
-		@param {Function} res Totem session response		
-		*/
+/**
+Update like-us stats
+@param {Object} req Totem session request
+@param {Function} res Totem session response		
+*/
 		likeus: (req, res) => {
 			const
 				{sql, loq, query, type, profile, client} = req,
@@ -3925,11 +3929,11 @@ desired ring = [ [lat,lon], ....]
 
 		},
 
-		/**
-		Return list of clients that have used this service
-		@param {Object} req Totem session request
-		@param {Function} res Totem session response		
-		*/
+/**
+Return list of clients that have used this service
+@param {Object} req Totem session request
+@param {Function} res Totem session response		
+*/
 		users: (req, res) => {
 			const
 				{sql, query, type } = req;
@@ -3942,12 +3946,12 @@ desired ring = [ [lat,lon], ....]
 				(err, recs) => res(err || recs) );
 		},
 
-		/**
-		Retrieve [requested neo4j graph](/api.view#sysGraph).
+/**
+Retrieve [requested neo4j graph](/api.view#sysGraph).
 
-		@param {Object} req Totem session request
-		@param {Function} res Totem session response
-		*/
+@param {Object} req Totem session request
+@param {Function} res Totem session response
+*/
 		graph: function (req,res) {
 			const 
 				{ query, sql, table, type } = req,
@@ -4060,11 +4064,11 @@ desired ring = [ [lat,lon], ....]
 
 		// notebooks
 
-		/**
-		Return published notebooks
-		@param {Object} req Totem session request
-		@param {Function} res Totem session response		
-		*/
+/**
+Return published notebooks
+@param {Object} req Totem session request
+@param {Function} res Totem session response		
+*/
 		notebooks: (req,res) => {
 			const
 				{sql,query,type} = req,
@@ -4176,12 +4180,12 @@ desired ring = [ [lat,lon], ....]
 
 		// system mgt
 
-		/**
-		Endpoint to ingest a source into the sql database
+/**
+Endpoint to ingest a source into the sql database
 
-		@param {Object} req Totem session request
-		@param {Function} res Totem session response
-		*/
+@param {Object} req Totem session request
+@param {Function} res Totem session response
+*/
 		ingest: (req,res) => {
 
 			function ingest( opts, query, cb ) {
@@ -4247,12 +4251,12 @@ desired ring = [ [lat,lon], ....]
 			}
 		},
 
-		/**
-		Endpoint to return release information about requested license.
+/**
+Endpoint to return release information about requested license.
 
-		@param {Object} req Totem session request
-		@param {Function} res Totem session response
-		*/
+@param {Object} req Totem session request
+@param {Function} res Totem session response
+*/
 		decode: (req,res) => {
 			const 
 				{ sql,query, type } = req,
@@ -4275,12 +4279,12 @@ desired ring = [ [lat,lon], ....]
 			});
 		},
 
-		/**
-		Endpoint to restart totem if authorized.
+/**
+Endpoint to restart totem if authorized.
 
-		@param {Object} req Totem session request
-		@param {Function} res Totem session response
-		*/
+@param {Object} req Totem session request
+@param {Function} res Totem session response
+*/
 		restart: (req,res) => {
 			const
 				{sql,query,type,client,profile} = req,
@@ -4307,12 +4311,12 @@ desired ring = [ [lat,lon], ....]
 				res( errors.noPermission );
 		},
 
-		/**
-		Endpoint to send notice to outsource jobs to agents.
+/**
+Endpoint to send notice to outsource jobs to agents.
 
-		@param {Object} req Totem session request
-		@param {Function} res Totem session response
-		*/
+@param {Object} req Totem session request
+@param {Function} res Totem session response
+*/
 		/*agent: (req,res) => {
 			const
 				{sql,query,type} = req,
@@ -4412,12 +4416,12 @@ save = CLIENT.HOST.CASE to save
 
 		}, */
 
-		/**
-		Endpoint to send notice to all clients
+/**
+Endpoint to send notice to all clients
 
-		@param {Object} req Totem session request
-		@param {Function} res Totem session response
-		*/
+@param {Object} req Totem session request
+@param {Function} res Totem session response
+*/
 		alert: (req,res) => {
 			const
 				{sql,query,type,client,prog} = req,
@@ -4439,12 +4443,12 @@ save = CLIENT.HOST.CASE to save
 				res( errors.noPermission );
 		},
 
-		/**
-		Endpoint to send emergency message to all clients then halt totem
+/**
+Endpoint to send emergency message to all clients then halt totem
 
-		@param {Object} req Totem session request
-		@param {Function} res Totem session response
-		*/
+@param {Object} req Totem session request
+@param {Function} res Totem session response
+*/
 		stop: (req,res) => {
 
 			const
@@ -4461,10 +4465,10 @@ save = CLIENT.HOST.CASE to save
 			process.exit();
 		},
 
-		/**
-		@param {Object} req Totem session request
-		@param {Function} res Totem session response
-		*/
+/**
+@param {Object} req Totem session request
+@param {Function} res Totem session response
+*/
 		devstatus: (req, res) => {
 			function statRepo(sql) {
 				var lookups = {
@@ -4551,10 +4555,10 @@ save = CLIENT.HOST.CASE to save
 			statRepo(sql);	
 		},
 
-		/**
-		@param {Object} req Totem session request
-		@param {Function} res Totem session response
-		*/
+/**
+@param {Object} req Totem session request
+@param {Function} res Totem session response
+*/
 		milestones: (req, res) => {
 			const 
 				{sql,log,query,type} = req,
@@ -4577,10 +4581,11 @@ save = CLIENT.HOST.CASE to save
 			res(SUBMITTED);
 		},	
 
-		/**
-		@param {Object} req Totem session request
-		@param {Function} res Totem session response
-		*/
+/**
+Configure DEBE/TOTEM.
+@param {Object} req Totem session request
+@param {Function} res Totem session response
+*/
 		config: (req,res) => {
 			const 
 				{sql,query,type} = req,
@@ -4626,10 +4631,10 @@ Respond with system configuration information on requested module mod = NAME or 
 				}); }); }); });
 		},
 
-		/**
-		@param {Object} req Totem session request
-		@param {Function} res Totem session response
-		*/
+/**
+@param {Object} req Totem session request
+@param {Function} res Totem session response
+*/
 		info: (req,res) => {
 			function toSchema( path, obj ) {
 				if ( isObject(obj) ) {
@@ -4891,22 +4896,22 @@ Respond with system configuration information on requested module mod = NAME or 
 
 		// i/f to other services
 
-		/**
-		Digital globe interface.
-		@param {Object} req Totem session request
-		@param {Function} res Totem session response
-		*/		
+/**
+Digital globe interface.
+@param {Object} req Totem session request
+@param {Function} res Totem session response
+*/		
 		DG: (req, res) => {  
 			const 
 				{sql,log,query} = req;
 			res("tbd");
 		},
 
-		/**
-		Hydra interface.
-		@param {Object} req Totem session request
-		@param {Function} res Totem session response
-		*/		
+/**
+Hydra interface.
+@param {Object} req Totem session request
+@param {Function} res Totem session response
+*/		
 		HYDRA: (req, res) => { // Hydra interface
 
 			const
@@ -4962,44 +4967,44 @@ size, pixels, scale, step, range, detects, infile, outfile, channel.  This endpo
 			
 		},
 
-		/**
-		NCL interface.
-		@param {Object} req Totem session request
-		@param {Function} res Totem session response
-		*/		
+/**
+NCL interface.
+@param {Object} req Totem session request
+@param {Function} res Totem session response
+*/		
 		NCL: (req, res) => { // Reserved for NCL and ESS service alerts
 			const 
 				{sql,log,query} = req;
 			res("tbd");
 		},
 
-		/**
-		ESS interface.
-		@param {Object} req Totem session request
-		@param {Function} res Totem session response
-		*/		
+/**
+ESS interface.
+@param {Object} req Totem session request
+@param {Function} res Totem session response
+*/		
 		ESS: (req, res) => { // Reserved for NCL and ESS service alerts
 			const 
 				{sql,log,query} = req;
 			res("tbd");
 		},
 
-		/**
-		MIDB interface.
-		@param {Object} req Totem session request
-		@param {Function} res Totem session response
-		*/		
+/**
+MIDB interface.
+@param {Object} req Totem session request
+@param {Function} res Totem session response
+*/		
 		MIDB: (req, res) => { // Reserved for NCL and ESS service alerts
 			const 
 				{sql,log,query} = req;
 			res("tbd");
 		},
 		
-		/**
-		Matlab interface.
-		@param {Object} req Totem session request
-		@param {Function} res Totem session response
-		*/		
+/**
+Matlab interface.
+@param {Object} req Totem session request
+@param {Function} res Totem session response
+*/		
 		matlab: (req,res) => {
 			const
 				{sql, query, type} = req;
@@ -5010,11 +5015,11 @@ size, pixels, scale, step, range, detects, infile, outfile, channel.  This endpo
 			res("matlab queue flushed");		
 		},
 
-		/**
-		ESC remedy interface.
-		@param {Object} req Totem session request
-		@param {Function} res Totem session response
-		*/		
+/**
+ESC remedy interface.
+@param {Object} req Totem session request
+@param {Function} res Totem session response
+*/		
 		ESC: (req,res) => {
 			const
 				{sql, query, type} = req,
@@ -5033,9 +5038,9 @@ size, pixels, scale, step, range, detects, infile, outfile, channel.  This endpo
 		}		
 	},
 	
-	/**
-	/TABLE.TYPE-endpoint routers
-	*/			
+/**
+/TABLE.TYPE-endpoint routers
+*/			
 	"byType.": {
 		// doc generators
 		_pdf: savePage,
@@ -5146,9 +5151,9 @@ size, pixels, scale, step, range, detects, infile, outfile, channel.  This endpo
 		*/
 	//},
 		
-	/**
-	Site skinning context
-	*/
+/**
+Site skinning context
+*/
 	"site.": { 		//< initial site context
 		by: "NGA/R".link( ENV.BY || "http://BY.undefined" ),
 		
@@ -5302,9 +5307,9 @@ size, pixels, scale, step, range, detects, infile, outfile, channel.  This endpo
 
 	},
 	
-	/**
-	Error messages
-	*/
+/**
+Error messages
+*/
 	"errors.": {  //< error messages
 		pretty: err => {
 			return "".tag("img",{src:"/stash/reject.jpg",width:40,height:60})
@@ -5356,9 +5361,9 @@ size, pixels, scale, step, range, detects, infile, outfile, channel.  This endpo
 		//noUploader: new Error("file uplaoder not available")		
 	},
 	
-	/**
-	Paths to things
-	*/
+/**
+Paths to things
+*/
 	"paths.": {  //< append paths to things
 		low: {
 			notices: "//gold/office/office03/R/2_NonRecords/R7-Anticipatory/WeeklyUpdates/".replace(/\//g,"\\")
@@ -5402,16 +5407,16 @@ size, pixels, scale, step, range, detects, infile, outfile, channel.  This endpo
 		host: ""		
 	},
 	
-	/**
-	Enable to give-away plugin services
-	@type {boolean}
-	*/
+/**
+Enable to give-away plugin services
+@type {boolean}
+*/
 	probono: true,  //< enable to run plugins unregulated
 		
-	/**
-	Enabled when this is child server spawned by a master server
-	@type {Boolean}
-	*/
+/**
+Enabled when this is child server spawned by a master server
+@type {Boolean}
+*/
 	isSpawned: false, 			//< Enabled when this is child server spawned by a master server
 
 	/*
@@ -5446,10 +5451,10 @@ size, pixels, scale, step, range, detects, infile, outfile, channel.  This endpo
 		
 	}, */
 		
-	/**
-	Reserved for soap interfaces
-	@type {Object}
-	*/
+/**
+Reserved for soap interfaces
+@type {Object}
+*/
 	bySOAP : { 						//< action:route hash for XML-driven engines
 		get: "",
 		put: "",
@@ -5457,10 +5462,10 @@ size, pixels, scale, step, range, detects, infile, outfile, channel.  This endpo
 		post: "/service/algorithm/:proxy"		//< hydra endpoint
 	},  		//< reserved for soap interfaces
 		
-	/*
-	Enable for double-blind testing 
-	@type {Boolean}
-	*/
+/*
+Enable for double-blind testing 
+@type {Boolean}
+*/
 	//blindTesting : false		//< Enable for double-blind testing 
 }, TOTEM, ".");
 
