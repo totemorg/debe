@@ -75,9 +75,8 @@ append base_body
 				Manage="/files.view" )
 
 				p some info
-				tab#center(class=project)
+				tab#center(class=project.link( explore || url ))
 					if explore
-						span!= flags.nomenu ? "" : "Open".link( explore )
 						iframe(src=explore.tag("?",{_view:"kiss"}),width="100%",height="100%",style="border:none")
 						block site_body
 

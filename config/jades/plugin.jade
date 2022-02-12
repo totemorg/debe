@@ -25,7 +25,7 @@ append site_parms
 append site_body
 	- ds = opts ? opts.ds : "noopts"
 	- dsName = ds.charAt(0).toUpperCase()+ds.substr(1)
-	- dsPath = `/${ds}.db?!Save*`
+	- dsPath = `/${ds}.db`.tag("?",opts ? opts.query : {}) + "&!Save*"
 	- links = {}
 
 	each val, key in {Export:"bool",Ingest:"bool",Pipe:"doc",Description:"doc",Entry:"json",Exit:"json",Save:"json"}
@@ -196,5 +196,13 @@ append site_body
 							[ EVENT, ... ]
 
 						as described in the [notebook api](/api.view).
+
+			tab.Mods
+				grid#Mods(
+					path="/mods.db?Name=#{ds}", 
+					cols="ID.n..hide,Mod.t,Made.d" )
+
+					:markdown
+						Any activity by notebook administrators are shown here.
 
 // UNCLASSIFIED
