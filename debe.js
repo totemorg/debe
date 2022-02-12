@@ -7511,15 +7511,15 @@ To connect to ${site.Nick} from Windows:
 
 }
 
-switch ( mode = process.argv[2] ) { // unit tests
-	case "D?":
+switch ( mode = process.argv[2].toUpperCase() ) { // unit tests
+	case "DHELP":
 	case "?":
 		Trace("unit test with 'node debe [D$ || D1 || ...]'");
 		Trace("site context", site);
 		break;
 	
-	case "D$":
-	case "lab":
+	case "DDEBUG":
+	case "LAB":
 		
 		Trace(`Welcome to TOTEM ${mode}!`);
 			  
@@ -7553,8 +7553,8 @@ switch ( mode = process.argv[2] ) { // unit tests
 	*/
 
 	case "D1":
-	case "admin":
-	case "start":
+	case "ADMIN":
+	case "START":
 		const
 			{ ingestFile } = require("../geohack");
 		
