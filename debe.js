@@ -1718,7 +1718,7 @@ Initialize DEBE on startup.
 					f:"Fork" 
 				}); */
 			
-			JSDB.config();
+			// JSDB.config();
 			
 			$.config({}, $ => {
 				const 
@@ -7511,38 +7511,40 @@ To connect to ${site.Nick} from Windows:
 
 }
 
-switch ( mode = process.argv[2].toUpperCase() ) { // unit tests
-	case "DHELP":
+switch ( process.argv[2] ) { // unit tests
+	case "D?":
 	case "?":
-		Trace("unit test with 'node debe [D$ || D1 || ...]'");
+		Trace("node debe [D$ || D1 || ...]");
 		Trace("site context", site);
 		break;
 	
-	case "DDEBUG":
-	case "LAB":
+	case "D$":
+	case "lab":
 		
-		Trace(`Welcome to TOTEM ${mode}!`);
-			  
-		const
-			{dogs,$libs} = DEBE,
-			{$api} = $libs;
+		if (isMaster) {
+			Trace(`Welcome to TOTEM ${mode}!`);
+				
+			const
+				{dogs,$libs} = DEBE,
+				{$api} = $libs;
 
-		config({}, sql => {
-		
-			if ( isMaster ) {
-				switch (mode) {
-					case "D$":
-						Debug( );
-						break;
+			config({}, sql => {
+			
+				if ( isMaster ) {
+					switch (mode) {
+						case "D$":
+							Debug( );
+							break;
 
-					case "lab":
-						Debug( $libs );
-						break;
+						case "LAB":
+							Debug( $libs );
+							break;
+					}
+
+					$api();
 				}
-
-				$api();
-			}
-		});
+			});
+		};
 
 		break;
 		
@@ -7553,8 +7555,8 @@ switch ( mode = process.argv[2].toUpperCase() ) { // unit tests
 	*/
 
 	case "D1":
-	case "ADMIN":
-	case "START":
+	case "admin":
+	case "start":
 		const
 			{ ingestFile } = require("../geohack");
 		
