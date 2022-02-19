@@ -3166,7 +3166,7 @@ Default area navigator.
 										site.nick.link( "/brief.view?notebook=totem" ),
 										client.link( "/login.html" ),
 										"API".link( "/api.view" ),
-										"Explore".link( "/site.view?explore=root" ),
+										"Explore".link( "/expore.view" ),
 										"Info".link( "/xfan.view?w=1000&h=600&src=/info" ),
 										path
 									].join(" || ") , files.map( file => {
