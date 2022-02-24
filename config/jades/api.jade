@@ -643,34 +643,7 @@ append base_body
 						for examples.
 
 		tab.Agents
-			folder#Agents(dock="left")
-				tab.Endpoints
-					:markdown
-						**Engines** can be outsourced to an **agent** at:
-
-							GET /NOTEBOOK.exe?agent=AGENT&poll=N&QUERY
-							GET /NOTEBOOK.exe?agent=AGENT&QUERY
-
-						where the &poll request will start a job, then poll the AGENT every N seconds for its results.
-						Conversely, a poll-less request will start a job, then reply on the AGENT to claim the job.  In
-						either case, QUERY defines the NOTEBOOK args.
-
-						***#{nick}*** reciprocates by providing its own **agent** at its `/agent` endpoint.
-
-						Agents provide a means to outsource an **engine**, while retaining a thread
-						on each **agent** request.  A valid **agent** must provide ***#{nick}*** the
-						following push/pull endpoints:
-
-							GET http://AGENT?push=***#{nick}***.CLIENT.NOTEBOOK.ID&args=JSON
-							GET http://AGENT?pull=JOBID
-
-						where the push endpoint defines the job being sent to the AGENT (with the CLIENT 
-						requesting the **agent**, the NOTEBOOK being outsourced, the ID of the test case,
-						and the JSON args to the NOTEBOOK).  The AGENT eventually responds at 
-						the pull endpoint with a JOBID, or a "" if no job could be created.  ***#{nick}*** will 
-						periodically poll the **agent** for the results of JOBID.
-
-				tab.Examples
+			:markdown
 
 		tab.Engines
 			folder#Engines(dock="left")
