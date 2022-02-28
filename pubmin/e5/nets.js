@@ -1,11 +1,11 @@
 "use strict";
 
 function nets(ctx, res, _ref) {
-  var $log = _ref.$log,
-      $pipe = _ref.$pipe,
-      $trace = _ref.$trace;
+  var $log = _ref.$log;
   // define notebook engine
-  var Snap = {
+  var $pipe = ctx.$pipe,
+      $trace = ctx.$trace,
+      Snap = {
     aNet: {
       nodes: {},
       edges: {}
@@ -28,7 +28,10 @@ function nets(ctx, res, _ref) {
   var actors = Snap.actors,
       bhats = Snap.bhats,
       whats = Snap.whats;
+  $trace("hello");
   $log("actors", actors);
+  res("ok");
+  return;
   $pipe(function (recs) {
     if (recs) {
       // have a batch so extend assoc net

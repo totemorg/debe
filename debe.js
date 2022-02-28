@@ -35,7 +35,7 @@ const
 	ENUMS = require("../enums"),
 	$ = require("../man"),
 	RAN = require("../randpr"),
-	PIPE = require("../pipe"),
+	//PIPE = require("../pipe"),
 	SKIN = require("../skin"),
 	BLOG = require("../blog"),
 	DOGS = require("../dogs");
@@ -5912,7 +5912,7 @@ function statusPlugin(req,res) {
 	if (type == "help")
 	return res("Status notebook");
 
-	skinContext( req, ctx => {
+	skinContext( sql, req, ctx => {
 
 		const 
 			{name,engine} = ctx;
@@ -5979,7 +5979,7 @@ function matchPlugin(req,res) {
 	if (type == "help")
 	return res("Match notebook");
 
-	skinContext( req, ctx => {
+	skinContext( sql, req, ctx => {
 
 		var
 			name = ctx.name,
@@ -6041,7 +6041,7 @@ function docPlugin(req,res) {
 	if (type == "help")
 	return res("Return notebook api help");
 
-	skinContext( req, ctx => {
+	skinContext( sql, req, ctx => {
 		//Trace(">>tou ctx",ctx);
 		getEngine( sql, name, eng => {
 			if ( eng ) {
@@ -6191,7 +6191,7 @@ function getPlugin(req,res) {
 	Trace( "release opts", {endPart: endPartner, endSrv: endService}, suitor );
 
 	if ( endservice )
-		skinContext( req, ctx => {
+		skinContext( sql, req, ctx => {
 			var 
 				name = ctx.name,
 				type = ctx.type,
@@ -6713,7 +6713,7 @@ function publishPlugin(req,res) {
 
 		Trace("publish", path, name, type);
 
-		skinContext( req, ctx => {	// get a skinning ctx to generate the ToU
+		skinContext( sql, req, ctx => {	// get a skinning ctx to generate the ToU
 			const 
 				{ dockeys, speckeys } = Copy({
 					speckeys: {},
@@ -7225,7 +7225,7 @@ responds with res(results).
 function runPlugin(req, res) {  //< callback res(ctx) with resulting ctx or cb(null) if error
 
 	const 
-		{ sql, table, query, type } = req,
+		{ sql, table, query, type, client } = req,
 		{ random } = Math,
 		book = "app."+table,
 		trace = true,			
@@ -7237,18 +7237,6 @@ function runPlugin(req, res) {  //< callback res(ctx) with resulting ctx or cb(n
 	return res("Run notebook");
 
 	sql.getContext( book, query, ctx => {		// get context for this notebook
-		function tracePipe( msg, args ) {
-			"pipe".trace( msg, req, msg => console.log( msg, args ) );
-		}
-
-		function eventPipe( cb ) {
-			const 
-				{ Pipe } = ctx;
-
-			cb( Pipe, ctx, save => {
-			});
-		}
-
 		function enumPipe( Pipe ) {
 			function crossParms( depth, keys, forCtx, setCtx, idxCtx, cb ) {	// cross forCtx keys with callback cb(setCtx)
 				if ( depth == keys.length ) 
@@ -7330,7 +7318,7 @@ function runPlugin(req, res) {  //< callback res(ctx) with resulting ctx or cb(n
 					sets.push( set );
 				});
 
-				tracePipe("enumerate", jobs);
+				//tracePipe("enumerate", jobs);
 
 				jobs.forEach( (job,idx) => {
 					//Trace(idx,job,sets[idx]);
@@ -7353,33 +7341,22 @@ function runPlugin(req, res) {  //< callback res(ctx) with resulting ctx or cb(n
 			});
 		}
 
-		function bufferPipe( cb ) {
-			const
-				{ Pipe } = ctx;
-
-			tracePipe("buffered", Pipe);
-
-			Fetch(Pipe, buff => cb(buff) );
-		}
-
-		// Trace(">>>notebook ctx", ctx);
+// Trace(">>>notebook ctx", ctx);
 
 		if (ctx) {
 			res(errors.ok);
 
 			const { Pipe } = ctx;
 
-			ATOM.$libs.$trace = tracePipe;
-			req.query = ctx;
-
 			if (Pipe)
 				switch ( Pipe.constructor ) {
 					case String: // source pipe
-						ATOM.$libs.$pipe = cb => PIPE(Pipe,cb); 
-						
+						req.query = Copy({
+							$trace: (msg,args) => `pipe ${book}`.trace( msg, args ),
+							$pipe: cb => Fetch(Pipe.tag("?",{_task:book,_name:ctx.Name,_client:client}),cb)
+						}, ctx);
+
 						ATOM.select(req, ctx => {
-							// Trace("pipe run ctx", ctx);
-							// Trace("save ctx?", ctx?ctx._net?"net":ctx:false);
 							if ( ctx )
 								Trace( sql.saveContext( ctx ) );
 						});
@@ -7387,8 +7364,11 @@ function runPlugin(req, res) {  //< callback res(ctx) with resulting ctx or cb(n
 						break;
 
 					case Array:  // event pipe
-						ATOM.$libs.$pipe = eventPipe;
-
+						req.query = Copy({
+							$trace: (msg,args) => `pipe ${book}`.trace( msg, args ),
+							$pipe: cb => cb(Pipe)
+						}, ctx);
+						
 						ATOM.select(req, ctx => {
 							//Trace(">>>engine select", ctx);
 							if ( ctx )
@@ -7409,13 +7389,19 @@ function runPlugin(req, res) {  //< callback res(ctx) with resulting ctx or cb(n
 						break;
 				}
 			
-			else
+			else {
+				req.query = Copy({
+					$trace: (msg,args) => `pipe ${book}`.trace( msg, args ),
+					$pipe: cb => cb(null)
+				}, ctx);
+
 				ATOM.select(req, ctx => {
 					//Trace("pipe run ctx", ctx);
 					Trace("save ctx?", ctx);
 					if ( ctx )
 						Trace( sql.saveContext( ctx ) );
-				});	
+				});
+			}
 		}
 
 		else
@@ -7522,7 +7508,7 @@ switch ( process.argv[2] ) { // unit tests
 	case "lab":
 		
 		if (isMaster) {
-			Trace(`Welcome to TOTEM ${mode}!`);
+			Trace( "Welcome to $TOTEM" );
 				
 			const
 				{dogs,$libs} = DEBE,
@@ -7531,12 +7517,12 @@ switch ( process.argv[2] ) { // unit tests
 			config({}, sql => {
 			
 				if ( isMaster ) {
-					switch (mode) {
+					switch (process.argv[2]) {
 						case "D$":
 							Debug( );
 							break;
 
-						case "LAB":
+						case "lab":
 							Debug( $libs );
 							break;
 					}

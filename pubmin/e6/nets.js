@@ -1,6 +1,7 @@
-function nets(ctx,res,{$log,$pipe,$trace}) {	// define notebook engine
+function nets(ctx,res,{$log}) {	// define notebook engine
 
 		const 
+			{$pipe,$trace} = ctx,
 			Snap = {
 				aNet: {
 					nodes: {},
@@ -22,8 +23,13 @@ function nets(ctx,res,{$log,$pipe,$trace}) {	// define notebook engine
 		var
 			{ actors,bhats,whats } = Snap;
 
+		$trace("hello");
+		
 		$log("actors", actors);
 
+		res("ok");
+		
+		return;
 		$pipe( recs => {
 			if ( recs ) {	// have a batch so extend assoc net
 				$log("records", recs.length, actors );
@@ -168,6 +174,5 @@ function nets(ctx,res,{$log,$pipe,$trace}) {	// define notebook engine
 				
 				res(ctx);		
 			}
-			
 		});
 	}

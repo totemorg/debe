@@ -25,7 +25,7 @@ append site_parms
 append site_body
 	- ds = opts ? opts.ds : "noopts"
 	- dsName = ds.charAt(0).toUpperCase()+ds.substr(1)
-	- dsPath = `/${ds}.db`.tag("?",opts ? opts.query : {}) + "&!Save*"
+	- dsPath = `/${ds}.db`.tag("?",opts ? opts.query : {}).tag("/",{"!Save*":""})
 	- links = {}
 
 	each val, key in {Export:"bool",Ingest:"bool",Pipe:"doc",Description:"doc",Entry:"json",Exit:"json",Save:"json"}
@@ -34,10 +34,13 @@ append site_body
 	each val, key in {backlog:"int",load:"float",budget:"float",cost:"float",batch:"int",limit:"int",start:"date",end:"date",every:"varchar(8)",on:"int",off:"int",rekey:"doc",watch:"int",propose:"bool",baseline:"varchar(64)",agent:"varchar(16)"}
 		- links[key] = link("+", `/${ds}.mod?${val}=Pipe_${key}`) + " / " + link("-", `/${ds}.mod?drop=Pipe_${key}`) + " " + tag("&"+key+"||Pipe_"+key,"code",{}) + " = "
 
+	script.
+		alert("#{dsName}==#{dsPath}==#{JSON.stringify(opts.query)}");
+
 	case mode
 		when "noopts"
 			script.
-				alert("plugin should be used by Totem");
+				alert("options opts undefined");
 
 		when "debug1"
 			border#brder(splash=true)

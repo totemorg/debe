@@ -328,20 +328,27 @@ append base_body
 
 						Task regulating:
 
-							_every 	= sec||min||hr||...  
+							_every 	= "NUM sec||min||hr||..."  
 							_start	= DATE  
 							_end	= DATE  
-							_watch	= NUM  
-							_limit	= INT  
 							_on		= NUM  
 							_off	= NUM  						
 							_util	= NUM  
+							
+						Task monitoring:
+										   
+							_watch	= NUM  
+							_task 	= "job task name"
+							_name	= "job case name"
+							_client = "job owner"
 
 						File reading:
 
-							_keys  = TO:FROM & ...
-							_limit = INT
-							_batch = INT
+							_batch	= NUM
+							_limit	= NUM
+							_keys	= [...]
+							_comma	= "delim"
+							_newline= "delim"
 							
 						Legacy:
 
