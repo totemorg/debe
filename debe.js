@@ -5253,7 +5253,7 @@ Paths to things
 			doc: ""
 		},
 		
-		tou: "/config/jades/tou.txt",
+		tou: "./jades/tou.txt",
 		//notebooks: "./notebooks",
 		
 		skin: {
