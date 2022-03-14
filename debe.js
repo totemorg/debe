@@ -42,7 +42,7 @@ const
 
 const 
 	{ exec } = CP,
-	{ Copy,Each,Log,Debug,Stream, Fetch,
+	{ Copy,Each,Log,Debug, Fetch,
 	 isKeyed,isString,isFunction,isError,isArray,isObject,isEmpty,typeOf,
 	 getList, getURL,
 	 txmailCon, rxmailCon,
@@ -236,10 +236,10 @@ Blogs each string in the list.
 @param {String} ds Name of dataset being blogged
 @param {Function} cb callback(recs) blogified version of records
 */
-	blogify: function ( req, key, ds, cb ) {
+	blog: function ( req, key, cb ) {
 		const 
 			{ sql, flags, client, profile, table, type, host } = req,
-			{ site, licenseCode } = DEBE,
+			ds = "/"+table,
 			book = ds,
 			product = table+".html",
 			recs = this,
@@ -267,16 +267,20 @@ Blogs each string in the list.
 								: [	// add options
 									site.nick.link( "/" ),
 									"schema".link( `xfan.view?src=${ds}.schema?name=${rec.Name}&w=4000&h=600` ),
-									"run".link( `${book}.exe?Name=${rec.Name}` ),
+									//"run".link( `${book}.exe?Name=${rec.Name}` ),
+									"run".link( `${book}.exe`.tag("?", {name: rec.Name}) ),
 									"goto".link( `${book}.view` ),
 									"publish".link( `${book}.pub` ),
 									"tou".link( `${book}.tou` ),
-									"open".link( `${book}.blog?key=${key}&name=${rec.Name}&subs=${isEnum}` ),
+									"data".link( `${book}.data`.tag("?", {name:rec.Name}) ),
+									//"open".link( `${book}.blog?key=${key}&name=${rec.Name}&subs=${isEnum}` ),
+									"open".link( `${book}.open`.tag("?", {name:rec.Name}) ),
 									(new Date().toDateString()) + "",
 									( client.match( /(.*)\@(.*)/ ) || ["",client] )[1].link( "email:" + client )
 								].join(" || ") + "<br>" + html
 						);
 
+						/*
 						if ( profile.Track ) 	// client is being tracked
 							if ( licenseCode ) { // code licensor installed
 								licenseCode( sql, html, {  // register this html with this client
@@ -303,13 +307,14 @@ Blogs each string in the list.
 								});		
 								Trace(`TRACKING ${client}`);
 							}
+						*/
 					}); 
 
 				else
-					cb( "empty" );
+					cb( "" );
 			};
 
-		recs.serialize( fetchBlog, (rec, blog) => {
+		recs.serial( fetchBlog, (rec, blog) => {
 			if (rec) 
 				rec[key] = blog;
 
@@ -696,8 +701,10 @@ config({
 */
 
 const
-	{ sendMail, Trace, routeTable, $libs, config, initialize,
-	 	licenseOnDownload, defaultDocs } = DEBE = module.exports = Copy({
+	{ 
+		sendMail, Trace, routeTable, $libs, config, initialize,
+	 	filters, licenseOnDownload, defaultDocs 
+	} = DEBE = module.exports = Copy({
 	
 	Trace: (msg, ...args) => `debe>>>${msg}`.trace( args ),
 		
@@ -1784,220 +1791,63 @@ Initialize DEBE on startup.
 		status: "", 
 		counts: {State: ""}
 	},
-
-/**
-Filters via request flags
-*/
-	"filterFlag." : {  
-		
-/**
-*/
-		"flagTrap.": {  // TRAP=name flags can modify the request flags
-			/*
-			save: function (req) {  //< _save=name retains query in named engine
-				var 
-					sql = req.sql,
-					cleanurl = req.url.replace(`_save=${req.flags.save}`,"");
-
-				Trace(`PUBLISH ${cleanurl} AT ${req.flags.save} FOR ${req.client}`, req);sql
-				sql.query("INSERT INTO openv.engines SET ?", {
-					Name: req.flags.save,
-					Enabled: 1,
-					Type: "url",
-					Code: cleanurl
-				});
-			}, */
-
-			/**
-			*/
-			browse: function(req) {	//< _browse=name navigates named folder
-				var query = req.query, flags = req.flags;
-				query.NodeID = parseInt(query.init) ? "" : query.target || "";
-				flags.nav = [query.NodeID, query.cmd];
-				delete query.cmd;
-				delete query.init;
-				delete query.target;
-				delete query.tree;
-			},
-
-			/**
-			*/
-			/*
-			view: function (req) {   //< ?_view=name correlates named view to request dataset
-				req.sql.query("INSERT INTO openv.viewers SET ?", {
-					Viewer: req.flags.view,
-					Dataset: req.table
-				});	
-			} */
-		},
-		
-		/*
-		select: (recs,req,res) => {
-			const
-				{ flags } = req,
-				{ select } = flags,
-				opts = [],
-				id = "_"+select;
-			
-			//Trace("select", recs);
-			// _select=Client,window.open(`/
-			//  iframe(src="/junk.html")
-			recs.forEach( rec => opts.push( rec[select].tag("option",{value:rec[select]}) ));
-			res( opts.join("").tag("select",{id:id,src:"/test.txt",onchange: `alert(${id}.getAttribute("src"))` }) );
-											 	// `window.open("/nb.mod?"+_Client_Type.value+"="+${id}.value)`}) );			
-		},*/
-		
-/**
-*/
-		blog: (recs,req,res) => {  //< renders dataset records
-			const 
-				{ flags, table, query } = req,
-				{ blog } = flags;
-			
-			//Trace("blog", flags);
-			
-			if ( blog )
-				if ( recs.forEach )
-					recs.blogify( req, "Description", "/"+table, res );
-			
-				else
-					res(recs);
-			
-			else
-				res(recs);
-		},
-		
-/**
-*/
-		$: (recs,req,res) => {
-			const { flags } = req;
-			var rtn = recs;
-			
-			Each( flags, (flag,script) => {
-				
-				function indexArray(ctx) {
-					Each( store[0] || {} , (key,val) => ctx[key] = store.get(key) );
-					//Trace("getctx", store, script);
-					if ( script ) $( "$="+script, ctx );
-					return $.toList(ctx.$);					
-				}
-				
-				function indexObject(ctx) {
-					Each( store, (key,val) => ctx[key] = store[key] );
-					//Trace("getctx", store, script);
-					if ( script ) $( "$="+script, ctx );
-					return $.toList(ctx.$);					
-				}
-				
-				if ( flag.startsWith("$") ) {
-					var 
-						ctx = { 
-							$: flag.parseJS({$: recs}) || 0,
-							list: function () {
-								var 
-									args = Object.keys(arguments),
-									rtn = [];
-
-								args.forEach( arg => rtn.push( $.toList(arguments[arg] )) );
-								return rtn;	
-							}
-						},
-						store = ctx.$;
-					
-					//Trace("$>>>>>>", flag, script, typeOf(store) );
-					if ( isArray(store) )
-						rtn = indexArray(ctx);
-					
-					else
-					if ( isObject(store) )
-						rtn = indexObject(ctx);
-					
-					else
-						rtn = store;
-				}
-			});
-			
-			res( rtn );
-		}
-		
-		/*
-		calc: (recs,req,res) => {
-			const { flags } = req;
-			var 
-				recs = recs.unpack(),
-				rec = recs[0] || {},
-				ctx = { 
-					//nomap: true,
-					$: recs,
-					$$: rec,
-					$$$: rec.Save || [],
-					x: rec.x || [],
-					y: rec.y || [],
-					scale: (x,a) => {
-						var 
-							X = x._data || x,
-							A = a._data || a,
-							K = A.length,
-							N = X.length;
-						
-						return $.toMatrix( $(N, (n,v) => {
-							v[n] = $( K, (k,u) => u[k] = X[n][k] * A[k] );
-						}) );
-					},
-					cat: function () {
-						var 
-							args = Object.keys(arguments),
-							rtn = [];
-						
-						args.forEach( arg => rtn.push( $.toList(arguments[arg] )) );
-						return rtn;	
-					},
-					get: function ( x, idx ) {
-						var 
-							args = Object.keys(arguments).slice(1),
-							N = args.length,
-							X = x._data || x;
-
-						if ( idx )
-							if ( N > 1 ) 
-								return $( N, (n,R) => R[n] = X.get( arguments[args[n]] ) );
-
-							else
-							if ( isArray(X) ) 
-								return X.get(idx);
-
-							else
-								return X[idx];
-						
-						else
-							return x;
-					}
-				};
-			
-			$( "calc="+flags.calc, ctx, ctx => {
-				if ( ctx ) 
-					if ( calc = ctx.calc ) {
-						if ( typeOf(calc) == "Object" )
-							Each(calc, (key,val) => calc[key] = $.toList(val) );
-
-						res( calc );
-					}
-
-					else
-						res( null );
-				
-				else
-					res( null );
-			});
-		} */
-		
-	},
-											 
+										 
 /**
 Filter dataset recs on specifed req-res thread
 */	
-	"filterType." : { 
+	"filters." : { 
+		data: (recs,req,res) => {  //< renders dataset records
+			const
+				{sql,table,query} = req,
+				{name} = query;
+			
+			sql.query( name 
+				? "SELECT Pipe,Name FROM app.?? WHERE ? LIMIT 1"
+				: "SELECT Pipe,Name FROM app.??", [table,{Name:name}], (err,recs) => {
+				
+				const rtn = {};
+				
+				recs.stream( (rec, key, cb) => {
+					if ( rec )
+						Fetch( "file:"+(rec.Pipe.Pipe || rec.Pipe), data => {
+							try {
+								rtn[rec.Name] = data ? JSON.parse(data) : null;
+							}
+							
+							catch (err) {
+								rtn[rec.Name] = null;
+							}
+							
+							cb();
+						});
+					
+					else 
+						res( rtn );
+				});
+			});
+		},
 		
+		open: (recs,req,res) => {  //< renders dataset records
+			filters.blog(recs,req, recs => {
+				var
+					blog = "";
+				
+				recs.data.forEach( rec => blog += rec.Description );
+				res( blog.tag("body").tag("html") );
+			});
+		},
+			
+		blog: (recs,req,res) => {  //< renders dataset records
+			recs.blog( req, "Description", recs => {
+				res({ 
+					success: true,
+					msg: errors.ok,
+					count: recs.found || recs.length,
+					data: recs
+				});
+			});
+		},
+				
 /**
 @param {Array} recs Records to filter
 @param {Object} req Totem session request
@@ -2635,6 +2485,7 @@ Default area navigator.
 			if ( query.target == "null") delete query.target;
 			
 			const
+				oldSchool = false,
 				btoa = b => Buffer.from(b,"utf-8").toString("base64"),
 				atob = a => Buffer.from(a,"base64").toString("utf-8"),
 				trace = true,
@@ -3159,46 +3010,58 @@ Default area navigator.
 
 					default:	// request made w/o elFinder
 						if ( path.endsWith("/") )	// requesting folder
-							Fetch( "file:"+path , files => {	
-								if ( files ) {
-									req.type = "html"; // override default json type
-									res([[ 
-										site.nick.link( "/brief.view?notebook=totem" ),
-										client.link( "/login.html" ),
-										"API".link( "/api.view" ),
-										"Explore".link( "/expore.view" ),
-										"Info".link( "/xfan.view?w=1000&h=600&src=/info" ),
-										path
-									].join(" || ") , files.map( file => {
-										if ( file.endsWith(".url") ) {	// resolve windows link
-											const
-												src = "."+path+file;
+							if (oldSchool)
+								Fetch( "file:"+path , files => {	
+									if ( files ) {
+										req.type = "html"; // override default json type
+										res([[ 
+											site.nick.link( "/brief.view?notebook=totem" ),
+											client.link( "/login.html" ),
+											"API".link( "/api.view" ),
+											"Explore".link( "/expore.view" ),
+											"Info".link( "/xfan.view?w=1000&h=600&src=/info" ),
+											path
+										].join(" || ") , files.map( file => {
+											if ( file.endsWith(".url") ) {	// resolve windows link
+												const
+													src = "."+path+file;
 
-											if ( html = cache[src] ) 
-												return html;
+												if ( html = cache[src] ) 
+													return html;
 
-											else 
-												try {
-													const
-														[x, url] = FS.readFileSync( src, "utf-8").match( /URL=(.*)/ ) || ["",""],
-														{href} = URL(url,referer);
+												else 
+													try {
+														const
+															[x, url] = FS.readFileSync( src, "utf-8").match( /URL=(.*)/ ) || ["",""],
+															{href} = URL(url,referer);
 
-													return cache[src] = url ? file.substr(0,file.indexOf(".url")).tag( href ) : "?"+file;
-												}
+														return cache[src] = url ? file.substr(0,file.indexOf(".url")).tag( href ) : "?"+file;
+													}
 
-												catch (err) {
-													return "?"+file
-												}
-										}
+													catch (err) {
+														return "?"+file
+													}
+											}
 
-										else
-											return file.link( file );
-									}).join("<br>")].join("<br>") );
-								}
+											else
+												return file.link( file );
+										}).join("<br>")].join("<br>") );
+									}
 
-								else
-									res( "folder not found" );
-							});
+									else
+										res( "folder not found" );
+								});
+						
+							else
+								renderJade(`
+extends base
+append base_parms
+	- tech = "elFinder"
+	- url = ""
+	- query ={}
+	- flags = {nomenu:1,edit:0}
+	- elFinder_path = "${path}"
+`, {}, res );
 
 						else { // requesting file
 							Fetch( "file:"+path, res );
@@ -5050,13 +4913,15 @@ ESC remedy interface.
 		_run: savePage,
 		_html: savePage,
 		
+		//blog: renderBlog,
+		
 		// skins
 		proj: renderSkin,
 		view: renderSkin,
 		calc: renderSkin,
 		note: renderSkin,
 		run: renderSkin,
-		plugin: renderSkin,
+		//plugin: renderSkin,
 		//site: renderSkin,
 		brief: renderSkin,
 		pivot: renderSkin,
@@ -5101,7 +4966,7 @@ ESC remedy interface.
 		//exp: exportPlugin,
 		//imp: importPlugin,
 		
-		blog: blogPlugin,
+		//blog: blogPlugin,
 		
 		doc: docPlugin,
 		md: docPlugin,
@@ -5324,7 +5189,7 @@ Error messages
 		ok: "ok",
 		noMarkdown: new Error("no markdown"),
 		noRecord: new Error("no record"),
-		noParameter: new Error("missing required parameter"),
+		//noParameter: new Error("missing required parameter"),
 		noPermission: new Error( "you are not authorized for this function" ),
 		noPartner: new Error( "missing endservice=DOMAIN/ENDPOINT option or ENDPOINT did not confirm partner" ),
 		noLicense: new Error("unpublished notebook, invalid endservice, unconfirmed endpartner, or no license available"),
@@ -5931,7 +5796,7 @@ function statusPlugin(req,res) {
 				//Trace("status", err, q.sql);
 
 				if ( !err && recs.length )
-					recs.serialize( fetchUsers, (rec,users) => {  // retain user stats
+					recs.serial( fetchUsers, (rec,users) => {  // retain user stats
 						if (rec) {
 							if ( users )
 								rec._Users = users.mailify( "users", {subject: name+" request"});
@@ -5953,7 +5818,7 @@ function statusPlugin(req,res) {
 						}
 
 						else
-							recs.serialize( fetchMods, (rec,mods) => {  // retain moderator stats
+							recs.serial( fetchMods, (rec,mods) => {  // retain moderator stats
 								if (rec) 
 									rec.MODs = mods.mailify( "moderators", {subject: name+" request"});
 
@@ -6042,10 +5907,11 @@ function docPlugin(req,res) {
 	return res("Return notebook api help");
 
 	skinContext( sql, req, ctx => {
-		//Trace(">>tou ctx",ctx);
+		Trace(">>tou ctx",ctx);
 		getEngine( sql, name, eng => {
 			if ( eng ) {
-				//Trace(">>>tou", eng.ToU);
+				//eng.ToU = "p test";
+				Trace(">>>tou", eng.ToU);
 				renderJade( eng.ToU || "no ToU", ctx, tou => res( tou ) );
 			}
 			/*
@@ -6314,12 +6180,13 @@ function simPlugin(req,res) {
 		res( new Error("bad sim spec") );
 }
 	
-/**
+/*
 Endpoint to blog a specifiec field from [requested](/api.view#blogPlugin) plugin/notebook/table.
 
 @param {Object} req http request
 @param {Function} res Totem session response callback
 */
+/*
 function blogPlugin(req,res) {
 	const 
 		{ query, sql, table, type, client } = req,
@@ -6338,15 +6205,22 @@ function blogPlugin(req,res) {
 	if (type == "help")
 	return res("Blog notebook");
 
-	//Trace(">>>>>>blog", table, key, type, query.subs, src);
+Trace(">>>>>>blog", table, key, type, query.subs, src);
+	
 	if ( key )
 		sql.query(
 			"SELECT * FROM app.?? WHERE ? LIMIT 1",
 			[table, {Name: name}],
 			(err, recs) => {
 
-			if ( rec = err ? null : recs[0] )
-				if ( md = rec[key] ) md.blogify(src, {}, rec, html => res(head+html) );
+			if ( rec = recs[0] )
+				if ( md = rec[key] ) 
+					md.blogify(src, {}, rec, html => {
+Log(html);
+						res(head+html);
+						//rec[key] = html;
+						//res(recs);
+					});
 
 				else
 					res( errors.noMarkdown );
@@ -6356,9 +6230,21 @@ function blogPlugin(req,res) {
 		});
 
 	else
-		res( errors.noParameter );
+		sql.query(
+			"SELECT * FROM app.?? WHERE ? LIMIT 1", [
+			table, {Name: name}], (err,recs) => {
+
+				if ( rec = recs[0] )
+					(rec.Description||"").blog( rec, html => {
+						res( html.tag("head").tag("html") );
+					});
+				
+				else
+					res(errors.noEngine);
+			});
 }
-	
+*/
+
 /**
 Endpoint to return users of a [requested](/api.view#usersPlugin) plugin/notebook/table.
 
@@ -6721,14 +6607,15 @@ function publishPlugin(req,res) {
 					defaultDocs: defaultDocs
 				}, ctx);
 
-			Stream( prokeys, {}, (def,key,cb) => {	// expand product key comments
-
+			Object.keys(prokeys).stream( (prokey,key,cb) => {	// expand product key comments
+				const def = prokeys[prokey];
+				
 				if ( cb )	// still streaming keys
 					getComment( def, (spec, doc) => {	// extract key's comment
 						var
 							comment = (defaultDocs[key] || "") + (doc || "");
 
-						comment.blog( ctx, html => { 	// blogify the comment
+						comment.blog( ctx, html => { 	// blog the comment
 							function makeSkinable( com ) {
 								return escape(com).replace(/[\.|\*|_|']/g,arg=>"%"+arg.charCodeAt(0).toString(16) );
 							}

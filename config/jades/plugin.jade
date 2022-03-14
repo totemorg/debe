@@ -8,7 +8,6 @@ append site_help
 		Provided a skinning framework with options:
 
 			- opts = viewing options (!{JSON.stringify(opts)})
-			- mode = notebook mode (!{mode})
 			- client = client viewing (!{client})
 			- addBrief
 			- addToU
@@ -21,11 +20,13 @@ append site_parms
 		- addBrief = false
 		- addToU = false
 		- mode = opts ? opts.mode : "noopts"
+		- ds = opts ? opts.ds : "noopts"
+		- query = opts ? opts.query : {}
 
 append site_body
-	- ds = opts ? opts.ds : "noopts"
+	- query["!not:"] = "Save*"
 	- dsName = ds.charAt(0).toUpperCase()+ds.substr(1)
-	- dsPath = `/${ds}.db`.tag("?",opts ? opts.query : {}).tag("/",{"!Save*":""})
+	- dsPath = `/${ds}.db`.tag("?",query)
 	- links = {}
 
 	each val, key in {Export:"bool",Ingest:"bool",Pipe:"doc",Description:"doc",Entry:"json",Exit:"json",Save:"json"}
@@ -34,8 +35,9 @@ append site_body
 	each val, key in {backlog:"int",load:"float",budget:"float",cost:"float",batch:"int",limit:"int",start:"date",end:"date",every:"varchar(8)",on:"int",off:"int",rekey:"doc",watch:"int",propose:"bool",baseline:"varchar(64)",agent:"varchar(16)"}
 		- links[key] = link("+", `/${ds}.mod?${val}=Pipe_${key}`) + " / " + link("-", `/${ds}.mod?drop=Pipe_${key}`) + " " + tag("&"+key+"||Pipe_"+key,"code",{}) + " = "
 
-	script.
-		alert("#{dsName}==#{dsPath}==#{JSON.stringify(opts.query)}");
+	//
+		script.
+		alert("dsPath=#{dsPath}");
 
 	case mode
 		when "noopts"

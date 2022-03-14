@@ -6,9 +6,12 @@ append layout_help
 		# base
 		Provides a skinning framework with options:
 
-			- tech = skinning tech flow || d3 || world || usa || cubeland || forest || simple || three || reveal || scene || elFinder || isotope || apy || layout || dojo || extjs (!{tech})
-			- edit = edit switch (!{flags.edit})
-			- nomenu = menu switch (!{flags.nomenu})
+			- url = hosting url (!{url})
+			- flags.edit = edit switch (!{flags.edit})
+			- flags.nomenu = menu switch (!{flags.nomenu})
+			- query.locale = "locale name" (!{query.locale})
+			- query.theme = "css theme name" (!{query.theme})
+			- tech = "flow || d3 || world || usa || cubeland || forest || simple || three || reveal || scene || elFinder || isotope || apy || layout || dojo || extjs" (!{tech})
 			- highlight = code highlighting tech (!{highlight})
 			- math = enable embedded math (!{math})
 			- capture = enable browser canvas capture (!{capture})
@@ -21,26 +24,24 @@ append layout_help
 			- layout_image = "darkroom || vide || fabric || camen" 
 			- layout_theme = "..."
 			- three_effect = "AnaglyphEffect || ... "
+			- elFinder_path = "/root/"
 
 append layout_parms
 	block base_parms
-		// base options
 		- tech = "layout"
 		- highlight = ""
 		- math = false
 		- capture = false
-		// extjs
 		- ext_carousel = false
 		- ext_charting = false
 		- ext_codeEdit = true
 		- ext_jsonEdit = true
 		- ext_theme = "crisp" 
-		// layout
 		- layout_grid = "datatable"
 		- layout_image = "darkroom" 
 		- layout_theme = ""
-		// three
 		- three_effect = "AnaglyphEffect"
+		- elFinder_path = "/root/"
 
 append layout_head
 	- locale = query.locale || "en"  // en | fr | de | ...
@@ -630,6 +631,33 @@ append layout_body
 		when "elFinder"
 			#content
 				block base_body
+			
+			script.
+				$().ready( () => {
+					$('#content').elfinder({
+						url : "#{elFinder_path}",
+
+						lang: "en",
+						//debug: ["error", "warning"],
+						rememberLastDir: true,
+						requestType: "get",
+						defaultView: "list",  // list||icons
+						resizable: true,
+						sort: "name",
+						sortDirect: "asc",
+						dragUploadAllow: "auto",
+						/*commands: [
+							"getfile","help","rename","open"
+						],*/
+						handlers: {
+							add: ev => console.log("add",ev),
+							upload: ev => console.log("up",ev),
+							//select: ev => console.log("sel",ev),
+							//open: ev => alert("open"),
+							//back: ev => alert("back"),
+						},
+					}).elfinder('instance');
+				});
 
 		when "three"
 			block base_body

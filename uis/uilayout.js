@@ -1566,343 +1566,6 @@ $().ready( () => {
 			else		
 			if ( dataTable ) {
 				const
-					config = {		// define grid
-						ajax: {
-							url: path,
-							dataSrc: "data",
-						},
-
-						/*
-						R Reorder
-						B Buttons
-						Z i forgot
-						C Column visibility menu
-						S Scroller
-						P Search panes
-						Q Search builder
-						l length changing
-						f fitering
-						i showing info
-						t the table
-						p pagnation controls
-						r processing display
-						<"div"> use div to position
-						*/
-
-						rowId: "ID", 
-						
-						dom: //bootstrap3
-"<'row'<'col-sm-6'RCZB><'col-sm-6'f>>" +
-"<'row'<'col-sm-12'tr>>" +
-"<'row'<'col-sm-5'l><'col-sm-7'p>>",
-							// '<"top"RCZBf<"clear">>rt<"bottom"ipl<"clear">>',
-							// 'RBlfrtip', //'RCZBlfrtip',
-							// '<"top"RCZBf<"clear">>rt<"bottom"ilp<"clear">>', //'Bfrtip',	//Zlfrtip
-
-						colReorder: {
-						},
-
-						colResize: {
-							tableWidthFixed: false
-						},
-
-						columnDefs: [ {	// default field options
-							//maxWidth: "30em",
-							//width: "30em",
-							orderable: false,
-							className: 'select-checkbox',
-							targets:   1, // should revise to index of field labeled "Name"
-							checkboxes: {
-							   selectRow: true
-							}
-						} ],
-						select: {
-							style:    'os',
-							selector: 'td:first-child'
-						},
-						order: [[ 0, 'asc' ]],
-
-						//select: true,
-						responsive: false,
-						altEditor: true,
-						//orderCellsTop: true,
-						//fixedHeader: true,
-
-						onAddRow: (editor, rowdata, success, error) => {
-							//table.row.add();
-							const str = ajaxString(editor,rowdata);
-
-							if ( str.forEach )
-								alert( "invalid fields: "+str.join(","));
-
-							else
-								$.ajax({
-									url: path,
-									type: 'POST',
-									data: str,
-									success: success,
-									error: error
-								});
-						},
-
-						onDeleteRow: (editor, rowdata, success, error) => {
-							$.ajax({
-								url: `${path}&ID=${rowdata.ID}`,
-								type: 'DELETE',
-								data: "",
-								success: success,
-								error: error
-							});
-						},
-
-						onEditRow: (editor, rowdata, success, error) => {
-							const str = ajaxString(editor,rowdata);
-
-							if ( str.forEach )
-								alert( "invalid fields: "+str.join(","));
-
-							else
-								$.ajax({
-									url: `${path}&ID=${rowdata.ID}`,
-									url: `${path}&ID=${rowdata.ID}`,
-									type: 'PUT',
-									data: str,
-									success: success,
-									error: error
-								});
-						},
-
-						/*rowReorder: {
-							dataSrc: 'ID',
-							//editor:  editor
-						},*/
-
-						/*
-						rowGroup: { 
-							dataSrc: "Name" 
-						}, */
-
-						buttons: [
-							{
-								className: notice.button,
-								text: icon("fit"),
-								titleAttr: "Fit",
-								action: ( e, dt, node, config ) => {
-									var 
-										dtinit = dt.init();
-
-									//console.log(dt, dtinit, toggle);
-									dtinit.responsive = toggle.responsive = !toggle.responsive;
-
-									dt.destroy();
-									//$("#test1 tbody").empty();
-									//$("#test1 thead").empty();
-
-									$(`#${gridID} table`).DataTable(dtinit);
-									//alert("regen");
-								}
-							},	
-							{
-								extend: "print",
-								className: notice.button,
-								text: icon("print"),
-								titleAttr: "Print",
-								//name: "print"
-							},
-							{
-								className: notice.button,
-								text: icon("blog"),
-								titleAttr: "Blog",
-								action: ( e, dt, node, config ) => {
-									//alert( JSON.stringify(selRec) );
-									$.ajax({
-										url:  path.tag("?",{ _blog: (toggle.blog = !toggle.blog) ? blogger : "", name:selRec.Name}),
-										type: 'GET',
-										data: "",
-										success: res => {
-											dt.clear().rows.add( res.data ).draw();
-											//table.ajax.reload();
-										},
-										error: () => {
-											alert(errors.nobackend);
-										}
-									});
-								}
-							},
-							{
-								className: notice.button,
-								text: icon("run"),
-								titleAttr: "Run",
-								action: ( e, dt, node, config ) => {
-									$.ajax({
-										url: path.replace(".db",".exe").tag("?",{name:selRec.Name}),
-										type: 'GET',
-										data: "",
-										success: res => {
-											//console.log("res",res);
-											alert("submitted");
-										},
-										error: () => {
-											alert(errors.nobackend);
-										}
-									});
-								}
-							},
-							{ 
-								className: notice.button,
-								extend: "colvis",
-								text: icon("display"),
-								titleAttr: "Display"
-							},
-							{
-								className: notice.button,
-								extend: 'selected', // Bind to Selected row
-								text: icon("select"),
-								titleAttr: 'Select',
-								action: ( e, dt, node, config ) => {
-									const
-										data = dt.rows( { selected: true } ).data() || [];
-									
-									if ( data[0] ) Copy( data[0], selRec ); else selRec.Name = "undefined";
-									
-									//alert( JSON.stringify(selRec) );
-									
-									$.ajax({
-										url: (toggle.select = !toggle.select) ? path.tag("?",{name:selRec.Name}) : path,
-										type: 'GET',
-										data: "",
-										success: res => {
-											dt.clear().rows.add( res.data ).draw();
-										},
-										error: () => {
-											alert(errors.nobackend);
-										}
-									});
-								}
-							},
-							{
-								className: notice.button,
-								extend: 'selected', // Bind to Selected row
-								text: icon("insert"),
-								titleAttr: 'Add',
-								name: 'add',        // do not change name
-							},
-							{
-								className: notice.button,
-								extend: 'selected', // Bind to Selected row
-								text: icon("update"),
-								titleAttr: 'Update',
-								name: 'edit'        // do not change name
-							},
-							{
-								className: notice.button,
-								extend: 'selected', // Bind to Selected row
-								text: icon("delete"),
-								titleAttr: 'Delete',
-								name: 'delete'      // do not change name
-							},
-							{
-								className: notice.button,
-								text: icon("clone"),
-								titleAttr: "Clone",
-								action: ( e, dt, node, config ) => {
-									const 
-										data = dt.rows({selected:true}).data(),
-										sel = data[0] || {Name:""};
-
-									sel.Name = "clone"+sel.Name;
-
-									//console.log( "sel", sel );
-									$.ajax({
-										url: path,
-										type: 'POST',
-										data: JSON.stringify(sel),
-										success: res => {
-											//console.log("res",res);
-											alert("cloned");
-										},
-										error: () => {
-											alert(errors.nobackend);
-										}
-									});
-
-								}
-							},		
-							{
-								className: notice.button,
-								text: icon("refresh"),
-								titleAttr: "Refresh",
-								name: 'refresh'      // do not change name
-							},
-							{
-								className: notice.button,
-								text: icon("down"),
-								titleAttr: "Import",
-								action: ( e, dt, node, config ) => {
-									$.ajax({
-										url: path.replace(".db",".import"),
-										type: 'GET',
-										data: "",
-										success: res => {
-											alert("imported");
-										},
-										error: () => {
-											alert(errors.nobackend);
-										}
-									});
-								}
-							},		
-							{
-								className: notice.button,
-								text: icon("up"),
-								titleAttr: "Export",
-								action: ( e, dt, node, config ) => {
-									$.ajax({
-										url: path.replace(".db",".export"),
-										type: 'GET',
-										data: "",
-										success: res => {
-											alert("exported");
-										},
-										error: () => {
-											alert(errors.nobackend);
-										}
-									});
-								}
-							},		
-							/*
-							{
-								text: "New",
-								action: ( e, dt, node, config ) => {
-									alert( 'New' );
-									console.log(e,dt,node,config);
-								}
-							},
-							{
-								text: "Save",
-								action: ( e, dt, node, config ) => {
-									alert( 'Save' );
-									console.log(e,dt,node,config);
-								}
-							},
-							{
-								text: "Delete",
-								action: ( e, dt, node, config ) => {
-									alert( 'Delete' );
-									console.log(e,dt,node,config);
-								}
-							}, */
-						],
-
-						autoWidth: false,
-						info: true,
-						lengthChange: true,
-						paging: true,
-						scrollY: 300,
-						scrollX: 600,
-						pageLength: 20,
-						columns: fields
-					},
 					$table = $el.children("table");
 
 				//console.log(">>connfig", $el[0]);
@@ -1937,8 +1600,361 @@ $().ready( () => {
 						});
 				});
 
-				//console.log(config);
-				$table.DataTable(config);
+				$table.DataTable({		// define grid
+					ajax: {
+						url: path
+						//dataSrc: "data",
+						/*data: d => {
+							console.log("ajax data", d);
+						}*/
+					},
+
+					/*
+					R Reorder
+					B Buttons
+					Z i forgot
+					C Column visibility menu
+					S Scroller
+					P Search panes
+					Q Search builder
+					l length changing
+					f fitering
+					i showing info
+					t the table
+					p pagnation controls
+					r processing display
+					<"div"> use div to position
+					*/
+
+					rowId: "ID", 
+
+					dom: //bootstrap3
+"<'row'<'col-sm-6'RCZB><'col-sm-6'f>>" +
+"<'row'<'col-sm-12'tr>>" +
+"<'row'<'col-sm-5'l><'col-sm-7'p>>",
+						// '<"top"RCZBf<"clear">>rt<"bottom"ipl<"clear">>',
+						// 'RBlfrtip', //'RCZBlfrtip',
+						// '<"top"RCZBf<"clear">>rt<"bottom"ilp<"clear">>', //'Bfrtip',	//Zlfrtip
+
+					colReorder: {
+					},
+
+					colResize: {
+						tableWidthFixed: false
+					},
+
+					columnDefs: [ {	// default field options
+						//maxWidth: "30em",
+						//width: "30em",
+						orderable: false,
+						className: 'select-checkbox',
+						targets:   1, // should revise to index of field labeled "Name"
+						checkboxes: {
+						   selectRow: true
+						}
+					} ],
+					select: {
+						style:    'os',
+						selector: 'td:first-child'
+					},
+					order: [[ 0, 'asc' ]],
+
+					//select: true,
+					responsive: false,
+					altEditor: true,
+					//orderCellsTop: true,
+					//fixedHeader: true,
+
+					onAddRow: (editor, rowdata, success, error) => {
+						//table.row.add();
+						const str = ajaxString(editor,rowdata);
+
+						if ( str.forEach )
+							alert( "invalid fields: "+str.join(","));
+
+						else
+							$.ajax({
+								url: path,
+								type: 'POST',
+								data: str,
+								success: success,
+								error: error
+							});
+					},
+
+					onDeleteRow: (editor, rowdata, success, error) => {
+						$.ajax({
+							url: `${path}&ID=${rowdata.ID}`,
+							type: 'DELETE',
+							data: "",
+							success: success,
+							error: error
+						});
+					},
+
+					onEditRow: (editor, rowdata, success, error) => {
+						const str = ajaxString(editor,rowdata);
+
+						if ( str.forEach )
+							alert( "invalid fields: "+str.join(","));
+
+						else
+							$.ajax({
+								url: `${path}&ID=${rowdata.ID}`,
+								url: `${path}&ID=${rowdata.ID}`,
+								type: 'PUT',
+								data: str,
+								success: success,
+								error: error
+							});
+					},
+
+					/*rowReorder: {
+						dataSrc: 'ID',
+						//editor:  editor
+					},*/
+
+					/*
+					rowGroup: { 
+						dataSrc: "Name" 
+					}, */
+
+					buttons: [
+						{
+							className: notice.button,
+							text: icon("fit"),
+							titleAttr: "Fit",
+							action: ( e, dt, node, config ) => {
+								var 
+									dtinit = dt.init();
+
+								//console.log(dt, dtinit, toggle);
+								dtinit.responsive = toggle.responsive = !toggle.responsive;
+
+								dt.destroy();
+								//$("#test1 tbody").empty();
+								//$("#test1 thead").empty();
+
+								$(`#${gridID} table`).DataTable(dtinit);
+								//alert("regen");
+							}
+						},	
+						{
+							extend: "print",
+							className: notice.button,
+							text: icon("print"),
+							titleAttr: "Print",
+							//name: "print"
+						},
+						{
+							className: notice.button,
+							text: icon("blog"),
+							titleAttr: "Blog",
+							action: ( e, dt, node, config ) => {
+								//alert( JSON.stringify(selRec) );
+								const
+									data = dt.rows( { selected: true } ).data() || [],
+									sel = data[0];
+
+								if ( sel ) {
+									toggle.blog = !toggle.blog;
+
+									// cant get DT.ajax.url() and .reload() to work so ...
+									$.ajax({
+										url: toggle.blog
+											? path.replace(".db",".blog").tag("?", {name:sel.Name})
+											: path.tag("?", {name:sel.Name}),
+										type: 'GET',
+										data: "",
+										success: res => {
+											// sometimes response is json parsed - wtf
+											const rec = res.length ? JSON.parse(res) : res;
+											dt.clear().rows.add( rec.data ).draw();
+										},
+										error: () => {
+											alert(errors.nobackend);
+										}
+									});
+								}
+								
+								else
+									alert("select a usecase");
+							}
+						},
+						{
+							className: notice.button,
+							text: icon("run"),
+							titleAttr: "Run",
+							action: ( e, dt, node, config ) => {
+								$.ajax({
+									url: path.replace(".db",".exe").tag("?",{name:selRec.Name}),
+									type: 'GET',
+									data: "",
+									success: res => {
+										//console.log("res",res);
+										alert("submitted");
+									},
+									error: () => {
+										alert(errors.nobackend);
+									}
+								});
+							}
+						},
+						{ 
+							className: notice.button,
+							extend: "colvis",
+							text: icon("display"),
+							titleAttr: "Display"
+						},
+						{
+							className: notice.button,
+							extend: 'selected', // Bind to Selected row
+							text: icon("select"),
+							titleAttr: 'Select',
+							action: ( e, dt, node, config ) => {
+								const
+									data = dt.rows( { selected: true } ).data() || [];
+
+								if ( data[0] ) Copy( data[0], selRec ); else selRec.Name = "undefined";
+
+								//alert( JSON.stringify(selRec) );
+
+								$.ajax({
+									url: (toggle.select = !toggle.select) ? path.tag("?",{name:selRec.Name}) : path,
+									type: 'GET',
+									data: "",
+									success: res => {
+										dt.clear().rows.add( res.data ).draw();
+									},
+									error: () => {
+										alert(errors.nobackend);
+									}
+								});
+							}
+						},
+						{
+							className: notice.button,
+							extend: 'selected', // Bind to Selected row
+							text: icon("insert"),
+							titleAttr: 'Add',
+							name: 'add',        // do not change name
+						},
+						{
+							className: notice.button,
+							extend: 'selected', // Bind to Selected row
+							text: icon("update"),
+							titleAttr: 'Update',
+							name: 'edit'        // do not change name
+						},
+						{
+							className: notice.button,
+							extend: 'selected', // Bind to Selected row
+							text: icon("delete"),
+							titleAttr: 'Delete',
+							name: 'delete'      // do not change name
+						},
+						{
+							className: notice.button,
+							text: icon("clone"),
+							titleAttr: "Clone",
+							action: ( e, dt, node, config ) => {
+								const 
+									data = dt.rows({selected:true}).data(),
+									sel = data[0] || {Name:""};
+
+								sel.Name = "clone"+sel.Name;
+
+								//console.log( "sel", sel );
+								$.ajax({
+									url: path,
+									type: 'POST',
+									data: JSON.stringify(sel),
+									success: res => {
+										//console.log("res",res);
+										alert("cloned");
+									},
+									error: () => {
+										alert(errors.nobackend);
+									}
+								});
+
+							}
+						},		
+						{
+							className: notice.button,
+							text: icon("refresh"),
+							titleAttr: "Refresh",
+							name: 'refresh'      // do not change name
+						},
+						{
+							className: notice.button,
+							text: icon("down"),
+							titleAttr: "Import",
+							action: ( e, dt, node, config ) => {
+								$.ajax({
+									url: path.replace(".db",".import"),
+									type: 'GET',
+									data: "",
+									success: res => {
+										alert("imported");
+									},
+									error: () => {
+										alert(errors.nobackend);
+									}
+								});
+							}
+						},		
+						{
+							className: notice.button,
+							text: icon("up"),
+							titleAttr: "Export",
+							action: ( e, dt, node, config ) => {
+								$.ajax({
+									url: path.replace(".db",".export"),
+									type: 'GET',
+									data: "",
+									success: res => {
+										alert("exported");
+									},
+									error: () => {
+										alert(errors.nobackend);
+									}
+								});
+							}
+						},		
+						/*
+						{
+							text: "New",
+							action: ( e, dt, node, config ) => {
+								alert( 'New' );
+								console.log(e,dt,node,config);
+							}
+						},
+						{
+							text: "Save",
+							action: ( e, dt, node, config ) => {
+								alert( 'Save' );
+								console.log(e,dt,node,config);
+							}
+						},
+						{
+							text: "Delete",
+							action: ( e, dt, node, config ) => {
+								alert( 'Delete' );
+								console.log(e,dt,node,config);
+							}
+						}, */
+					],
+
+					autoWidth: false,
+					info: true,
+					lengthChange: true,
+					paging: true,
+					scrollY: 300,
+					scrollX: 600,
+					pageLength: 20,
+					columns: fields
+				});
 			}
 
 			else

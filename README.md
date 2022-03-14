@@ -167,7 +167,7 @@ Returns a ref-joined list of links
 * [Array](#DEBE.module_Array)
     * [~gridify(noheader)](#DEBE.module_Array..gridify)
     * [~groupify(dot)](#DEBE.module_Array..groupify)
-    * [~blogify(keys, ds, cb)](#DEBE.module_Array..blogify)
+    * [~blog(keys, ds, cb)](#DEBE.module_Array..blog)
     * [~merge(Recs, idx)](#DEBE.module_Array..merge)
     * [~schemaify(src)](#DEBE.module_Array..schemaify)
     * [~treeify(idx, kids, level, keys, wt)](#DEBE.module_Array..treeify)
@@ -195,9 +195,9 @@ Groups each "x.y.z. ...." spec in the list.
 | --- | --- | --- |
 | dot | <code>string</code> | item seperator |
 
-<a name="DEBE.module_Array..blogify"></a>
+<a name="DEBE.module_Array..blog"></a>
 
-### Array~blogify(keys, ds, cb)
+### Array~blog(keys, ds, cb)
 Blogs each string in the list.
 
 **Kind**: inner method of [<code>Array</code>](#DEBE.module_Array)  
@@ -380,24 +380,19 @@ config({
     * [~tableRoutes.](#module_DEBE..tableRoutes.)
     * [~defaultDocs](#module_DEBE..defaultDocs)
     * [~licenseOnDownload](#module_DEBE..licenseOnDownload)
-    * [~filterFlag.](#module_DEBE..filterFlag.)
-        * [.flagTrap.](#module_DEBE..filterFlag..flagTrap.)
-            * [.browse()](#module_DEBE..filterFlag..flagTrap..browse)
-        * [.blog()](#module_DEBE..filterFlag..blog)
-        * [.$()](#module_DEBE..filterFlag..$)
-    * [~filterType.](#module_DEBE..filterType.)
-        * [.xdoc](#module_DEBE..filterType..xdoc)
-        * [.xxls](#module_DEBE..filterType..xxls)
-        * [.xpps](#module_DEBE..filterType..xpps)
-        * [.xppt](#module_DEBE..filterType..xppt)
-        * [.dbx(recs, req, res)](#module_DEBE..filterType..dbx)
-        * [.db(recs, req, res)](#module_DEBE..filterType..db)
-        * [.kml(recs, req, res)](#module_DEBE..filterType..kml)
-        * [.flat(recs, req, res)](#module_DEBE..filterType..flat)
-        * [.txt(recs, req, res)](#module_DEBE..filterType..txt)
-        * [.html(recs, req, res)](#module_DEBE..filterType..html)
-        * [.tree(recs, req, res)](#module_DEBE..filterType..tree)
-        * [.schema(recs, req, res)](#module_DEBE..filterType..schema)
+    * [~filters.](#module_DEBE..filters.)
+        * [.xdoc](#module_DEBE..filters..xdoc)
+        * [.xxls](#module_DEBE..filters..xxls)
+        * [.xpps](#module_DEBE..filters..xpps)
+        * [.xppt](#module_DEBE..filters..xppt)
+        * [.dbx(recs, req, res)](#module_DEBE..filters..dbx)
+        * [.db(recs, req, res)](#module_DEBE..filters..db)
+        * [.kml(recs, req, res)](#module_DEBE..filters..kml)
+        * [.flat(recs, req, res)](#module_DEBE..filters..flat)
+        * [.txt(recs, req, res)](#module_DEBE..filters..txt)
+        * [.html(recs, req, res)](#module_DEBE..filters..html)
+        * [.tree(recs, req, res)](#module_DEBE..filters..tree)
+        * [.schema(recs, req, res)](#module_DEBE..filters..schema)
     * [~byArea.](#module_DEBE..byArea.)
         * [.root(req, res)](#module_DEBE..byArea..root)
     * [~byTable.](#module_DEBE..byTable.)
@@ -455,7 +450,6 @@ config({
     * [~trackPlugin()](#module_DEBE..trackPlugin)
     * [~getPlugin()](#module_DEBE..getPlugin)
     * [~simPlugin()](#module_DEBE..simPlugin)
-    * [~blogPlugin(req, res)](#module_DEBE..blogPlugin)
     * [~usersPlugin(req, res)](#module_DEBE..usersPlugin)
     * [~exportPlugin(req, res)](#module_DEBE..exportPlugin)
     * [~importPlugin(req, res)](#module_DEBE..importPlugin)
@@ -577,71 +571,31 @@ Default doc for reserved notebook keys
 
 ### DEBE~licenseOnDownload
 **Kind**: inner property of [<code>DEBE</code>](#module_DEBE)  
-<a name="module_DEBE..filterFlag."></a>
+<a name="module_DEBE..filters."></a>
 
-### DEBE~filterFlag.
-Filters via request flags
-
-**Kind**: inner property of [<code>DEBE</code>](#module_DEBE)  
-
-* [~filterFlag.](#module_DEBE..filterFlag.)
-    * [.flagTrap.](#module_DEBE..filterFlag..flagTrap.)
-        * [.browse()](#module_DEBE..filterFlag..flagTrap..browse)
-    * [.blog()](#module_DEBE..filterFlag..blog)
-    * [.$()](#module_DEBE..filterFlag..$)
-
-<a name="module_DEBE..filterFlag..flagTrap."></a>
-
-#### filterFlag..flagTrap.
-**Kind**: static property of [<code>filterFlag.</code>](#module_DEBE..filterFlag.)  
-<a name="module_DEBE..filterFlag..flagTrap..browse"></a>
-
-##### flagTrap..browse()
-**Kind**: static method of [<code>flagTrap.</code>](#module_DEBE..filterFlag..flagTrap.)  
-<a name="module_DEBE..filterFlag..blog"></a>
-
-#### filterFlag..blog()
-**Kind**: static method of [<code>filterFlag.</code>](#module_DEBE..filterFlag.)  
-<a name="module_DEBE..filterFlag..$"></a>
-
-#### filterFlag..$()
-**Kind**: static method of [<code>filterFlag.</code>](#module_DEBE..filterFlag.)  
-<a name="module_DEBE..filterType."></a>
-
-### DEBE~filterType.
+### DEBE~filters.
 Filter dataset recs on specifed req-res thread
 
 **Kind**: inner property of [<code>DEBE</code>](#module_DEBE)  
 
-* [~filterType.](#module_DEBE..filterType.)
-    * [.xdoc](#module_DEBE..filterType..xdoc)
-    * [.xxls](#module_DEBE..filterType..xxls)
-    * [.xpps](#module_DEBE..filterType..xpps)
-    * [.xppt](#module_DEBE..filterType..xppt)
-    * [.dbx(recs, req, res)](#module_DEBE..filterType..dbx)
-    * [.db(recs, req, res)](#module_DEBE..filterType..db)
-    * [.kml(recs, req, res)](#module_DEBE..filterType..kml)
-    * [.flat(recs, req, res)](#module_DEBE..filterType..flat)
-    * [.txt(recs, req, res)](#module_DEBE..filterType..txt)
-    * [.html(recs, req, res)](#module_DEBE..filterType..html)
-    * [.tree(recs, req, res)](#module_DEBE..filterType..tree)
-    * [.schema(recs, req, res)](#module_DEBE..filterType..schema)
+* [~filters.](#module_DEBE..filters.)
+    * [.xdoc](#module_DEBE..filters..xdoc)
+    * [.xxls](#module_DEBE..filters..xxls)
+    * [.xpps](#module_DEBE..filters..xpps)
+    * [.xppt](#module_DEBE..filters..xppt)
+    * [.dbx(recs, req, res)](#module_DEBE..filters..dbx)
+    * [.db(recs, req, res)](#module_DEBE..filters..db)
+    * [.kml(recs, req, res)](#module_DEBE..filters..kml)
+    * [.flat(recs, req, res)](#module_DEBE..filters..flat)
+    * [.txt(recs, req, res)](#module_DEBE..filters..txt)
+    * [.html(recs, req, res)](#module_DEBE..filters..html)
+    * [.tree(recs, req, res)](#module_DEBE..filters..tree)
+    * [.schema(recs, req, res)](#module_DEBE..filters..schema)
 
-<a name="module_DEBE..filterType..xdoc"></a>
+<a name="module_DEBE..filters..xdoc"></a>
 
-#### filterType..xdoc
-**Kind**: static property of [<code>filterType.</code>](#module_DEBE..filterType.)  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| recs | <code>Array</code> | Records to filter |
-| req | <code>Object</code> | Totem session request |
-| res | <code>function</code> | Totem session response |
-
-<a name="module_DEBE..filterType..xxls"></a>
-
-#### filterType..xxls
-**Kind**: static property of [<code>filterType.</code>](#module_DEBE..filterType.)  
+#### filters..xdoc
+**Kind**: static property of [<code>filters.</code>](#module_DEBE..filters.)  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -649,21 +603,10 @@ Filter dataset recs on specifed req-res thread
 | req | <code>Object</code> | Totem session request |
 | res | <code>function</code> | Totem session response |
 
-<a name="module_DEBE..filterType..xpps"></a>
+<a name="module_DEBE..filters..xxls"></a>
 
-#### filterType..xpps
-**Kind**: static property of [<code>filterType.</code>](#module_DEBE..filterType.)  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| recs | <code>Array</code> | Records to filter |
-| req | <code>Object</code> | Totem session request |
-| res | <code>function</code> | Totem session response |
-
-<a name="module_DEBE..filterType..xppt"></a>
-
-#### filterType..xppt
-**Kind**: static property of [<code>filterType.</code>](#module_DEBE..filterType.)  
+#### filters..xxls
+**Kind**: static property of [<code>filters.</code>](#module_DEBE..filters.)  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -671,21 +614,10 @@ Filter dataset recs on specifed req-res thread
 | req | <code>Object</code> | Totem session request |
 | res | <code>function</code> | Totem session response |
 
-<a name="module_DEBE..filterType..dbx"></a>
+<a name="module_DEBE..filters..xpps"></a>
 
-#### filterType..dbx(recs, req, res)
-**Kind**: static method of [<code>filterType.</code>](#module_DEBE..filterType.)  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| recs | <code>Array</code> | Records to filter |
-| req | <code>Object</code> | Totem session request |
-| res | <code>function</code> | Totem session response |
-
-<a name="module_DEBE..filterType..db"></a>
-
-#### filterType..db(recs, req, res)
-**Kind**: static method of [<code>filterType.</code>](#module_DEBE..filterType.)  
+#### filters..xpps
+**Kind**: static property of [<code>filters.</code>](#module_DEBE..filters.)  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -693,21 +625,10 @@ Filter dataset recs on specifed req-res thread
 | req | <code>Object</code> | Totem session request |
 | res | <code>function</code> | Totem session response |
 
-<a name="module_DEBE..filterType..kml"></a>
+<a name="module_DEBE..filters..xppt"></a>
 
-#### filterType..kml(recs, req, res)
-**Kind**: static method of [<code>filterType.</code>](#module_DEBE..filterType.)  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| recs | <code>Array</code> | Records to filter |
-| req | <code>Object</code> | Totem session request |
-| res | <code>function</code> | Totem session response |
-
-<a name="module_DEBE..filterType..flat"></a>
-
-#### filterType..flat(recs, req, res)
-**Kind**: static method of [<code>filterType.</code>](#module_DEBE..filterType.)  
+#### filters..xppt
+**Kind**: static property of [<code>filters.</code>](#module_DEBE..filters.)  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -715,21 +636,10 @@ Filter dataset recs on specifed req-res thread
 | req | <code>Object</code> | Totem session request |
 | res | <code>function</code> | Totem session response |
 
-<a name="module_DEBE..filterType..txt"></a>
+<a name="module_DEBE..filters..dbx"></a>
 
-#### filterType..txt(recs, req, res)
-**Kind**: static method of [<code>filterType.</code>](#module_DEBE..filterType.)  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| recs | <code>Array</code> | Records to filter |
-| req | <code>Object</code> | Totem session request |
-| res | <code>function</code> | Totem session response |
-
-<a name="module_DEBE..filterType..html"></a>
-
-#### filterType..html(recs, req, res)
-**Kind**: static method of [<code>filterType.</code>](#module_DEBE..filterType.)  
+#### filters..dbx(recs, req, res)
+**Kind**: static method of [<code>filters.</code>](#module_DEBE..filters.)  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -737,10 +647,10 @@ Filter dataset recs on specifed req-res thread
 | req | <code>Object</code> | Totem session request |
 | res | <code>function</code> | Totem session response |
 
-<a name="module_DEBE..filterType..tree"></a>
+<a name="module_DEBE..filters..db"></a>
 
-#### filterType..tree(recs, req, res)
-**Kind**: static method of [<code>filterType.</code>](#module_DEBE..filterType.)  
+#### filters..db(recs, req, res)
+**Kind**: static method of [<code>filters.</code>](#module_DEBE..filters.)  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -748,10 +658,65 @@ Filter dataset recs on specifed req-res thread
 | req | <code>Object</code> | Totem session request |
 | res | <code>function</code> | Totem session response |
 
-<a name="module_DEBE..filterType..schema"></a>
+<a name="module_DEBE..filters..kml"></a>
 
-#### filterType..schema(recs, req, res)
-**Kind**: static method of [<code>filterType.</code>](#module_DEBE..filterType.)  
+#### filters..kml(recs, req, res)
+**Kind**: static method of [<code>filters.</code>](#module_DEBE..filters.)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| recs | <code>Array</code> | Records to filter |
+| req | <code>Object</code> | Totem session request |
+| res | <code>function</code> | Totem session response |
+
+<a name="module_DEBE..filters..flat"></a>
+
+#### filters..flat(recs, req, res)
+**Kind**: static method of [<code>filters.</code>](#module_DEBE..filters.)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| recs | <code>Array</code> | Records to filter |
+| req | <code>Object</code> | Totem session request |
+| res | <code>function</code> | Totem session response |
+
+<a name="module_DEBE..filters..txt"></a>
+
+#### filters..txt(recs, req, res)
+**Kind**: static method of [<code>filters.</code>](#module_DEBE..filters.)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| recs | <code>Array</code> | Records to filter |
+| req | <code>Object</code> | Totem session request |
+| res | <code>function</code> | Totem session response |
+
+<a name="module_DEBE..filters..html"></a>
+
+#### filters..html(recs, req, res)
+**Kind**: static method of [<code>filters.</code>](#module_DEBE..filters.)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| recs | <code>Array</code> | Records to filter |
+| req | <code>Object</code> | Totem session request |
+| res | <code>function</code> | Totem session response |
+
+<a name="module_DEBE..filters..tree"></a>
+
+#### filters..tree(recs, req, res)
+**Kind**: static method of [<code>filters.</code>](#module_DEBE..filters.)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| recs | <code>Array</code> | Records to filter |
+| req | <code>Object</code> | Totem session request |
+| res | <code>function</code> | Totem session response |
+
+<a name="module_DEBE..filters..schema"></a>
+
+#### filters..schema(recs, req, res)
+**Kind**: static method of [<code>filters.</code>](#module_DEBE..filters.)  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1311,18 +1276,6 @@ Convert records to requested req.type office file.
 
 ### DEBE~simPlugin()
 **Kind**: inner method of [<code>DEBE</code>](#module_DEBE)  
-<a name="module_DEBE..blogPlugin"></a>
-
-### DEBE~blogPlugin(req, res)
-Endpoint to blog a specifiec field from [requested](/api.view#blogPlugin) plugin/notebook/table.
-
-**Kind**: inner method of [<code>DEBE</code>](#module_DEBE)  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| req | <code>Object</code> | http request |
-| res | <code>function</code> | Totem session response callback |
-
 <a name="module_DEBE..usersPlugin"></a>
 
 ### DEBE~usersPlugin(req, res)
