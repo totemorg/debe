@@ -3815,7 +3815,7 @@ Retrieve [requested neo4j graph](/api.view#sysGraph).
 @param {Object} req Totem session request
 @param {Function} res Totem session response
 */
-		graph: function (req,res) {
+		graphs: function (req,res) {
 			const 
 				{ query, sql, table, type } = req,
 				{ name, idmode } = query,
@@ -3836,7 +3836,9 @@ Retrieve [requested neo4j graph](/api.view#sysGraph).
 			return res("Return graph name = NAME:NAME: ... & idmode = name||hat" );
 
 			//Trace(">>>get", net);
+			
 			neoThread( neo => {			
+//Log("graph", neo, neo.cypher);
 				if ( net.indexOf("cnet")>=0 )
 					neo.cypher( `MATCH (a:${net})-[r]->(b:${net}) RETURN r,a,b ORDER BY r.cutsize`, {}, (err,recs) => {
 

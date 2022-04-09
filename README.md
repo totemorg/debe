@@ -408,7 +408,7 @@ config({
         * [.proctor(req, res)](#module_DEBE..byTable..proctor)
         * [.likeus(req, res)](#module_DEBE..byTable..likeus)
         * [.users(req, res)](#module_DEBE..byTable..users)
-        * [.graph(req, res)](#module_DEBE..byTable..graph)
+        * [.graphs(req, res)](#module_DEBE..byTable..graphs)
         * [.notebooks(req, res)](#module_DEBE..byTable..notebooks)
         * [.ingest(req, res)](#module_DEBE..byTable..ingest)
         * [.decode(req, res)](#module_DEBE..byTable..decode)
@@ -762,7 +762,7 @@ Default area navigator.
     * [.proctor(req, res)](#module_DEBE..byTable..proctor)
     * [.likeus(req, res)](#module_DEBE..byTable..likeus)
     * [.users(req, res)](#module_DEBE..byTable..users)
-    * [.graph(req, res)](#module_DEBE..byTable..graph)
+    * [.graphs(req, res)](#module_DEBE..byTable..graphs)
     * [.notebooks(req, res)](#module_DEBE..byTable..notebooks)
     * [.ingest(req, res)](#module_DEBE..byTable..ingest)
     * [.decode(req, res)](#module_DEBE..byTable..decode)
@@ -925,9 +925,9 @@ Return list of clients that have used this service
 | req | <code>Object</code> | Totem session request |
 | res | <code>function</code> | Totem session response |
 
-<a name="module_DEBE..byTable..graph"></a>
+<a name="module_DEBE..byTable..graphs"></a>
 
-#### byTable..graph(req, res)
+#### byTable..graphs(req, res)
 Retrieve [requested neo4j graph](/api.view#sysGraph).
 
 **Kind**: static method of [<code>byTable.</code>](#module_DEBE..byTable.)  
