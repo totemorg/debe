@@ -66,14 +66,7 @@ Clone **DEBE** from one of its REPOs:
 	git clone REPO/totemstan/dogs
 	git clone REPO/totemstan/pipe
 
-## Setup 
-
-	npm run setprot						# Configure for protected mode
-	npm run setdebug					# Configure for debugging mode
-	npm run setoper						# Configure for operational mode
-	npm run setprod						# Configure for production mode
-
-### Start
+To start **DEBE**: 
 
 	npm run genio						# Generate totemstan.github.io from jades/totemblog
 	npm run raster --in=src --out=tar	# Rasterize source url into a target file 
@@ -81,8 +74,13 @@ Clone **DEBE** from one of its REPOs:
 	npm run lab							# Start debe with matrix lab workshop
 	npm run admin						# Start debe 
 
-### Maintenance 
+To configure and maintain **DEBE**:
 	
+	npm run setprot						# Configure for protected mode
+	npm run setdebug					# Configure for debugging mode
+	npm run setoper						# Configure for operational mode
+	npm run setprod						# Configure for production mode
+
 	npm run redoc						# Update repo
 	npm run verminor					# Roll version
 	npm run vermajor					# Roll version
@@ -112,6 +110,7 @@ follow the **ENUMS** deep copy conventions (
 [COE](https://sc.appdev.proj.coe/acmesds/enum) 
 [SBU](https://gitlab.west.nga.ic.gov/acmesds/enum)
 ).
+See the Program Reference for sample usages.
 
 ## Program Reference
 <details>
