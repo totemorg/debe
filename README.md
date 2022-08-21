@@ -48,8 +48,23 @@ for supervised/unsupervised file sharing.
 
 ## Installation
 
-See [TOTEM installation](https://github.com/totemstan/acmesds)
-to install **TOTEM**.
+Clone **DEBE** from one of its REPOs:
+
+	cd MYPROJECT
+	git clone REPO/totemstan/debe
+	git clone REPO/totemstan/totem
+	git clone REPO/totemstan/atomic
+	git clone REPO/totemstan/enums
+	git clone REPO/totemstan/jsdb
+	git clone REPO/totemstan/atomic
+	git clone REPO/totemstan/geohack
+	git clone REPO/totemstan/man
+	git clone REPO/totemstan/randpr
+	git clone REPO/totemstan/reader
+	git clone REPO/totemstan/skin
+	git clone REPO/totemstan/blog
+	git clone REPO/totemstan/dogs
+	git clone REPO/totemstan/pipe
 
 ## Setup 
 
@@ -286,7 +301,7 @@ in accordance with [jsdoc](https://jsdoc.app/).
 	RAS = http://DOMAIN
 	BY = https://DOMAIN
 
-**Requires**: <code>module:[totem](https://github.com/totemstan/totem)</code>, <code>module:[atomic](https://github.com/totemstan/atomic)</code>, <code>module:[geohack](https://github.com/totemstan/geohack)</code>, <code>module:[man](https://github.com/totemstan/man)</code>, <code>module:[randpr](https://github.com/totemstan/randpr)</code>, <code>module:[enums](https://github.com/totemstan/enums)</code>, <code>module:[reader](https://github.com/totemstan/reader)</code>, <code>module:[skin](https://github.com/totemstan/skin)</code>, <code>module:[blog](https://github.com/totemstan/blog)</code>, <code>module:[dogs](https://github.com/totemstan/dogs)</code>, <code>module:[pipe](https://github.com/totemstan/pipe)</code>, <code>module:crypto</code>, <code>module:child\_process</code>, <code>module:fs</code>, <code>module:stream</code>, <code>module:cluster</code>, <code>module:repl</code>, <code>module:i18n-abide</code>, <code>module:optimist</code>, <code>module:tokml</code>, <code>module:mathjax-node</code>  
+**Requires**: <code>module:[totem](https://github.com/totemstan/totem)</code>, <code>module:[atomic](https://github.com/totemstan/atomic)</code>, <code>module:[geohack](https://github.com/totemstan/geohack)</code>, <code>module:[man](https://github.com/totemstan/man)</code>, <code>module:[randpr](https://github.com/totemstan/randpr)</code>, <code>module:[enums](https://github.com/totemstan/enums)</code>, <code>module:[reader](https://github.com/totemstan/reader)</code>, <code>module:[skin](https://github.com/totemstan/skin)</code>, <code>module:[blog](https://github.com/totemstan/blog)</code>, <code>module:[dogs](https://github.com/totemstan/dogs)</code>, <code>module:[pipe](https://github.com/totemstan/pipe)</code>, <code>module:[crypto](https://nodejs.org/docs/latest/api/)</code>, <code>module:[child\_process](https://nodejs.org/docs/latest/api/)</code>, <code>module:[fs](https://nodejs.org/docs/latest/api/)</code>, <code>module:[stream](https://nodejs.org/docs/latest/api/)</code>, <code>module:[cluster](https://nodejs.org/docs/latest/api/)</code>, <code>module:[repl](https://nodejs.org/docs/latest/api/)</code>, <code>module:[i18n-abide](https://www.npmjs.com/package/i18n-abide)</code>, <code>module:[optimist](https://www.npmjs.com/package/optimist)</code>, <code>module:[tokml](https://www.npmjs.com/package/tokml)</code>, <code>module:[officegen](https://www.npmjs.com/package/officegen</code>  
 **Author**: [ACMESDS](https://totemstan.github.io)  
 **Example**  
 ```js

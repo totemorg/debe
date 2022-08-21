@@ -1,7 +1,7 @@
 ﻿// UNCLASSIFIED 
 
 const
-	READ = require("../reader");		// partial config of NLP (avoids string prototype collision)
+	READ = require("./reader");		// partial config of NLP (avoids string prototype collision)
 
 // NodeJS modules
 const 									
@@ -30,15 +30,15 @@ const
 const
 	// include modules
 	//EAT = require("./ingesters"),	
-	TOTEM = require("../totem"),
-	ATOM = require("../atomic"), 
-	ENUMS = require("../enums"),
-	$ = require("../man"),
-	RAN = require("../randpr"),
-	//PIPE = require("../pipe"),
-	SKIN = require("../skin"),
-	BLOG = require("../blog"),
-	DOGS = require("../dogs");
+	TOTEM = require("./totem"),
+	ATOM = require("./atomic"), 
+	ENUMS = require("./enums"),
+	$ = require("./man"),
+	RAN = require("./randpr"),
+	//PIPE = require("./pipe"),
+	SKIN = require("./skin"),
+	BLOG = require("./blog"),
+	DOGS = require("./dogs");
 
 const 
 	{ exec } = CP,
@@ -614,17 +614,17 @@ in accordance with [jsdoc]{@link https://jsdoc.app/}.
 @requires [dogs](https://github.com/totemstan/dogs)
 @requires [pipe](https://github.com/totemstan/pipe)
 
-@requires crypto
-@requires child_process
-@requires fs
-@requires stream
-@requires cluster
-@requires repl
+@requires [crypto](https://nodejs.org/docs/latest/api/)
+@requires [child_process](https://nodejs.org/docs/latest/api/)
+@requires [fs](https://nodejs.org/docs/latest/api/)
+@requires [stream](https://nodejs.org/docs/latest/api/)
+@requires [cluster](https://nodejs.org/docs/latest/api/)
+@requires [repl](https://nodejs.org/docs/latest/api/)
 
-@requires i18n-abide
-@requires optimist
-@requires tokml
-@requires mathjax-node
+@requires [i18n-abide](https://www.npmjs.com/package/i18n-abide)
+@requires [optimist](https://www.npmjs.com/package/optimist)
+@requires [tokml](https://www.npmjs.com/package/tokml)
+@requires [officegen](https://www.npmjs.com/package/officegen
 
 @example 
 
