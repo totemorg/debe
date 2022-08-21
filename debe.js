@@ -624,7 +624,7 @@ in accordance with [jsdoc]{@link https://jsdoc.app/}.
 @requires [i18n-abide](https://www.npmjs.com/package/i18n-abide)
 @requires [optimist](https://www.npmjs.com/package/optimist)
 @requires [tokml](https://www.npmjs.com/package/tokml)
-@requires [officegen](https://www.npmjs.com/package/officegen
+@requires [officegen](https://www.npmjs.com/package/officegen)
 
 @example 
 
