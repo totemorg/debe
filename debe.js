@@ -7387,13 +7387,14 @@ To connect to ${site.Nick} from Windows:
 }
 
 switch ( process.argv[2] ) { // unit tests
-	case "D?":
-	case "?":
-		Trace("node debe [D$ || D1 || ...]");
-		Trace("site context", site);
+	case "D$":
+		Trace("$", {
+			usage: "node debe [D$ || D1 || ...]",
+			siteContext: site
+		});
+		Debug();
 		break;
 	
-	case "D$":
 	case "lab":
 		
 		if (isMaster) {
