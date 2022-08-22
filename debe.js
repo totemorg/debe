@@ -1727,35 +1727,33 @@ Initialize DEBE on startup.
 			
 			// JSDB.config();
 			
-			$.config({}, $ => {
-				const 
-					{saveKeys,scripts} = $;
-				
-				sqlThread( sql => {
-					/*
-					sql.getFields("openv._stats", {}, keys => {		//  init shared file stats
-						keys.forEach( key => saveKeys[key] = true );
-					}); */
+			const 
+				{saveKeys,scripts} = $;
 
-					sql.query("SELECT * FROM app.scripts", [], (err,recs) => {
-						if ( !err )
-							recs.forEach( rec => {
-								if ( script = rec.Script ) {
-									var fat = script.indexOf("=>");
-									if ( fat >= 0 )
-										try {
-											script = script.substr(0,fat+2) + "`" + script.substr(fat+2) + "`";
-											scripts[ rec.Name ] = eval( script );
-										}
-										catch (err) {
-											Trace( "Bad $script", script );
-										}
+			sqlThread( sql => {
+				/*
+				sql.getFields("openv._stats", {}, keys => {		//  init shared file stats
+					keys.forEach( key => saveKeys[key] = true );
+				}); */
 
-									else
-										scripts[ rec.Name ] = script;
-								}
-							});
-					});
+				sql.query("SELECT * FROM app.scripts", [], (err,recs) => {
+					if ( !err )
+						recs.forEach( rec => {
+							if ( script = rec.Script ) {
+								var fat = script.indexOf("=>");
+								if ( fat >= 0 )
+									try {
+										script = script.substr(0,fat+2) + "`" + script.substr(fat+2) + "`";
+										scripts[ rec.Name ] = eval( script );
+									}
+									catch (err) {
+										Trace( "Bad $script", script );
+									}
+
+								else
+									scripts[ rec.Name ] = script;
+							}
+						});
 				});
 			});
 
@@ -4494,6 +4492,8 @@ Respond with system configuration information on requested module mod = NAME or 
 						debe: debe
 					});
 				}); }); }); });
+			
+			return DEBE;
 		},
 
 /**

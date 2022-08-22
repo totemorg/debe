@@ -88,29 +88,27 @@ To configure and maintain **DEBE**:
 
 ## Usage
 
-Require, configure and start a DEBE server:
+Require, configure and start a **DEBE** server:
 
-	const DEBE = require("debe");
-	
-	DEBE.config({
+	const DEBE = require("debe").config({
 		key: value, 						// set key
 		"key.key": value, 					// indexed set
 		"key.key.": value					// indexed append
-	}, err =>  {
-		console.log( err ? "something evil is lurking" : "look mom - Im running!");
+	}, sql => {
+		console.log( sql ? "look mom - Im running!" : "something evil is lurking" );
 	});
 
 where its configuration keys (
-[WWW](http://totem.hopto.org/shares/prm/totem/index.html) 
+[WWW](http://totem.zapto.org/shares/prm/totem/index.html) 
 [COE](https://totem.west.ile.nga.ic.gov/shares/prm/totem/index.html) 
 [SBU](https://totem.nga.mil/shares/prm/totem/index.html)
 )
-follow the **ENUMS** deep copy conventions (
+follow the ENUM deep copy conventions (
 [WWW](https://github.com/totemstan/enum) 
 [COE](https://sc.appdev.proj.coe/acmesds/enum) 
 [SBU](https://gitlab.west.nga.ic.gov/acmesds/enum)
 ).
-See the Program Reference for sample usages.
+See the Program Reference for examples.
 
 ## Program Reference
 <details>
