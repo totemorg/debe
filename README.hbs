@@ -48,7 +48,7 @@ for supervised/unsupervised file sharing.
 
 ## Installation
 
-Clone **DEBE** from one of its REPOs:
+Clone **DEBE** and its dependencies from one of its REPOs:
 
 	cd MYPROJECT
 	git clone REPO/totemstan/debe
