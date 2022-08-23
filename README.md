@@ -66,29 +66,25 @@ Clone **DEBE** from one of its REPOs:
 	git clone REPO/totemstan/dogs
 	git clone REPO/totemstan/pipe
 
-To start **DEBE**: 
+To start and manage **DEBE**: 
+
+	npm run start [ ? | $ | ...]	# Unit test
+	npm run verminor				# Roll minor version
+	npm run vermajor				# Roll major version
+	npm run redoc					# Regen documentation
+
+	npm run	startdbs				# Start required database servers
+	npm run setprot					# Configure for protected mode
+	npm run setdebug				# Configure for debugging mode
+	npm run setoper					# Configure for operational mode
+	npm run setprod					# Configure for production mode
 
 	npm run genio						# Generate totemstan.github.io from jades/totemblog
 	npm run raster --in=src --out=tar	# Rasterize source url into a target file 
-	npm run	startdbs					# Start required database servers
-	npm run lab							# Start debe with matrix lab workshop
-	npm run admin						# Start debe 
-
-To configure and maintain **DEBE**:
 	
-	npm run setprot						# Configure for protected mode
-	npm run setdebug					# Configure for debugging mode
-	npm run setoper						# Configure for operational mode
-	npm run setprod						# Configure for production mode
-
-	npm run redoc						# Update repo
-	npm run verminor					# Roll version
-	npm run vermajor					# Roll version
-	rpm run	relink						# Relink dependent TOTEM modules
-
 ## Usage
 
-Require, optionally configure and start a **DEBE** server:
+Acquire, optionally configure and start a **DEBE** server:
 
 	const DEBE = require("debe").config({
 		key: value, 						// set key
