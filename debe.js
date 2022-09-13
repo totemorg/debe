@@ -42,7 +42,7 @@ const
 
 const 
 	{ exec } = CP,
-	{ Copy,Each,Log,Debug, Fetch,
+	{ Copy,Each,Log,Start, Fetch,
 	 isKeyed,isString,isFunction,isError,isArray,isObject,isEmpty,typeOf,
 	 getList, getURL,
 	 txmailCon, rxmailCon,
@@ -702,7 +702,7 @@ config({
 
 const
 	{ 
-		sendMail, Trace, routeTable, $libs, config, initialize,
+		sendMail, Trace, routeTable, $libs, config, initialize, dogs,
 	 	filters, licenseOnDownload, defaultDocs 
 	} = DEBE = module.exports = Copy({
 	
@@ -1622,9 +1622,6 @@ Initialize DEBE on startup.
 			});
 
 			// watchdogs
-			
-			const
-				{dogs} = DEBE;
 			
 			Each( dogs, (name,dog) => {
 				$libs["$"+name+"_dog"] = function () { Log("Dogging",name); sqlThread(sql => dog(sql)); } 
@@ -7386,56 +7383,40 @@ To connect to ${site.Nick} from Windows:
 
 }
 
-switch ( process.argv[2] ) { // unit tests
-	case "D$":
+const
+	{$api} = $libs,
+	$ctx = {};
+
+Start("debe", {
+	"??": () => 
 		Trace("$", {
-			usage: "node debe [D$ || D1 || ...]",
 			siteContext: site
-		});
-		Debug();
-		break;
+		}),
 	
-	case "lab":
-		
-		if (isMaster) {
-			Trace( "Welcome to $TOTEM" );
-				
-			const
-				{dogs,$libs} = DEBE,
-				{$api} = $libs;
-
-			config({}, sql => {
+	res: cmd => {
+		if ( cmd.startsWith("?") ) 
+			console.log( $ctx[ cmd.substr(1) ] || $ctx );
+	
+		else
+			$(cmd,$ctx);
+	},
+	  
+	lab: () => 
+		config({}, sql => {
 			
-				if ( isMaster ) {
-					switch (process.argv[2]) {
-						case "D$":
-							Debug( );
-							break;
+			Trace( "Welcome to TOTEM lab" );
+				
+			$api();
+			//Each( $libs, (key,lib) => ctx[key] = lib );
+		}),
 
-						case "lab":
-							Debug( $libs );
-							break;
-					}
-
-					$api();
-				}
-			});
-		};
-
-		break;
-		
 	/**
 	See [Installation and Usage](https://sc.appdev.proj.coe/acmesds/debe)
 	@var D1
 	@memberof UnitTest
 	*/
 
-	case "D1":
-	case "admin":
-	case "start":
-		const
-			{ ingestFile } = require("../geohack");
-		
+	admin: () =>
 		config({
 			"secureLink.challenge.extend": 10,
 			onFile: {
@@ -7500,21 +7481,25 @@ assessments from our worldwide reporting system, please contact ${poc}.
 				}
 			} 
 		}, sql => {
-			Trace( 
+			
+		const
+			{ ingestFile } = require("../geohack");
+		
+			
+		Trace( 
 `Yowzers - this does everything but eat!  An encrypted service, a database, a jade UI for clients,
 usecase-engine plugins, file-upload watchers, and watch dogs that monitor system resources (jobs, files, 
 clients, users, system health, etc).` 
-			);
+		);
 			
-		});
-		break;
+		}),
 		
 	/**
 	See [Installation and Usage](https://sc.appdev.proj.coe/acmesds/debe)
 	@var D2
 	@memberof UnitTest
 	*/
-	case "D2":
+	D2: () =>
 		config({
 			"secureLink.challenge.extend": 10,
 			"byTable.": {
@@ -7528,8 +7513,7 @@ clients, users, system health, etc).`
 			}
 		}, sql => {
 			Trace( "This bad boy in an encrypted service with a database and has an /wfs endpoint" );
-		});
-		break;
+		}),
 		
 	/**
 	See [Installation and Usage](https://sc.appdev.proj.coe/acmesds/debe)
@@ -7537,12 +7521,11 @@ clients, users, system health, etc).`
 	@memberof UnitTest
 	*/
 		
-	case "D3":
+	D3: () =>
 		config({
 		}, sql => {
 			Trace( "Stateful network flow manger started" );
-		});
-		break;
+		}),
 		
 	/**
 	See [Installation and Usage](https://sc.appdev.proj.coe/acmesds/debe)
@@ -7550,22 +7533,22 @@ clients, users, system health, etc).`
 	@memberof UnitTest
 	*/
 		
-	case "D4":
-		function readFile(sql, path, cb) {
-			const {xlsx} = readers;
-			
-			sql.beginBulk();
-			xlsx( "./config.stores/test.xls", rec => { 
-				if (rec) 
-					cb(rec,sql);
-				
-				else 
-					sql.endBulk();
-			});
-		}
-			
+	D4: () =>
 		config({
 		}, sql => {
+			function readFile(sql, path, cb) {
+				const {xlsx} = readers;
+
+				sql.beginBulk();
+				xlsx( "./config.stores/test.xls", rec => { 
+					if (rec) 
+						cb(rec,sql);
+
+					else 
+						sql.endBulk();
+				});
+			}
+			
 			var recs = 0, now = new Date();
 			readFile( sql, "./config.stores/test.xls", (rec,sql) => {
 				if ( ++recs<5 ) {
@@ -7588,20 +7571,19 @@ clients, users, system health, etc).`
 					}, err => Trace("add", err) );
 				}
 			});
-		});
-		break;
+		}),
 		
-	case "D5":
+	D5: () => {
 		const {pdf} = readers;
 		pdf( "./config.stores/ocrTest01.pdf", txt => Trace(txt) );
-		break;
+	},
 		
-	case "raster":
-		const 
-			[xcmd,xdebe,xblog,src,tar] = process.argv;
-		
+	raster: () => 
 		config({
 		}, sql => {
+			const 
+				[xcmd,xdebe,xblog,src,tar] = process.argv;
+		
 			Trace(`Rasterizing ${src} => ${tar}`);
 			
 			if ( tar.endsWith(".html") ) 
@@ -7617,21 +7599,7 @@ clients, users, system health, etc).`
 					Trace(err || "rastered");
 					DEBE.stop( () => process.exit() );
 				});
-		});
-		break;
-		
-	case "xxxlab":
-		
-		config({}, sql => {
-			Trace( "Welcome to TOTEM Lab!" );
-
-			const 
-				{$api} = Debug($libs, cmd => DEBE.replCmd = cmd );
-
-			//Each( $libs, (key,lib) => ctx[key] = lib );
-
-			$api();
-		});
-}
+		})
+});
 
 // UNCLASSIFIED
