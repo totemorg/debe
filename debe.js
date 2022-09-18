@@ -833,8 +833,9 @@ See [enums]{@link https://github.com/totemstan/enums/}
 		$each: Each,
 /**
 */
-		$api: () => {
-			CP.exec( `firefox ${site.master}/labapi.view` );
+		$help: f => {
+			const name = f ? f.name : "labapi";
+			CP.exec( `firefox ${site.master}/${name}.view` );
 			return null;
 		}
 	},
@@ -7384,8 +7385,7 @@ To connect to ${site.Nick} from Windows:
 }
 
 const
-	{$api} = $libs,
-	$ctx = {};
+	{$help} = $ctx = $libs;
 
 Start("debe", {
 	"??": () => 
@@ -7394,9 +7394,22 @@ Start("debe", {
 		}),
 	
 	res: cmd => {
-		if ( cmd.startsWith("?") ) 
-			console.log( $ctx[ cmd.substr(1) ] || $ctx );
+		if ( cmd.startsWith("?") ) {
+			const 
+				n = cmd.substr(1),
+				x = $ctx[ n ] || $.imports[ n ];
 	
+			if (x)
+				if (x.name)
+					CP.exec( `firefox ${site.master}/${x.name}.view` );
+
+				else
+					console.log( x );
+
+			else
+				console.log($ctx);
+		}
+
 		else
 			$(cmd,$ctx);
 	},
@@ -7406,7 +7419,7 @@ Start("debe", {
 			
 			Trace( "Welcome to TOTEM lab" );
 				
-			$api();
+			$help();
 			//Each( $libs, (key,lib) => ctx[key] = lib );
 		}),
 
