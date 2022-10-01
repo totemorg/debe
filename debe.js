@@ -7396,18 +7396,23 @@ Start("debe", {
 	res: cmd => {
 		if ( cmd.startsWith("?") ) {
 			const 
-				n = cmd.substr(1),
-				x = $ctx[ n ] || $.imports[ n ];
-	
-			if (x)
-				if (x.name)
-					CP.exec( `firefox ${site.master}/${x.name}.view` );
+				n = cmd.substr(1) || "",
+				x = n ? $ctx[ n ] || $.imports[ n ] : $ctx;
 
-				else
-					console.log( x );
+			if ( book = n.match( /(.*)\:\:(.*)/ ) ) {
+				const [nb,uc] = book;
+			}
+				
+			else
+	  		if ( url = n.match( /(.*)\:(.*)/ ) ) {
+			}
+
+	  		else
+	  		if (x.name)
+				CP.exec( `firefox ${site.master}/${x.name}.view` );
 
 			else
-				console.log($ctx);
+				console.log( x );
 		}
 
 		else

@@ -1,4 +1,4 @@
-# DEBE [WWW](https://github.com/totemstan/debe)  [COE](https://sc.appdev.proj.coe/acmesds/debe)  [SBU](https://gitlab.west.nga.ic.gov/acmesds/deb)
+# [DEBE](https://github.com/totem-man/debe)
 
 Extends the **TOTEM** web service to provide the following endpoints:
 
@@ -51,20 +51,20 @@ for supervised/unsupervised file sharing.
 Clone **DEBE** and its dependencies from one of its REPOs:
 
 	cd MYPROJECT
-	git clone REPO/totemstan/debe
-	git clone REPO/totemstan/totem
-	git clone REPO/totemstan/atomic
-	git clone REPO/totemstan/enums
-	git clone REPO/totemstan/jsdb
-	git clone REPO/totemstan/atomic
-	git clone REPO/totemstan/geohack
-	git clone REPO/totemstan/man
-	git clone REPO/totemstan/randpr
-	git clone REPO/totemstan/reader
-	git clone REPO/totemstan/skin
-	git clone REPO/totemstan/blog
-	git clone REPO/totemstan/dogs
-	git clone REPO/totemstan/pipe
+	git clone REPO/totem-man/debe
+	git clone REPO/totem-man/totem
+	git clone REPO/totem-man/atomic
+	git clone REPO/totem-man/enums
+	git clone REPO/totem-man/jsdb
+	git clone REPO/totem-man/atomic
+	git clone REPO/totem-man/geohack
+	git clone REPO/totem-man/man
+	git clone REPO/totem-man/randpr
+	git clone REPO/totem-man/reader
+	git clone REPO/totem-man/skin
+	git clone REPO/totem-man/blog
+	git clone REPO/totem-man/dogs
+	git clone REPO/totem-man/pipe
 
 To start and manage **DEBE**: 
 
@@ -79,7 +79,7 @@ To start and manage **DEBE**:
 	npm run setoper					# Configure for operational mode
 	npm run setprod					# Configure for production mode
 
-	npm run genio						# Generate totemstan.github.io from jades/totemblog
+	npm run genio						# Generate totem-man.github.io from jades/totemblog
 	npm run raster --in=src --out=tar	# Rasterize source url into a target file 
 	
 ## Usage
@@ -94,17 +94,8 @@ Acquire, optionally configure and start a **DEBE** server:
 		console.log( sql ? "look mom - Im running!" : "something evil is lurking" );
 	});
 
-where its configuration keys (
-[WWW](http://totem.zapto.org/shares/prm/totem/index.html) 
-[COE](https://totem.west.ile.nga.ic.gov/shares/prm/totem/index.html) 
-[SBU](https://totem.nga.mil/shares/prm/totem/index.html)
-)
-follow the ENUM deep copy conventions (
-[WWW](https://github.com/totemstan/enum) 
-[COE](https://sc.appdev.proj.coe/acmesds/enum) 
-[SBU](https://gitlab.west.nga.ic.gov/acmesds/enum)
-).
-See the Program Reference for examples.
+where configuration keys follow [ENUMS deep copy conventions](https://github.com/totem-man/enums)
+
 
 ## Program Reference
 <details>
@@ -384,7 +375,7 @@ config({
         * [.$fetch()](#module_DEBE..$libs.$fetch)
         * [.$get()](#module_DEBE..$libs.$get)
         * [.$ran()](#module_DEBE..$libs.$ran)
-        * [.$api()](#module_DEBE..$libs.$api)
+        * [.$help()](#module_DEBE..$libs.$help)
     * [~tableRoutes.](#module_DEBE..tableRoutes.)
     * [~defaultDocs](#module_DEBE..defaultDocs)
     * [~licenseOnDownload](#module_DEBE..licenseOnDownload)
@@ -487,7 +478,7 @@ config({
     * [.$fetch()](#module_DEBE..$libs.$fetch)
     * [.$get()](#module_DEBE..$libs.$get)
     * [.$ran()](#module_DEBE..$libs.$ran)
-    * [.$api()](#module_DEBE..$libs.$api)
+    * [.$help()](#module_DEBE..$libs.$help)
 
 <a name="module_DEBE..$libs.$site"></a>
 
@@ -559,9 +550,9 @@ See [enums](https://github.com/totemstan/enums/)
 See [man](https://github.com/totemstan/man/)
 
 **Kind**: static method of [<code>$libs</code>](#module_DEBE..$libs)  
-<a name="module_DEBE..$libs.$api"></a>
+<a name="module_DEBE..$libs.$help"></a>
 
-#### $libs.$api()
+#### $libs.$help()
 **Kind**: static method of [<code>$libs</code>](#module_DEBE..$libs)  
 <a name="module_DEBE..tableRoutes."></a>
 
@@ -1405,31 +1396,12 @@ Endpoint to create/return public-private certs of given [url query](/api.view#ge
 ## Contacting, Contributing, Following
 
 Feel free to 
-* submit and status **TOTEM** issues (
-[WWW](http://totem.hopto.org/issues.view) 
-[COE](https://totem.west.ile.nga.ic.gov/issues.view) 
-[SBU](https://totem.nga.mil/issues.view)
-)  
-* contribute to **TOTEM** notebooks (
-[WWW](http://totem.hopto.org/shares/notebooks/) 
-[COE](https://totem.west.ile.nga.ic.gov/shares/notebooks/) 
-[SBU](https://totem.nga.mil/shares/notebooks/)
-)  
-* revise **TOTEM** requirements (
-[WWW](http://totem.hopto.org/reqts.view) 
-[COE](https://totem.west.ile.nga.ic.gov/reqts.view) 
-[SBU](https://totem.nga.mil/reqts.view), 
-)  
-* browse **TOTEM** holdings (
-[WWW](http://totem.hopto.org/) 
-[COE](https://totem.west.ile.nga.ic.gov/) 
-[SBU](https://totem.nga.mil/)
-)  
-* or follow **TOTEM** milestones (
-[WWW](http://totem.hopto.org/milestones.view) 
-[COE](https://totem.west.ile.nga.ic.gov/milestones.view) 
-[SBU](https://totem.nga.mil/milestones.view)
-).
+* submit and status [TOTEM issues](http://totem.hopto.org/issues.view) 
+* contribute to [TOTEM notebooks](http://totem.hopto.org/shares/notebooks/) 
+* revise [TOTEM requirements](http://totem.hopto.org/reqts.view) 
+* browse [TOTEM holdings](http://totem.hopto.org/) 
+* or follow [TOTEM milestones](http://totem.hopto.org/milestones.view) 
+
 
 ## License
 

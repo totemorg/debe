@@ -1,5 +1,5 @@
 :markdown
-	## Data processing
+	## Available to Notebooks
 	[$log](https://www.github.com/totemstan/enums)( ... )  
 	[$trace](https://www.github.com/totemstan/enums)( "MESSAGE" )  
 	[$pipe](https://www.github.com/totemstan/pipe)( BATCH => { if (BATCH) { do whatever } else { stream ended } )  
@@ -16,8 +16,6 @@
 	[$update](https://www.github.com/totemstan/totem)( "DATASET ? KEY=VALUE & ..." , {KEY:VALUE, ...}, info => {...})  
 	[$insert](https://www.github.com/totemstan/totem)( "DATASET ? KEY=VALUE & ..." , {KEY:VALUE, ...}, info => {...})  
 	[$delete](https://www.github.com/totemstan/totem)( "DATASET ? KEY=VALUE & ..." , info => {...})  
-	[$](https://www.github.com/totemstan/man)( "[MATHJS](https://mathjs.org/)", CTX )  
-	[$](https://www.github.com/totemstan/man).FUNCTION( ARG, ... )  
 
 	## Notebook execution
 	[$NOTEBOOK](https://www.github.com/totemstan/debe)( "USECASE ? STORE$.KEY" || "USECASE ? KEY" || "USECASE", {SETKEY:NEWVALUE, ... } )  
@@ -50,6 +48,8 @@
 	
 	## Program control
 	
+	See [MATHJS](https://mathjs.org/) with following program control extensions. 
+	
 	If-then-else:
 	
 		if TEST
@@ -71,7 +71,7 @@
 				DO
 		end
 
-	Enumeration:
+	Looping:
 
 		for INDEX
 			DO
