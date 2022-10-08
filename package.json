@@ -1,6 +1,6 @@
 {
-  "name": "debe",
-  "version": "1.39.0",
+  "name": "@totemstan/debe",
+  "version": "1.40.0",
   "description": "built on totem - does everything but eat",
   "main": "debe.js",
   "scripts": {
@@ -23,6 +23,12 @@
   "author": "ACME Software Disposal Service",
   "license": "ISC",
   "dependencies": {
+    "@totemstan/atomic": "^1.6.0",
+    "@totemstan/blog": "^1.4.0",
+    "@totemstan/dogs": "^1.2.0",
+    "@totemstan/enums": "^1.17.0",
+    "@totemstan/jsdb": "^1.12.0",
+    "@totemstan/skin": "^1.14.0",
     "ajv": "^6.10.2",
     "archiver": "^3.1.1",
     "feed": "^4.1.0",
@@ -37,8 +43,6 @@
     "optimist": "^0.6.1",
     "prettydiff": "^101.2.6",
     "request": "^2.88.0",
-    "socket.io": "^2.3.0",
-    "socket.io-clusterhub": "^0.2.1",
     "string-similarity": "^1.2.2",
     "tar-stream": "^2.1.0",
     "togeojson": "^0.16.0",
