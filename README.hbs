@@ -46,28 +46,9 @@ test connections, and provides several *FILE* areas:
 
 for supervised/unsupervised file sharing.
 
-## Installation
+## Manage
 
-Clone **DEBE** and its dependencies from one of its REPOs:
-
-	cd MYPROJECT
-	git clone REPO/totem-man/debe
-	git clone REPO/totem-man/totem
-	git clone REPO/totem-man/atomic
-	git clone REPO/totem-man/enums
-	git clone REPO/totem-man/jsdb
-	git clone REPO/totem-man/atomic
-	git clone REPO/totem-man/geohack
-	git clone REPO/totem-man/man
-	git clone REPO/totem-man/randpr
-	git clone REPO/totem-man/reader
-	git clone REPO/totem-man/skin
-	git clone REPO/totem-man/blog
-	git clone REPO/totem-man/dogs
-	git clone REPO/totem-man/pipe
-
-To start and manage **DEBE**: 
-
+	npm install @totemstan/debe		# install
 	npm run start [ ? | $ | ...]	# Unit test
 	npm run verminor				# Roll minor version
 	npm run vermajor				# Roll major version

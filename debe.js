@@ -30,15 +30,15 @@ const
 const
 	// include modules
 	//EAT = require("./ingesters"),	
-	TOTEM = require("./totem"),
-	ATOM = require("./atomic"), 
-	ENUMS = require("./enums"),
-	$ = require("./man"),
+	TOTEM = require("@totemstan/totem"),
+	ATOM = require("@totemstan/atomic"), 
+	ENUMS = require("@totemstan/enums"),
+	$ = require("@totemstan/man"),
 	RAN = require("./randpr"),
 	//PIPE = require("./pipe"),
-	SKIN = require("./skin"),
-	BLOG = require("./blog"),
-	DOGS = require("./dogs");
+	SKIN = require("@totemstan/skin"),
+	BLOG = require("@totemstan/blog"),
+	DOGS = require("@totemstan/dogs");
 
 const 
 	{ exec } = CP,
