@@ -7,6 +7,7 @@
 /temps/**
 /clients/
 /captcha/
+/public/
 /tmp/**
 /pubmin/**
 /uploads/**

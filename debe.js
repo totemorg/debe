@@ -33,8 +33,8 @@ const
 	TOTEM = require("@totemstan/totem"),
 	ATOM = require("@totemstan/atomic"), 
 	ENUMS = require("@totemstan/enums"),
-	$ = require("@totemstan/man"),
-	RAN = require("./randpr"),
+	//$ = require("@totemstan/man"),
+	//RAN = require("./randpr"),
 	//PIPE = require("./pipe"),
 	SKIN = require("@totemstan/skin"),
 	BLOG = require("@totemstan/blog"),
@@ -777,10 +777,6 @@ Usage:
 See [man]{@link https://github.com/totemstan/man/}
 */
 		$: $,
-/**
-See [man]{@link https://github.com/totemstan/man/}
-*/
-		$ran: opts => new RAN(opts),
 /**
 See [debe]{@link https://github.com/totemstan/debe/}
 */
