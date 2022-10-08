@@ -67,7 +67,7 @@ for supervised/unsupervised file sharing.
 
 Acquire, optionally configure and start a **DEBE** server:
 
-	const DEBE = require("debe").config({
+	require("debe").config({
 		key: value, 						// set key
 		"key.key": value, 					// indexed set
 		"key.key.": value					// indexed append
@@ -355,7 +355,6 @@ config({
         * [.$each](#module_DEBE..$libs.$each)
         * [.$fetch()](#module_DEBE..$libs.$fetch)
         * [.$get()](#module_DEBE..$libs.$get)
-        * [.$ran()](#module_DEBE..$libs.$ran)
         * [.$help()](#module_DEBE..$libs.$help)
     * [~tableRoutes.](#module_DEBE..tableRoutes.)
     * [~defaultDocs](#module_DEBE..defaultDocs)
@@ -458,7 +457,6 @@ config({
     * [.$each](#module_DEBE..$libs.$each)
     * [.$fetch()](#module_DEBE..$libs.$fetch)
     * [.$get()](#module_DEBE..$libs.$get)
-    * [.$ran()](#module_DEBE..$libs.$ran)
     * [.$help()](#module_DEBE..$libs.$help)
 
 <a name="module_DEBE..$libs.$site"></a>
@@ -524,12 +522,6 @@ See [enums](https://github.com/totemstan/enums/)
 <a name="module_DEBE..$libs.$get"></a>
 
 #### $libs.$get()
-**Kind**: static method of [<code>$libs</code>](#module_DEBE..$libs)  
-<a name="module_DEBE..$libs.$ran"></a>
-
-#### $libs.$ran()
-See [man](https://github.com/totemstan/man/)
-
 **Kind**: static method of [<code>$libs</code>](#module_DEBE..$libs)  
 <a name="module_DEBE..$libs.$help"></a>
 
