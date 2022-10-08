@@ -1,6 +1,6 @@
 {
   "name": "@totemstan/debe",
-  "version": "1.40.0",
+  "version": "1.41.0",
   "description": "built on totem - does everything but eat",
   "main": "debe.js",
   "scripts": {
@@ -29,6 +29,7 @@
     "@totemstan/enums": "^1.17.0",
     "@totemstan/jsdb": "^1.12.0",
     "@totemstan/skin": "^1.14.0",
+    "@totemstan/totem": "^1.40.0",
     "ajv": "^6.10.2",
     "archiver": "^3.1.1",
     "feed": "^4.1.0",
