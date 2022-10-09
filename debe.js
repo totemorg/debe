@@ -1,7 +1,7 @@
 ﻿// UNCLASSIFIED 
 
 const
-	READ = require("./reader");		// partial config of NLP (avoids string prototype collision)
+	READ = require("@totemstan/reader");		// partial config of NLP (avoids string prototype collision)
 
 // NodeJS modules
 const 									
@@ -33,7 +33,7 @@ const
 	TOTEM = require("@totemstan/totem"),
 	ATOM = require("@totemstan/atomic"), 
 	ENUMS = require("@totemstan/enums"),
-	//$ = require("@totemstan/man"),
+	$ = require("@totemstan/man"),
 	//RAN = require("./randpr"),
 	//PIPE = require("./pipe"),
 	SKIN = require("@totemstan/skin"),
@@ -53,7 +53,7 @@ const
 		sqlThread, errors, paths, cache, site, byTable, userID, dsThread,
 		watchFile, timeIntervals, neoThread, startJob 
 	} = TOTEM,
-	{ JIMP } = $,
+	// { JIMP } = $,
 	{ isMaster } = CLUSTER;
 
 /**
@@ -785,10 +785,7 @@ See [debe]{@link https://github.com/totemstan/debe/}
 See [debe]{@link https://github.com/totemstan/debe/}
 */
 		$task: runTask,
-/**
-See [man]{@link https://github.com/totemstan/man/}
-*/
-		$jimp: JIMP,
+		// $jimp: JIMP,
 /**
 See [jsdb]{@link https://github.com/totemstan/jsdb/}
 */
@@ -1724,12 +1721,16 @@ Initialize DEBE on startup.
 			const 
 				{saveKeys,scripts} = $;
 
+			// console.log(">>>>>>scripts", $);
+			
 			sqlThread( sql => {
 				/*
+				if (saveKeys)
 				sql.getFields("openv._stats", {}, keys => {		//  init shared file stats
 					keys.forEach( key => saveKeys[key] = true );
 				}); */
 
+				if (scripts)
 				sql.query("SELECT * FROM app.scripts", [], (err,recs) => {
 					if ( !err )
 						recs.forEach( rec => {
@@ -1757,9 +1758,9 @@ Initialize DEBE on startup.
 				"$libs.": $libs
 			});
 
-			READ.config({
+			/* READ.config({
 				jimp: JIMP
-			});
+			});  */
 			
 			if ( init ) sqlThread( sql => {
 				sql.query("SELECT Ref AS `Key`,group_concat(DISTINCT Path SEPARATOR '|') AS `Select` FROM openv.lookups GROUP BY Ref", [], (err,recs) => {
@@ -2071,7 +2072,7 @@ Default area navigator.
 */
 		root: (req,res) => {
 			function sendFolder(res,recs) {
-				//Trace("sending",cwd, recs);
+				//console.log(">>>>>>>>>>>>>>>>sending",cmd, recs);
 				const
 					cwd = {
 						mime:"directory",
@@ -2241,22 +2242,34 @@ Default area navigator.
 
 					case 2: // debug
 						res({  
-						cwd: cwd,
+							cwd: cwd,
 
-						/*"options":{
-							"path":"", //"Demo",
-							"url":"", //"http:\/\/elfinder.org\/files\/demo\/",
-							"tmbUrl":"", //"http:\/\/elfinder.org\/files\/demo\/.tmb\/",
-							"disabled":["extract"],
-							"separator":"\/",
-							"copyOverwrite":1,
-							"archivers": {
-								"create":["application\/x-tar", "application\/x-gzip"],
-								"extract":[] }
-						},*/
+							/*"options":{
+								"path":"", //"Demo",
+								"url":"", //"http:\/\/elfinder.org\/files\/demo\/",
+								"tmbUrl":"", //"http:\/\/elfinder.org\/files\/demo\/.tmb\/",
+								"disabled":["extract"],
+								"separator":"\/",
+								"copyOverwrite":1,
+								"archivers": {
+									"create":["application\/x-tar", "application\/x-gzip"],
+									"extract":[] }
+							},*/
 
-						files: [cwd].concat([
-							/*{  // cwd again
+							files: [cwd].concat([
+								/*{  // cwd again
+									"mime":"directory",
+									"ts":1334071677,
+									"read":1,
+									"write":0,
+									"size":0,
+									"hash":"root",
+									"volumeid":"l1_",
+									"name":"Demo",
+									"locked":1,
+									"dirs":1},*/
+
+								/*{
 								"mime":"directory",
 								"ts":1334071677,
 								"read":1,
@@ -2268,106 +2281,94 @@ Default area navigator.
 								"locked":1,
 								"dirs":1},*/
 
-							/*{
-							"mime":"directory",
-							"ts":1334071677,
-							"read":1,
-							"write":0,
-							"size":0,
-							"hash":"root",
-							"volumeid":"l1_",
-							"name":"Demo",
-							"locked":1,
-							"dirs":1},*/
+								{
+									"mime":"directory",
+									"ts":1340114567,
+									"read":0,
+									"write":0,
+									"size":0,
+									"hash":"l1_QmFja3Vw",
+									"name":"Backup",
+									"phash":"/root/",
+									"locked":1},
 
-							{
-								"mime":"directory",
-								"ts":1340114567,
-								"read":0,
-								"write":0,
-								"size":0,
-								"hash":"l1_QmFja3Vw",
-								"name":"Backup",
-								"phash":"/root/",
-								"locked":1},
+								{
+									"mime":"directory",
+									"ts":1310252178,
+									"read":1,
+									"write":0,
+									"size":0,
+									"hash":"l1_SW1hZ2Vz",
+									"name":"Images",
+									"phash":"/root/",
+									"locked":1},
 
-							{
-								"mime":"directory",
-								"ts":1310252178,
-								"read":1,
-								"write":0,
-								"size":0,
-								"hash":"l1_SW1hZ2Vz",
-								"name":"Images",
-								"phash":"/root/",
-								"locked":1},
+								{
+									"mime":"directory",
+									"ts":1310250758,
+									"read":1,
+									"write":0,
+									"size":0,
+									"hash":"l1_TUlNRS10eXBlcw",
+									"name":"MIME-types",
+									"phash":"/root/",
+									"locked":1},
 
-							{
-								"mime":"directory",
-								"ts":1310250758,
-								"read":1,
-								"write":0,
-								"size":0,
-								"hash":"l1_TUlNRS10eXBlcw",
-								"name":"MIME-types",
-								"phash":"/root/",
-								"locked":1},
+								{
+									"mime":"directory",
+									"ts":1268269762,
+									"read":1,
+									"write":0,
+									"size":0,
+									"hash":"l1_V2VsY29tZQ",
+									"name":"Welcome",
+									"phash":"/root/",
+									"locked":1,
+									"dirs":1},
 
-							{
-								"mime":"directory",
-								"ts":1268269762,
-								"read":1,
-								"write":0,
-								"size":0,
-								"hash":"l1_V2VsY29tZQ",
-								"name":"Welcome",
-								"phash":"/root/",
-								"locked":1,
-								"dirs":1},
+								{
+									"mime":"directory",
+									"ts":1390785037,
+									"read":1,
+									"write":1,
+									"size":0,
+									"hash":"l2_Lwxxyyzz",
+									"volumeid":"l2_",
+									"name":"Test here",
+									"locked":1},
 
-							{
-								"mime":"directory",
-								"ts":1390785037,
-								"read":1,
-								"write":1,
-								"size":0,
-								"hash":"l2_Lwxxyyzz",
-								"volumeid":"l2_",
-								"name":"Test here",
-								"locked":1},
+								{
+									"mime":"application\/x-genesis-rom",
+									"ts":1310347586,"read":1,
+									"write":0,
+									"size":3683,
+									"hash":"l1_UkVBRE1FLm1k",
+									"name":"README.md",
+									"phash":"/root/",
+									"locked":1}
+							]),
 
-							{
-								"mime":"application\/x-genesis-rom",
-								"ts":1310347586,"read":1,
-								"write":0,
-								"size":3683,
-								"hash":"l1_UkVBRE1FLm1k",
-								"name":"README.md",
-								"phash":"/root/",
-								"locked":1}
-						]),
+							api: "2.0","uplMaxSize":"16M","netDrivers":[],
 
-						api: "2.0","uplMaxSize":"16M","netDrivers":[],
+							debug: {
+								"connector":"php",
+								"phpver":"5.3.26-1~dotdeb.0",
+								"time":0.016080856323242,
+								"memory":"1307Kb \/ 1173Kb \/ 128M",
+								"upload":"",
+								"volumes":[
+									{	"id":"l1_",
+										"name":"localfilesystem",
+										"mimeDetect":"internal",
+										"imgLib":"imagick"},
 
-						debug: {
-							"connector":"php",
-							"phpver":"5.3.26-1~dotdeb.0",
-							"time":0.016080856323242,
-							"memory":"1307Kb \/ 1173Kb \/ 128M",
-							"upload":"",
-							"volumes":[
-								{	"id":"l1_",
-									"name":"localfilesystem",
-									"mimeDetect":"internal",
-									"imgLib":"imagick"},
+									{	"id":"l2_",
+										"name":"localfilesystem",
+										"mimeDetect":"internal",
+										"imgLib":"gd"}],
 
-								{	"id":"l2_",
-									"name":"localfilesystem",
-									"mimeDetect":"internal",
-									"imgLib":"gd"}],
-
-							"mountErrors":[]}
-					});
+								"mountErrors":[]}
+						});
 						break;
 						
 					default:
@@ -2745,38 +2746,49 @@ Default area navigator.
 
 						else 		// nav folder
 							Fetch( "file:"+target , files => {
-								sendFolder(res, files.map( file => {
-									const 
-										[x,name,type] = file.match(/(.*)\.(.*)/) || ["",file,""];
+								//console.log(">>>>>>>>>>>>>>>>files", files);
+								if (files)
+									sendFolder(res, files.map( file => {
+										const 
+											[x,name,type] = file.match(/(.*)\.(.*)/) || ["",file,""];
 
-									switch (type) {
-										case "url":
-										case "lnk":
-											return null;
+										switch (type) {
+											case "url":
+											case "lnk":
+												return null;
 
-										default:
-											const 
-												stat = FS.statSync( "."+parent+file );
+											default:
+												try {
+													const 
+														stat = FS.statSync( "."+parent+file );
 
-											return {
-												ts: now,
-												mime: type ? `application/${type}` : "directory",	// mime type
-												dirs: type ? 0 : 1, 			// place inside tree too
-												size: stat.size,
-												hash: btoa(parent+file), //parent+file,	// hash name
-												name: file, 					// keys name
-												phash: parentHash, 				// parent hash name
-												read: isRead,						// read state
-												write: isWrite,						// write state
-												locked: isLocked,						// lock state
-												isowner: isOwner,					// has ownership
-												//tmb: "",						// thumbnail for images
-												//alias: "",					// sumbolic link pack
-												//dim: "",						// image dims
-												//volumeid: "l1_", 				// rec.group,										
-											};
-									}
-								}));
+													return {
+														ts: now,
+														mime: type ? `application/${type}` : "directory",	// mime type
+														dirs: type ? 0 : 1, 			// place inside tree too
+														size: stat.size,
+														hash: btoa(parent+file), //parent+file,	// hash name
+														name: file, 					// keys name
+														phash: parentHash, 				// parent hash name
+														read: isRead,						// read state
+														write: isWrite,						// write state
+														locked: isLocked,						// lock state
+														isowner: isOwner,					// has ownership
+														//tmb: "",						// thumbnail for images
+														//alias: "",					// sumbolic link pack
+														//dim: "",						// image dims
+														//volumeid: "l1_", 				// rec.group,										
+													};
+												}
+												
+												catch (err) {
+													return null;
+												}
+										}
+									}));
+								
+								else
+									sendFolder(res, []);
 							});
 
 						break;
@@ -5606,6 +5618,7 @@ function fileUpload(req, res) {
 
 			Fetch( path, files => {
 
+				if (files)
 				files.forEach( (file,id) => {
 					var link = `/${area}/${file}`;
 

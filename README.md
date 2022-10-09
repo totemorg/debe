@@ -75,7 +75,7 @@ Acquire, optionally configure and start a **DEBE** server:
 		console.log( sql ? "look mom - Im running!" : "something evil is lurking" );
 	});
 
-where configuration keys follow [ENUMS deep copy conventions](https://github.com/totem-man/enums)
+where configuration keys follow [ENUMS deep copy conventions](https://github.com/totem-man/enums).
 
 
 ## Program Reference
@@ -348,7 +348,6 @@ config({
         * [.$](#module_DEBE..$libs.$)
         * [.$log](#module_DEBE..$libs.$log)
         * [.$task](#module_DEBE..$libs.$task)
-        * [.$jimp](#module_DEBE..$libs.$jimp)
         * [.$sql](#module_DEBE..$libs.$sql)
         * [.$neo](#module_DEBE..$libs.$neo)
         * [.$copy](#module_DEBE..$libs.$copy)
@@ -450,7 +449,6 @@ config({
     * [.$](#module_DEBE..$libs.$)
     * [.$log](#module_DEBE..$libs.$log)
     * [.$task](#module_DEBE..$libs.$task)
-    * [.$jimp](#module_DEBE..$libs.$jimp)
     * [.$sql](#module_DEBE..$libs.$sql)
     * [.$neo](#module_DEBE..$libs.$neo)
     * [.$copy](#module_DEBE..$libs.$copy)
@@ -483,12 +481,6 @@ See [debe](https://github.com/totemstan/debe/)
 
 #### $libs.$task
 See [debe](https://github.com/totemstan/debe/)
-
-**Kind**: static property of [<code>$libs</code>](#module_DEBE..$libs)  
-<a name="module_DEBE..$libs.$jimp"></a>
-
-#### $libs.$jimp
-See [man](https://github.com/totemstan/man/)
 
 **Kind**: static property of [<code>$libs</code>](#module_DEBE..$libs)  
 <a name="module_DEBE..$libs.$sql"></a>
