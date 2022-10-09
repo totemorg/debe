@@ -1,6 +1,6 @@
 {
   "name": "@totemstan/debe",
-  "version": "1.42.0",
+  "version": "1.43.0",
   "description": "built on totem - does everything but eat",
   "main": "debe.js",
   "scripts": {
@@ -23,11 +23,13 @@
   "author": "ACME Software Disposal Service",
   "license": "ISC",
   "dependencies": {
-    "@totemstan/atomic": "^1.6.0",
+    "@totemstan/atomic": "^1.8.0",
     "@totemstan/blog": "^1.4.0",
     "@totemstan/dogs": "^1.2.0",
-    "@totemstan/enums": "^1.17.0",
+    "@totemstan/enums": "^1.18.0",
     "@totemstan/jsdb": "^1.12.0",
+    "@totemstan/man": "^1.10.0",
+    "@totemstan/reader": "^1.4.0",
     "@totemstan/skin": "^1.14.0",
     "@totemstan/totem": "^1.40.0",
     "ajv": "^6.10.2",
