@@ -1,7 +1,7 @@
 ﻿// UNCLASSIFIED 
 
 const
-	READ = require("@totemstan/reader");		// partial config of NLP (avoids string prototype collision)
+	READ = require("./reader");		// partial config of NLP (avoids string prototype collision)
 
 // NodeJS modules
 const 									
@@ -30,15 +30,15 @@ const
 const
 	// include modules
 	//EAT = require("./ingesters"),	
-	TOTEM = require("@totemstan/totem"),
-	ATOM = require("@totemstan/atomic"), 
-	ENUMS = require("@totemstan/enums"),
-	$ = require("@totemstan/man"),
+	TOTEM = require("./totem"),
+	ENUMS = require("./totem/enums"),
+	SKIN = require("./totem/skin"),
+	ATOM = require("./atomic"), 
+	$ = require("./man"),
 	//RAN = require("./randpr"),
 	//PIPE = require("./pipe"),
-	SKIN = require("@totemstan/skin"),
-	BLOG = require("@totemstan/blog"),
-	DOGS = require("@totemstan/dogs");
+	//BLOG = require("./blog"),
+	DOGS = require("./dogs");
 
 const 
 	{ exec } = CP,
@@ -60,23 +60,6 @@ const
 @module DEBE.String
 */
 Copy({
-/**
-Returns a ref-joined list of links
-@extends Array
-@param {String} ref
-*/
-	linkify: function (ref) {
-		return ref 
-			? this.link( ref ) 
-			: this.replace( /\[([^\[\]]*)\]\(([^\)]*)\)/g, (str,lab,url) => lab.link(url) );
-	},
-	
-/**
-*/
-	mailify: function ( label, tags ) {
-		return this ? label.link( "mailto:"+this.tag("?", tags || {}) ) : "missing email list";
-	},
-	
 /**
 */
 	align: function (hits,y,s) {
@@ -121,208 +104,6 @@ Returns a ref-joined list of links
 @module DEBE.Array
 */
 Copy({  // array prototypes
-/**
-Creates an html table from an array.
-@param {Boolean} noheader switch to enable header processing
-*/
-	gridify: function (rehead,style) {	//< dump dataset as html table
-		function join(recs,sep) { 
-			switch (recs.constructor) {
-				case Array: 
-					return this.join(sep);
-
-				case Object:
-					var rtn = [];
-					for (var n in this) rtn.push(this[n]);
-					return rtn.join(sep);
-
-				default:
-					return this;
-			}
-		}
-
-		function table(recs) {  // generate an html table from given data or object
-			switch (recs.constructor) {
-				case Array:  // [ {head1:val}, head2:val}, ...]  create table from headers and values
-
-					var rtn = "";
-					const heads = {}, rec0 = recs[0];
-
-					if (rehead && rec0) {
-						if ( rec0.forEach )
-							rec0.forEach( (val,key) => heads[key] = rehead[key] || key );
-
-						else																		
-							Each(rec0, (key,val) => heads[key] = rehead[key] || key );
-
-						var row = "";
-						Each(heads, (key,val) => row += val.tag("th", {}) );
-
-						rtn += row.tag("tr", {});
-					}
-
-					recs.forEach( (rec,idx) => {
-						var row = "", intro = true;
-						Each(heads, (key,val) => {
-							if (val = rec[key])
-								row += val.forEach
-									? table(val)
-									: (val+"").linkify().tag("td", intro ? {class:"intro"} : {});
-							else
-								row += ((val==0) ? "0" : "").tag("td", {});
-
-							intro = false;
-						});
-						rtn += row.tag("tr", {});
-					});
-
-					return rtn.tag("table",style || {border:0,width:"100%"}); //.tag("div",{style:"overflow-x:auto"});
-
-				case Object: // { key:val, ... } create table dump of object hash
-
-					var rtn = "";
-					Each(recs, (key,val) => {
-						if (val)
-							rtn += isArray(val)
-								? table(val)
-								: (key.tag("td", {}) + JSON.stringify(val).tag("td", {})).tag("tr", {});
-					});
-
-					return rtn.tag("table",{});
-
-				default:
-					return recs+"";
-			}
-		}
-
-		function dump(x) {
-			rtn = "";
-			for (var n in x)  {
-				switch ( x[n].constructor ) {
-					case Object:
-						rtn += dump( x[n] ); break;
-					case Array:
-						rtn += n+"[]"; break;
-					case Function:
-						rtn += n+"()"; break;
-					default:
-						rtn += n;
-				}
-				rtn += "; ";
-			}
-			return rtn;
-		}
-
-		return  table( this );
-	},
-	
-/**
-Groups each "x.y.z. ...." spec in the list.
-
-@param {string} dot item seperator
-*/
-	groupify: function (dot) {
-		var src = {};
-		this.forEach( key => src[key] = key.split(dot).pop() ); 
-
-		return [].joinify( Copy(src, {} ,dot) );
-	},
-
-/**
-Blogs each string in the list.
-
-@see totem:blogify
-@param {List} keys list of keys to blog
-@param {String} ds Name of dataset being blogged
-@param {Function} cb callback(recs) blogified version of records
-*/
-	blog: function ( req, key, cb ) {
-		const 
-			{ sql, flags, client, profile, table, type, host } = req,
-			ds = "/"+table,
-			book = ds,
-			product = table+".html",
-			recs = this,
-			ctx = {
-				host: host,
-				table: table,
-				client: client,
-				type: type
-			},
-			fetchBlog = ( rec, cb ) => {
-				const 
-					isEnum = (rec.Pipe||"").startsWith("{"),	// is client doing an enumerated pipe ?
-					src = (ds+".json").tag("?", { 		// define default src key
-						name: isEnum
-							? rec.Name + "-*"	// request all children cases
-							: rec.Name			// request only this case
-					});
-
-				//Trace(">>>>>>>>>>blog", src, ds, key, rec[key]);
-
-				if ( md = rec[key] ) // have valid markdown
-					md.blogify(src, ctx, rec, html => {	// blog it
-						cb( flags.kiss
-								? html 	// keep it simple
-								: [	// add options
-									site.nick.link( "/" ),
-									"schema".link( `xfan.view?src=${ds}.schema?name=${rec.Name}&w=4000&h=600` ),
-									//"run".link( `${book}.exe?Name=${rec.Name}` ),
-									"run".link( `${book}.exe`.tag("?", {name: rec.Name}) ),
-									"goto".link( `${book}.view` ),
-									"publish".link( `${book}.pub` ),
-									"tou".link( `${book}.tou` ),
-									"data".link( `${book}.data`.tag("?", {name:rec.Name}) ),
-									//"open".link( `${book}.blog?key=${key}&name=${rec.Name}&subs=${isEnum}` ),
-									"open".link( `${book}.open`.tag("?", {name:rec.Name}) ),
-									(new Date().toDateString()) + "",
-									( client.match( /(.*)\@(.*)/ ) || ["",client] )[1].link( "email:" + client )
-								].join(" || ") + "<br>" + html
-						);
-
-						/*
-						if ( profile.Track ) 	// client is being tracked
-							if ( licenseCode ) { // code licensor installed
-								licenseCode( sql, html, {  // register this html with this client
-									_Partner: client,
-									_EndService: "",  // leave empty so lincersor wont validate by connecting to service
-									_Published: new Date(),
-									_Product: product,
-									Path: "/tag/"+product
-								}, pub => {
-									if (pub) {
-										//cb( `${rec.topic}=>${req.client}`.link( "/tags.view" ) );
-										sql.query("INSERT INTO openv.tags SET ? ON DUPLICATE KEY UPDATE Views=Views+1", {
-											Viewed: pub._Published,
-											Target: pub._Partner,
-											Topic: table,
-											License: pub._License,
-											Message: "viewed".link( "/decode.html".tag("?", {
-												Target:pub._Partner,
-												License:pub._License,
-												Topic:table
-											}))
-										});
-									}
-								});		
-								Trace(`TRACKING ${client}`);
-							}
-						*/
-					}); 
-
-				else
-					cb( "" );
-			};
-
-		recs.serial( fetchBlog, (rec, blog) => {
-			if (rec) 
-				rec[key] = blog;
-
-			else 
-				cb( recs );
-		});
-	},
-
 /**
 Merge changes when doing table deltas from their baseline versions.
 @param {Array} Recs Source records to merge into this records
@@ -526,40 +307,7 @@ Returns a tree = {name,weight,nodes} from records having been sorted on keys=[ke
 			}
 
 		return tar;
-	},
-
-/**
-Joins a list with an optional callback cb(head,list) to join the current list 
-with the current head.
-
-@param {Function} cb
-@example
-	[	a: null,
-		g1: [ b: null, c: null, g2: [ x: null ] ],
-		g3: [ y: null ] ].joinify()
-
-returning a string
-	"a,g1(b,c,g2(x)),g3(y)"
-*/
-	joinify: function (src) {
-		var 
-			rtn = [];
-
-		//Trace(">keys=", Object.keys(src));
-
-		Object.keys(src).forEach( key => {
-			var list = src[key];
-
-			if ( isString(list) )
-				rtn.push( list );
-
-			else
-				rtn.push( key + "(" + [].joinify(list) + ")" );
-		});
-
-		//Trace(">>rtn", rtn);
-		return rtn.join(",");
-	}	
+	}
 
 }, Array.prototype);
 	
@@ -604,15 +352,11 @@ in accordance with [jsdoc]{@link https://jsdoc.app/}.
 
 @requires [totem](https://github.com/totemstan/totem)
 @requires [atomic](https://github.com/totemstan/atomic)
-@requires [geohack](https://github.com/totemstan/geohack)
 @requires [man](https://github.com/totemstan/man)
-@requires [randpr](https://github.com/totemstan/randpr)
 @requires [enums](https://github.com/totemstan/enums)
 @requires [reader](https://github.com/totemstan/reader)
 @requires [skin](https://github.com/totemstan/skin)
-@requires [blog](https://github.com/totemstan/blog)
 @requires [dogs](https://github.com/totemstan/dogs)
-@requires [pipe](https://github.com/totemstan/pipe)
 
 @requires [crypto](https://nodejs.org/docs/latest/api/)
 @requires [child_process](https://nodejs.org/docs/latest/api/)
@@ -1068,9 +812,9 @@ as described in the [Notebooks api](/api.view). `,
 		}
 	},
 
-	/*
-	Legacy 
-	*/
+/*
+Legacy 
+*/
 	onUpdate: function (sql,ds,body) { //< runs when dataset changed
 		//Trace("update", ds, body);
 		if (false)
@@ -1789,6 +1533,11 @@ Initialize DEBE on startup.
 Filter dataset recs on specifed req-res thread
 */	
 	"filters." : { 
+/**
+@param {Array} recs Records to filter
+@param {Object} req Totem session request
+@param {Function} res Totem session response
+*/
 		data: (recs,req,res) => {  //< renders dataset records
 			const
 				{sql,table,query} = req,
@@ -1819,7 +1568,11 @@ Filter dataset recs on specifed req-res thread
 				});
 			});
 		},
-		
+/**
+@param {Array} recs Records to filter
+@param {Object} req Totem session request
+@param {Function} res Totem session response
+*/		
 		open: (recs,req,res) => {  //< renders dataset records
 			filters.blog(recs,req, recs => {
 				var
@@ -1830,17 +1583,7 @@ Filter dataset recs on specifed req-res thread
 			});
 		},
 			
-		blog: (recs,req,res) => {  //< renders dataset records
-			recs.blog( req, "Description", recs => {
-				res({ 
-					success: true,
-					msg: errors.ok,
-					count: recs.found || recs.length,
-					data: recs
-				});
-			});
-		},
-				
+			
 /**
 @param {Array} recs Records to filter
 @param {Object} req Totem session request
@@ -1856,39 +1599,6 @@ Filter dataset recs on specifed req-res thread
 			res({
 				data: Recs
 			});
-		},
-		
-/**
-@param {Array} recs Records to filter
-@param {Object} req Totem session request
-@param {Function} res Totem session response
-*/
-		db: (recs, req, res) => {	
-			res({ 
-				success: true,
-				msg: errors.ok,
-				count: recs.found || recs.length,
-				data: recs
-			});
-			/*
-			req.sql.query("select found_rows()")
-			.on('result', stat => {		// records sourced from sql	
-				Trace(">>>>>>", stat);
-				res({ 
-					success: true,
-					msg: errors.ok,
-					count: stat["found_rows()"] || 0,
-					data: recs
-				});
-			})
-			.on("error", () => {  		// records sourced from virtual table
-				res({ 
-					success: false,
-					msg: "busy",
-					count: 0,
-					data: []
-				});
-			}); */
 		},
 		
 /**
@@ -1919,6 +1629,7 @@ Filter dataset recs on specifed req-res thread
 @param {Object} req Totem session request
 @param {Function} res Totem session response
 */
+		/*
 		txt: (recs,req,res) => { //< dataset.txt convert to text
 			var head = recs[0], cols = [], cr = String.fromCharCode(13), txt="", list = ",";
 
@@ -1935,7 +1646,8 @@ Filter dataset recs on specifed req-res thread
 
 			res( txt );
 		},
-
+		*/
+		
 		/*
 		stat: (recs,req,res) => { // dataset.stat provide info
 			var 
@@ -1973,9 +1685,10 @@ Usage: ${uses.join(", ")}  `);
 @param {Object} req Totem session request
 @param {Function} res Totem session response
 */
+		/*
 		html: (recs,req,res) => { //< dataset.html converts to html
 			res( recs.gridify ? recs.gridify({},{border: "1"}) : recs );
-		},
+		}, */
 
 		// MS office doc types
 /**
@@ -2064,1039 +1777,6 @@ Usage: ${uses.join(", ")}  `);
 /AREA/FILE-endpoint routers
 */
 	"byArea.": {
-		all: null, 
-/**
-Default area navigator.
-@param {Object} req Totem session request
-@param {Function} res Totem session response		
-*/
-		root: (req,res) => {
-			function sendFolder(res,recs) {
-				//console.log(">>>>>>>>>>>>>>>>sending",cmd, recs);
-				const
-					cwd = {
-						mime:"directory",
-						ts:now,
-						read:1,
-						write:1,
-						size:0,
-						hash: btoa(parent), 
-						volumeid:"totem",
-						name: parent, 
-						locked:0,
-						dirs:1,
-						isowner: true
-					};
-
-				switch (0) {
-					case 1: // debug
-						res({  
-						cwd: { 
-							"mime":"directory",
-							"ts":1334071677,
-							"read":1,
-							"write":0,
-							"size":0,
-							"hash": "/root/",
-							"volumeid":"l1_",
-							"name":"Demo",
-							"locked":1,
-							"dirs":1},
-
-						/*"options":{
-							"path":"", //"Demo",
-							"url":"", //"http:\/\/elfinder.org\/files\/demo\/",
-							"tmbUrl":"", //"http:\/\/elfinder.org\/files\/demo\/.tmb\/",
-							"disabled":["extract"],
-							"separator":"\/",
-							"copyOverwrite":1,
-							"archivers": {
-								"create":["application\/x-tar", "application\/x-gzip"],
-								"extract":[] }
-						},*/
-
-						files: [{ 
-							"mime":"directory",
-							"ts":1334071677,
-							"read":1,
-							"write":0,
-							"size":0,
-							"hash": "/root/",
-							"volumeid":"l1_",
-							"name":"Demo",
-							"locked":1,
-							"dirs":1}].concat([
-							/*{  // cwd again
-								"mime":"directory",
-								"ts":1334071677,
-								"read":1,
-								"write":0,
-								"size":0,
-								"hash":"root",
-								"volumeid":"l1_",
-								"name":"Demo",
-								"locked":1,
-								"dirs":1},*/
-
-							/*{
-							"mime":"directory",
-							"ts":1334071677,
-							"read":1,
-							"write":0,
-							"size":0,
-							"hash":"root",
-							"volumeid":"l1_",
-							"name":"Demo",
-							"locked":1,
-							"dirs":1},*/
-
-							{
-								"mime":"directory",
-								"ts":1340114567,
-								"read":0,
-								"write":0,
-								"size":0,
-								"hash":"l1_QmFja3Vw",
-								"name":"Backup",
-								"phash":"/root/",
-								"locked":1},
-
-							{
-								"mime":"directory",
-								"ts":1310252178,
-								"read":1,
-								"write":0,
-								"size":0,
-								"hash":"l1_SW1hZ2Vz",
-								"name":"Images",
-								"phash":"/root/",
-								"locked":1},
-
-							{
-								"mime":"directory",
-								"ts":1310250758,
-								"read":1,
-								"write":0,
-								"size":0,
-								"hash":"l1_TUlNRS10eXBlcw",
-								"name":"MIME-types",
-								"phash":"/root/",
-								"locked":1},
-
-							{
-								"mime":"directory",
-								"ts":1268269762,
-								"read":1,
-								"write":0,
-								"size":0,
-								"hash":"l1_V2VsY29tZQ",
-								"name":"Welcome",
-								"phash":"/root/",
-								"locked":1,
-								"dirs":1},
-
-							{
-								"mime":"directory",
-								"ts":1390785037,
-								"read":1,
-								"write":1,
-								"size":0,
-								"hash":"l2_Lwxxyyzz",
-								"volumeid":"l2_",
-								"name":"Test here",
-								"locked":1},
-
-							{
-								"mime":"application\/x-genesis-rom",
-								"ts":1310347586,"read":1,
-								"write":0,
-								"size":3683,
-								"hash":"l1_UkVBRE1FLm1k",
-								"name":"README.md",
-								"phash":"/root/",
-								"locked":1}
-						]),
-
-						api: "2.0","uplMaxSize":"16M","netDrivers":[],
-
-						debug: {
-							"connector":"php",
-							"phpver":"5.3.26-1~dotdeb.0",
-							"time":0.016080856323242,
-							"memory":"1307Kb \/ 1173Kb \/ 128M",
-							"upload":"",
-							"volumes":[
-								{	"id":"l1_",
-									"name":"localfilesystem",
-									"mimeDetect":"internal",
-									"imgLib":"imagick"},
-
-								{	"id":"l2_",
-									"name":"localfilesystem",
-									"mimeDetect":"internal",
-									"imgLib":"gd"}],
-
-							"mountErrors":[]}
-					});
-						break;
-
-					case 2: // debug
-						res({  
-							cwd: cwd,
-
-							/*"options":{
-								"path":"", //"Demo",
-								"url":"", //"http:\/\/elfinder.org\/files\/demo\/",
-								"tmbUrl":"", //"http:\/\/elfinder.org\/files\/demo\/.tmb\/",
-								"disabled":["extract"],
-								"separator":"\/",
-								"copyOverwrite":1,
-								"archivers": {
-									"create":["application\/x-tar", "application\/x-gzip"],
-									"extract":[] }
-							},*/
-
-							files: [cwd].concat([
-								/*{  // cwd again
-									"mime":"directory",
-									"ts":1334071677,
-									"read":1,
-									"write":0,
-									"size":0,
-									"hash":"root",
-									"volumeid":"l1_",
-									"name":"Demo",
-									"locked":1,
-									"dirs":1},*/
-
-								/*{
-								"mime":"directory",
-								"ts":1334071677,
-								"read":1,
-								"write":0,
-								"size":0,
-								"hash":"root",
-								"volumeid":"l1_",
-								"name":"Demo",
-								"locked":1,
-								"dirs":1},*/
-
-								{
-									"mime":"directory",
-									"ts":1340114567,
-									"read":0,
-									"write":0,
-									"size":0,
-									"hash":"l1_QmFja3Vw",
-									"name":"Backup",
-									"phash":"/root/",
-									"locked":1},
-
-								{
-									"mime":"directory",
-									"ts":1310252178,
-									"read":1,
-									"write":0,
-									"size":0,
-									"hash":"l1_SW1hZ2Vz",
-									"name":"Images",
-									"phash":"/root/",
-									"locked":1},
-
-								{
-									"mime":"directory",
-									"ts":1310250758,
-									"read":1,
-									"write":0,
-									"size":0,
-									"hash":"l1_TUlNRS10eXBlcw",
-									"name":"MIME-types",
-									"phash":"/root/",
-									"locked":1},
-
-								{
-									"mime":"directory",
-									"ts":1268269762,
-									"read":1,
-									"write":0,
-									"size":0,
-									"hash":"l1_V2VsY29tZQ",
-									"name":"Welcome",
-									"phash":"/root/",
-									"locked":1,
-									"dirs":1},
-
-								{
-									"mime":"directory",
-									"ts":1390785037,
-									"read":1,
-									"write":1,
-									"size":0,
-									"hash":"l2_Lwxxyyzz",
-									"volumeid":"l2_",
-									"name":"Test here",
-									"locked":1},
-
-								{
-									"mime":"application\/x-genesis-rom",
-									"ts":1310347586,"read":1,
-									"write":0,
-									"size":3683,
-									"hash":"l1_UkVBRE1FLm1k",
-									"name":"README.md",
-									"phash":"/root/",
-									"locked":1}
-							]),
-
-							api: "2.0","uplMaxSize":"16M","netDrivers":[],
-
-							debug: {
-								"connector":"php",
-								"phpver":"5.3.26-1~dotdeb.0",
-								"time":0.016080856323242,
-								"memory":"1307Kb \/ 1173Kb \/ 128M",
-								"upload":"",
-								"volumes":[
-									{	"id":"l1_",
-										"name":"localfilesystem",
-										"mimeDetect":"internal",
-										"imgLib":"imagick"},
-
-									{	"id":"l2_",
-										"name":"localfilesystem",
-										"mimeDetect":"internal",
-										"imgLib":"gd"}],
-
-								"mountErrors":[]}
-						});
-						break;
-						
-					default:
-						res( ( cmd == "tree" )
-							? {tree:recs}
-							: {
-								cwd: cwd, 
-
-								options: {
-								   "separator"       : "/",                                     // (String) Path separator for the current volume
-								   "disabled"        : [],                                      // (Array)  List of commands not allowed (disabled) on this volume
-								   "copyOverwrite"   : 1,                                       // (Number) Whether or not to overwrite files with the same name on the current volume when copy
-								   "uploadOverwrite" : 1,                                       // (Number) Whether or not to overwrite files with the same name on the current volume when upload
-								   "uploadMaxSize"   : 1073741824,                              // (Number) Upload max file size per file
-								   "uploadMaxConn"   : 3,                                       // (Number) Maximum number of chunked upload connection. `-1` to disable chunked upload
-								   "uploadMime": {                                              // (Object) MIME type checker for upload
-									   "allow": [ "all" ], //[ "image", "text/plain" ],                      // (Array) Allowed MIME type
-									   "deny": [], //[ "all" ],                                       // (Array) Denied MIME type
-									   "firstOrder": "allow", //"deny"                                     // (String) First order to check ("deny" or "allow")
-								   },
-							
-								  "archivers"       : {                                        // (Object) Archive settings
-									 "create"  : [
-									   "application/zip",
-									 ],                                                   // (Array)  List of the mime type of archives which can be created
-									 "extract" : [
-									   "application/zip",
-									 ],                                                   // (Array)  List of the mime types that can be extracted / unpacked
-									 "createext": {
-									   "application/zip": "zip",
-									 }                                                    // (Object)  Map list of { MimeType: FileExtention }
-								  }
-								},
-								/*
-								options: {
-									path:"/", //cwdPath,
-									url:"/", //"/root/",
-									tmbUrl:"/root/.tmb/",
-									disabled:["extract"],
-									separator: "/",
-									copyOverwrite:1,
-									archivers: {
-										create:["application/x-tar", "application/x-gzip"],
-										extract:[] }
-								}, */
-
-								files: [cwd].concat(recs),
-
-								api: 2.1057,
-
-								uplMaxFile: 20,
-								uplMaxSize:"16M",
-								netDrivers:[]
-
-								/*
-								debug: true,   //enable client debugger in about info
-								debug: {
-									connector:"php",
-									phpver:"5.3.26-1~dotdeb.0",
-									time:0.016080856323242,
-									memory:"1307Kb \/ 1173Kb \/ 128M",
-									upload:"",
-									volumes:[
-											{	id:"v1",
-												name:"localfilesystem",
-												mimeDetect:"internal",
-												imgLib:"imagick"},
-											{	id:"v2",
-												name:"localfilesystem",
-												mimeDetect:"internal",
-												imgLib:"gd"}],
-									mountErrors:[]
-								} */
-						} );
-				}
-			}
-
-			function logCommand(cmd, info) {
-				if (isString(cmd)) {
-					Trace( "file logger", cmd );
-					const [op,ds] = cmd.split(" ");
-					sql.query("INSERT INTO openv.dblogs SET ? ON DUPLICATE KEY UPDATE Actions=Actions+1,?", [{
-						Op: op,
-						Dataset: ds,
-						Client: client,
-						Event: now
-					}, {
-						Event: now
-					}]);
-					CP.exec( cmd );
-				}
-				
-				else {
-					Trace( "file logger", cmd.name);
-					cmd(info);
-				}
-
-				return info;
-			}
-			
-			const 
-				{sql,query,path,client,body,action,host,area,profile,referer} = req;
-
-			if ( req.type == "help" )
-			return res("Navigate folder target=NAME/NAME/... per command cmd=open|tree|file|size|...|null" );
-
-			if ( query.target == "null") delete query.target;
-			
-			const
-				oldSchool = false,
-				btoa = b => Buffer.from(b,"utf-8").toString("base64"),
-				atob = a => Buffer.from(a,"base64").toString("utf-8"),
-				trace = true,
-				{cmd,init,tree,src} = body.cmd ? body : query,
-				targets = [query["targets[]"] || query.target || btoa(path)].map( tar => atob(tar) ),
-				[target] = targets,
-				  // parent = target.split("/").slice(0,-1).join("/")+"/",
-				  // target || atob(btoa(path||"/root/")), 
-				[x,pre,node] = target.match( /(.*)\/(.*)/ ) || ["",parent,""],
-				parent = pre + "/",
-				parentHash = btoa(parent),
-				json = parent.substr(1).replace(/\/\[/g,"[").replace(/\//g,"."),
-				now = new Date().getTime();
-			
-			// https://github.com/Studio-42/elFinder/wiki/Client-Server-API-2.1
-			sql.query("SELECT Client,Name FROM openv.engines WHERE ? LIMIT 1", {Name:node}, (err,engs) => {
-				const
-					eng = engs[0] || {
-					  Client: "totem",
-					  Name: node
-					},
-					isOwner = (eng.Client == client) || profile.Overlord || profile.Creator,
-					isRead = true,
-					isWrite = isOwner,
-					isLocked = false;
-					  
-				if ( trace )
-					Trace("nav", {
-						cmd: cmd,
-						query: query,
-						//body: body,
-						uphexsnip: Buffer.from( (body["upload[]"]||"").substr(0,8)).toString("hex"),
-						upesc: escape( (body["upload[]"]||"" ).substr(0,8)),
-						uplen: (body["upload[]"]||"").length,
-						path: path,
-						tar: target,
-						tars: targets,
-						src: src,
-						act: action,
-						json: json,
-						parent: parent,
-						node: node,
-						//prof: profile,
-						owner: isOwner
-					});
-
-				switch (cmd) {		// look for elFinder commands
-					case "tree":	// expanding folder in left paine
-					case "open":	// expanding folder 
-
-						if ( src )	// nav json
-							/*
-							if ( src.endsWith("?") )	// nav folders
-								if ( parent.endsWith("=/") ) {	// this is still experimental
-									const
-										name = parent.split("/").pop(),
-										get = "http:"+src.tag("&",{name: name.substr(0,name.length-1), "json:":path.substr(1,path.length-2)});
-
-									Trace("fetch", get );
-									Fetch( get, txt => {
-
-										if ( files = JSON.parse(txt)[0].json ) {
-											if ( files.forEach ) 
-												sendFolder(res, files.map( (file,idx) => {
-													const 
-														name = "["+idx+"]/",
-														nameHash = btoa(parent+name),
-														type = !(isArray(file) || isObject(file)),
-														info = {
-															ts: now,
-															size: file.length,
-															hash: nameHash, 				// hash name
-															name: name, 					// keys name
-															phash: parentHash, 				// parent hash name
-
-															read: 1,						// read state
-															write: 1,						// write state
-															locked: 0,						// lock state
-															//tmb: "",						// thumbnail for images
-															//alias: "",					// sumbolic link pack
-															//dim: "",						// image dims
-															isowner: true,				//	had ownership
-															//volumeid: "l1_", 				// rec.group,										
-														};
-
-													/ *{
-														mime: type,	// mime type
-														ts:1310252178,		// time stamp format?
-														read: 1,				// read state
-														write: 0,			// write state
-														size: 666,			// size
-														hash: nameHash, // parent+name, 
-														name: name, // keys name
-														phash: parentHash,	// parent
-														locked: 0,		// lock state
-														//volumeid: type ? "v2_" : "v1_", // rec.group,
-														dirs: 1, 			// place inside tree too
-													}* /
-													return Copy(info, type
-														? {
-															mime: "application/txt",	// mime type
-															dirs: 0, 			// place inside tree too
-														}
-														: {
-															mime: "directory",	// mime type
-															dirs: 1, 			// place inside tree too
-														} );	
-												}));
-
-											else
-											if ( isObject(files) ) {
-												/ *{
-													mime: type,	// mime type
-													ts:1310252178,		// time stamp format?
-													read: 1,				// read state
-													write: 0,			// write state
-													size: 666,			// size
-													hash: nameHash, //parent+name,
-													name: name, // keys name
-													phash: parentHash, //parent,
-													locked: 0,		// lock state
-													//volumeid: type ? "v2_" : "v1_", // rec.group,
-													dirs: 1, 			// place inside tree too
-												} * /
-												Each(files, (idx,file) => {
-													const 
-														name = `"${idx}"/`,
-														nameHash = btoa(parent+name),
-														type = !(isArray(file) || isObject(file)),
-														info = {
-															ts: now,
-															size: Object.keys(file).length,
-															hash: nameHash, 				// hash name
-															name: name, 					// keys name
-															phash: parentHash, 				// parent hash name
-
-															read: 1,						// read state
-															write: 1,						// write state
-															locked: 0,						// lock state
-															//tmb: "",						// thumbnail for images
-															//alias: "",					// sumbolic link pack
-															//dim: "",						// image dims
-															//isowner: true,				//	had ownership
-															//volumeid: "l1_", 				// rec.group,										
-														};
-
-													recs.push( Copy(info, type 
-														? {
-															mime: "application/txt",	// mime type
-															dirs: 0, 			// place inside tree too
-														}
-														: {
-															mime: "directory",	// mime type
-															dirs: 1, 			// place inside tree too
-														} ));
-												});
-												sendFolder(res,recs);
-											}
-
-											else 
-												res(files);
-										}
-
-										else
-											res("bad src provided");
-
-									});	
-								}
-
-								else
-									Fetch( "http:"+src+"&name", txt => {
-										sendFolder(res, JSON.parse(txt).map( file => {
-											const
-												name = `${file.name}=/`,
-												nameHash = btoa(parent+name);
-
-											return {
-												mime: "directory",	// mime type
-												dirs: 1, 					// place inside tree too
-												ts: now,
-												size: Object.keys(file).length,
-												hash: nameHash, 				// hash name
-												name: name, 					// keys name
-												phash: parentHash, 				// parent hash name
-
-												read: 1,						// read state
-												write: 1,						// write state
-												locked: 0,						// lock state
-												//tmb: "",						// thumbnail for images
-												//alias: "",					// sumbolic link pack
-												//dim: "",						// image dims
-												//isowner: true,				//	had ownership
-												//volumeid: "l1_", 				// rec.group,										
-											};
-										}) );
-									});
-
-							else	// nav json
-							*/
-							Fetch( "http:"+src.tag("&",{"json:":json}), txt => {
-
-								if ( files = JSON.parse(txt)[0].json ) {
-									if ( files.forEach ) 
-										sendFolder(res, files.map( (file,idx) => {
-											const 
-												name = "["+idx+"]/",
-												type = !(isArray(file) || isObject(file));
-
-											return {
-												ts: now,
-												mime: type ? `application/txt` : "directory",	// mime type
-												dirs: type ? 0 : 1, 			// place inside tree too												
-												size: file.length,
-												hash: btoa(parent+name), 				// hash name
-												name: name, 					// keys name
-												phash: parentHash, 				// parent hash name
-												read: isRead,						// read state
-												write: isWrite,					// write state
-												locked: isLocked,						// lock state
-												isowner: isOwner				// has ownership
-												//tmb: "",						// thumbnail for images
-												//alias: "",					// sumbolic link pack
-												//dim: "",						// image dims
-												//volumeid: "l1_", 				// rec.group,										
-											};
-										}));
-
-									else
-									if ( isObject(files) ) {
-										const recs = [];
-										Each(files, (idx,file) => recs.push( [idx,file] ) );
-										sendFolder(res,recs.map( ([idx,file]) => {
-											const 
-												name = `"${idx}"/`,
-												type = !(isArray(file) || isObject(file));
-
-											return {
-												ts: now,
-												mime: type ? `application/txt` : "directory",	// mime type
-												dirs: type ? 0 : 1, 			// place inside tree too												
-												size: Object.keys(file).length,
-												hash: btoa(parent+name), 				// hash name
-												name: name, 					// keys name
-												phash: parentHash, 				// parent hash name
-												read: isRead,						// read state
-												write: isWrite,						// write state
-												locked: isLocked,						// lock state
-												isowner: isOwner,					// has ownership
-												//tmb: "",						// thumbnail for images
-												//alias: "",					// sumbolic link pack
-												//dim: "",						// image dims
-												//volumeid: "l1_", 				// rec.group,										
-											};
-										}));
-									} 
-
-									else 
-										res(files);
-								}
-
-								else
-									res("bad src provided");
-
-							});
-
-						else 		// nav folder
-							Fetch( "file:"+target , files => {
-								//console.log(">>>>>>>>>>>>>>>>files", files);
-								if (files)
-									sendFolder(res, files.map( file => {
-										const 
-											[x,name,type] = file.match(/(.*)\.(.*)/) || ["",file,""];
-
-										switch (type) {
-											case "url":
-											case "lnk":
-												return null;
-
-											default:
-												try {
-													const 
-														stat = FS.statSync( "."+parent+file );
-
-													return {
-														ts: now,
-														mime: type ? `application/${type}` : "directory",	// mime type
-														dirs: type ? 0 : 1, 			// place inside tree too
-														size: stat.size,
-														hash: btoa(parent+file), //parent+file,	// hash name
-														name: file, 					// keys name
-														phash: parentHash, 				// parent hash name
-														read: isRead,						// read state
-														write: isWrite,						// write state
-														locked: isLocked,						// lock state
-														isowner: isOwner,					// has ownership
-														//tmb: "",						// thumbnail for images
-														//alias: "",					// sumbolic link pack
-														//dim: "",						// image dims
-														//volumeid: "l1_", 				// rec.group,										
-													};
-												}
-												
-												catch (err) {
-													return null;
-												}
-										}
-									}));
-								
-								else
-									sendFolder(res, []);
-							});
-
-						break;
-
-					case "file":	// requesting a single file
-
-						if ( src ) 
-							res( parent );
-
-						else
-							Fetch( "file:"+target, txt => res( txt ) );
-
-						break;
-
-					case "size":
-						res({
-							size: 222
-						});
-						break;
-
-					case "abort":
-						break;
-
-					case "zipdl":
-						res({
-							file: "5abf02cc77050",       // key of temporary archive file 
-							name: "files.zip", // download file name
-							mime: "application/zip"      // MIME type
-						});
-						break;
-
-					case "rename":
-						var 
-							{name} = query,
-							type = name.split(".").pop();
-
-						res({
-							added: targets.map( tar => logCommand( `mv -n .${parent}{${node},${name}}`, {
-								ts: now,
-								mime: `application/${type}`,	// mime type
-								dirs: 0, 						// place inside tree too												
-								size: 666,
-								hash: btoa(parent+name), 				// hash name
-								name: name, 					// keys name
-								phash: parentHash, 				// parent hash name
-								read: isRead,						// read state
-								write: isWrite,						// write state
-								locked: isLocked,						// lock state
-								isowner: isOwner						// has ownership
-							})),
-							removed: [btoa(`${parent}{${node}`)]
-						});
-						break;
-
-					case "resize":
-						var 
-							name = node,
-							type = name.split(".").pop();
-
-						res({
-							changed: targets.map( tar => logCommand( `resize .${tar}`, {
-								ts: now,
-								mime: `application/${type}`,	// mime type
-								dirs: 0, 						// place inside tree too												
-								size: 666,
-								hash: btoa(parent+node), 		// hash name
-								name: name, 					// keys name
-								phash: parentHash, 				// parent hash name
-								read: isRead,						// read state
-								write: isWrite,						// write state
-								locked: isLocked,						// lock state
-								isowner: isOwner						// has ownership
-							}))
-						});
-						break;
-
-					case "rm":
-						res({
-							removed: targets.map( tar => logCommand( `rm .${tar}`, btoa(tar) ))
-						});
-						break;
-
-					case "url":
-						res({
-							url: target
-						});
-						break;
-
-					case "search":
-						res({
-							files: []
-						});
-						break;
-
-					case "ping":
-						res("");
-						break;
-
-					case "ls":
-						res({
-							list: []
-						});
-						break;
-
-					case "upload":
-						var
-							name = body.filename,
-							type = name.split(".").pop(),
-							data = body["upload[]"],
-							tarFile = "."+atob(body["upload_path[]"])+name;
-
-						Trace("upload", {
-							tar: atob(body.target),
-							fnname: body.filename,
-							path: atob(body["upload_path[]"]),
-							tarFile: tarFile,
-							type: body.mimeType
-						});
-						res({
-							added: [tarFile].map( tar => logCommand( function uploadFile(info) {
-								FS.writeFile( tarFile, data, "utf-8", err => Trace("upload", err||"ok") );
-							}, {
-								ts: now,
-								mime: `application/"${type}`,	// mime type
-								dirs: 0, 						// place inside tree too												
-								size: data.length,
-								hash: btoa(parent+name), 		// hash name
-								name: name, 					// file name
-								phash: parentHash, 				// parent hash name
-								read: isRead,					// read state
-								write: isWrite,					// write state
-								locked: isLocked,				// lock state
-								isowner: isOwner				// has ownership
-							}))
-						});
-						break;
-
-					case "paste":
-					case "duplicate":
-						var
-							name = `copy_${node}`,
-							type = name.split(".").pop();
-
-						res({
-							added: targets.map( tar => logCommand( `cp -n .${tar} .${parent}${name}`, {
-								ts: now,
-								mime: `application/${type}`,	// mime type
-								dirs: 0, 						// place inside tree too												
-								size: body["upload[]"].length,
-								hash: btoa(parent+name), 		// hash name
-								name: name, 					// keys name
-								phash: parentHash, 				// parent hash name
-								read: isRead,						// read state
-								write: isWrite,						// write state
-								locked: isLocked,						// lock state
-								isowner: isOwner						// has ownership
-							}))
-						});
-						break;
-
-					case "archive":
-						var 
-							{name} = query,
-							type = name.split(".").pop();
-
-						res({
-							added: targets.map( tar => logCommand( `zip -r .${parent}${name} .${tar}`, {
-								ts: now,
-								mime: `application/${type}`,	// mime type
-								dirs: 0, 						// place inside tree too												
-								size: 666,
-								hash: btoa(parent+name), 		// hash name
-								name: name, 					// keys name
-								phash: parentHash, 				// parent hash name
-								read: isRead,						// read state
-								write: isWrite,						// write state
-								locked: isLocked,						// lock state
-								isowner: isOwner						// has ownership
-							}))
-						});
-						break;
-
-					case "mkdir":
-						break;
-
-					case "mkfile":
-						var 
-							{name} = query,
-							type = name.split(".").pop();
-
-						res({
-							added: targets.map( tar => logCommand( `touch .${tar}${name}`, {
-								ts: now,
-								mime: `application/${type}`,	// mime type
-								dirs: 0, 						// place inside tree too												
-								size: 0,
-								hash: btoa(parent+name), 		// hash name
-								name: name, 					// keys name
-								phash: parentHash, 				// parent hash name
-								read: isRead,						// read state
-								write: isWrite,						// write state
-								locked: isLocked,						// lock state
-								isowner: isOwner						// has ownership
-							}))
-						});
-						break;
-
-					case "parents": // requesting all parents
-					case "tmb":
-					case "put":
-					case "get":
-					case "netmount":
-					case "info":
-					case "editor":
-					case "chmod":
-					case "callback":
-					case "extract":
-					case "abort":
-						res({
-							error: "unsupported command"
-						});
-						break;
-
-					default:	// request made w/o elFinder
-						if ( path.endsWith("/") )	// requesting folder
-							if (oldSchool)
-								Fetch( "file:"+path , files => {	
-									if ( files ) {
-										req.type = "html"; // override default json type
-										res([[ 
-											site.nick.link( "/brief.view?notebook=totem" ),
-											client.link( "/login.html" ),
-											"API".link( "/api.view" ),
-											"Explore".link( "/expore.view" ),
-											"Info".link( "/xfan.view?w=1000&h=600&src=/info" ),
-											path
-										].join(" || ") , files.map( file => {
-											if ( file.endsWith(".url") ) {	// resolve windows link
-												const
-													src = "."+path+file;
-
-												if ( html = cache[src] ) 
-													return html;
-
-												else 
-													try {
-														const
-															[x, url] = FS.readFileSync( src, "utf-8").match( /URL=(.*)/ ) || ["",""],
-															{href} = URL(url,referer);
-
-														return cache[src] = url ? file.substr(0,file.indexOf(".url")).tag( href ) : "?"+file;
-													}
-
-													catch (err) {
-														return "?"+file
-													}
-											}
-
-											else
-												return file.link( file );
-										}).join("<br>")].join("<br>") );
-									}
-
-									else
-										res( "folder not found" );
-								});
-						
-							else
-								renderJade(`
-extends base
-append base_parms
-	- tech = "elFinder"
-	- url = ""
-	- query ={}
-	- flags = {nomenu:1,edit:0}
-	- elFinder_path = "${path}"
-`, {}, res );
-
-						else { // requesting file
-							Fetch( "file:"+path, res );
-
-							if ( area == "refs" && profile.Track ) {		// track client's download
-								//Trace(">>>>>track download", profile );
-								sql.query(
-									"INSERT INTO openv.bricks SET ? ON DUPLICATE KEY UPDATE Samples=Samples+1",
-									{
-										Name: path,
-										Area: area,
-										Client: client
-									});
-							}
-						}
-				}
-			});
-
-			/*
-			areas.forEach( (area,i) => 
-				areas[i] = area
-					? area.tag( "/"+area+"/" )
-					: site.nick.tag( "/xfan.view?src=/info&w=1000&h=600" )
-							+ " protecting the warfighter from bad data"
-			);
-
-			req.type = "html";
-			res( areas.join("<br>") );
-			*/
-		}
-
 	},
 
 /**
@@ -4748,7 +3428,7 @@ Respond with system configuration information on requested module mod = NAME or 
 									atomic: "/shares/prm/atomic/index.html",
 									man: "/shares/prm/man/index.html",
 									//flex: "/shares/prm/flex/index.html",
-									geohack: "/shares/geohack/man/index.html"
+									chip: "/shares/chip/man/index.html"
 								}
 							},
 							datasets: {
@@ -4925,16 +3605,16 @@ ESC remedy interface.
 		
 		// skins
 		proj: renderSkin,
-		view: renderSkin,
+		//view: renderSkin,
 		calc: renderSkin,
 		note: renderSkin,
 		run: renderSkin,
 		//plugin: renderSkin,
 		//site: renderSkin,
-		brief: renderSkin,
+		//brief: renderSkin,
 		pivot: renderSkin,
 		exam: renderSkin,
-		help: renderSkin,
+		//help: renderSkin,
 		browse: renderSkin,
 		rtp: renderSkin,
 		
@@ -5045,7 +3725,8 @@ Site skinning context
 			JIRA: ENV.JIRA || "JIRA.undefined", 
 			RAS: ENV.RAS || "RAS.undefined",
 			Repo: ENV.REPO || "REPO.undefined",
-			Survey: "/survey.view"
+			Survey: "/survey.view",
+			Calendar: "/test.view"
 		},
 		
 		sitemap: [
@@ -5149,7 +3830,7 @@ Site skinning context
 		info: {
 		},
 		
-		mods: ["totem","enum","jsdb","debe","geohack","atomic","reader","randpr"],
+		mods: ["totem","enums","jsdb","debe","chip","atomic","reader"],
 		
 		JIRA: ENV.JIRA || "JIRA.undefined",
 		RAS: ENV.RAS || "RAS.undefined",
@@ -7393,15 +6074,13 @@ To connect to ${site.Nick} from Windows:
 
 }
 
-const
-	{$help} = $ctx = $libs;
-
-Start("debe", {
+Start("debe", {			// start unit test
 	"??": () => 
 		Trace("$", {
 			siteContext: site
 		}),
 	
+	/*
 	res: cmd => {
 		if ( cmd.startsWith("?") ) {
 			const 
@@ -7427,25 +6106,21 @@ Start("debe", {
 		else
 			$(cmd,$ctx);
 	},
-	  
+	 */
+	
 	lab: () => 
-		config({}, sql => {
-			
+		config({}, sql => {			
+			const
+				{$help} = $ctx = $libs;
+
 			Trace( "Welcome to TOTEM lab" );
 				
 			$help();
 			//Each( $libs, (key,lib) => ctx[key] = lib );
 		}),
 
-	/**
-	See [Installation and Usage](https://sc.appdev.proj.coe/acmesds/debe)
-	@var D1
-	@memberof UnitTest
-	*/
-
-	admin: () =>
+	chip: () =>
 		config({
-			"secureLink.challenge.extend": 10,
 			onFile: {
 				"./uploads/": (sql, name, path) => {  // watch changes to a file				
 
@@ -7509,15 +6184,32 @@ assessments from our worldwide reporting system, please contact ${poc}.
 			} 
 		}, sql => {
 			
-		const
-			{ ingestFile } = require("../geohack");
-		
+			const
+				{ ingestFile } = require("../chip");
 			
-		Trace( 
+			Trace( 
 `Yowzers - this does everything but eat!  An encrypted service, a database, a jade UI for clients,
 usecase-engine plugins, file-upload watchers, and watch dogs that monitor system resources (jobs, files, 
 clients, users, system health, etc).` 
-		);
+			);
+			
+		}),
+		
+	/**
+	See [Installation and Usage](https://sc.appdev.proj.coe/acmesds/debe)
+	@var admin
+	@memberof UnitTest
+	*/
+
+	admin: () =>
+		config({
+			"secureLink.challenge.extend": 10
+		}, sql => {
+			Trace( 
+`Yowzers - this does everything but eat!  An encrypted service, a database, a jade UI for clients,
+usecase-engine plugins, file-upload watchers, and watch dogs that monitor system resources (jobs, files, 
+clients, users, system health, etc).` 
+			);
 			
 		}),
 		

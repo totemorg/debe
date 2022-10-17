@@ -302,6 +302,12 @@ append layout_head
 				when "switcher"
 					script(type="text/javascript",src='/clients/jquery/plugins/misc/themeswitchertool.js')
 
+		when "pick"
+			link(rel="stylesheet",href="/clients/pick-hours-availability-calendar/css/mark-your-calendar.css")
+			script(type="text/javascript",src='/clients/jquery/js/jquery-3.5.1.slim.min.js')
+			script(type="text/javascript",src='/clients/pick-hours-availability-calendar/js/mark-your-calendar.js')
+			script(type="text/javascript",src="/uis/uibase.js")
+
 		when "extjs"
 			// extjs framework
 			// https://www.extjs.com/
@@ -417,7 +423,7 @@ append layout_body
 
 	- edit = parseInt(flags.edit)
 	- nomenu = parseInt(flags.nomenu)
-	- menu = edit ? "Close".link( url.tag("?",{_edit:0}) ) : ["Edit".link( url.tag("?", {_edit:1}) ), "Help".link( `/${name}.help` ), "NoMenu".link( url.tag("?", {_nomenu:1}) )].join(" || ")
+	- menu = edit ? "Close".link( url.tag("?",{_edit:0}) ) : ["Edit".link( url.tag("?", {_edit:1}) ), "Help".link( `/${name}.help` ), "Menu".link( url.tag("?", {_nomenu:1}) )].join(" || ")
 	
 	span!= nomenu ? "" : menu
 
@@ -628,7 +634,13 @@ append layout_body
 			makeAceEditorResizable(ed);
 
 	case tech
+		when "pick"
+			#status
+			#content
+				block base_body
+
 		when "elFinder"
+			#status
 			#content
 				block base_body
 			
@@ -701,6 +713,7 @@ append layout_body
 			script(type="text/javascript",src="/uis/uibrief.js")
 
 		when "voxel"
+			#status
 			#container
 				#crosshair
 				#battery
@@ -725,6 +738,7 @@ append layout_body
 
 		when "layout"
 		when "tablayout"
+			#status
 			#content
 				block base_body
 

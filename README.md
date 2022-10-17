@@ -1,4 +1,4 @@
-# [DEBE](https://github.com/totem-man/debe)
+# [DEBE](https://www.npmjs.com/package/@totemorg/debe)
 
 Extends the **TOTEM** web service to provide the following endpoints:
 
@@ -48,7 +48,7 @@ for supervised/unsupervised file sharing.
 
 ## Manage
 
-	npm install @totemstan/debe		# install
+	npm install @totemorg/debe		# install
 	npm run start [ ? | $ | ...]	# Unit test
 	npm run verminor				# Roll minor version
 	npm run vermajor				# Roll major version
@@ -75,7 +75,7 @@ Acquire, optionally configure and start a **DEBE** server:
 		console.log( sql ? "look mom - Im running!" : "something evil is lurking" );
 	});
 
-where configuration keys follow [ENUMS deep copy conventions](https://github.com/totem-man/enums).
+where configuration keys follow [ENUMS deep copy conventions](https://www.npmjs.com/package/@totemorg/enums).
 
 
 ## Program Reference
@@ -111,27 +111,9 @@ BY = https://DOMAIN
 ## String
 
 * [String](#DEBE.module_String)
-    * [~linkify(ref)](#DEBE.module_String..linkify) ⇐ <code>Array</code>
-    * [~mailify()](#DEBE.module_String..mailify)
     * [~align()](#DEBE.module_String..align)
     * [~trimGoogle()](#DEBE.module_String..trimGoogle)
 
-<a name="DEBE.module_String..linkify"></a>
-
-### String~linkify(ref) ⇐ <code>Array</code>
-Returns a ref-joined list of links
-
-**Kind**: inner method of [<code>String</code>](#DEBE.module_String)  
-**Extends**: <code>Array</code>  
-
-| Param | Type |
-| --- | --- |
-| ref | <code>String</code> | 
-
-<a name="DEBE.module_String..mailify"></a>
-
-### String~mailify()
-**Kind**: inner method of [<code>String</code>](#DEBE.module_String)  
 <a name="DEBE.module_String..align"></a>
 
 ### String~align()
@@ -145,49 +127,9 @@ Returns a ref-joined list of links
 ## Array
 
 * [Array](#DEBE.module_Array)
-    * [~gridify(noheader)](#DEBE.module_Array..gridify)
-    * [~groupify(dot)](#DEBE.module_Array..groupify)
-    * [~blog(keys, ds, cb)](#DEBE.module_Array..blog)
     * [~merge(Recs, idx)](#DEBE.module_Array..merge)
     * [~schemaify(src)](#DEBE.module_Array..schemaify)
     * [~treeify(idx, kids, level, keys, wt)](#DEBE.module_Array..treeify)
-    * [~joinify(cb)](#DEBE.module_Array..joinify)
-
-<a name="DEBE.module_Array..gridify"></a>
-
-### Array~gridify(noheader)
-Creates an html table from an array.
-
-**Kind**: inner method of [<code>Array</code>](#DEBE.module_Array)  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| noheader | <code>Boolean</code> | switch to enable header processing |
-
-<a name="DEBE.module_Array..groupify"></a>
-
-### Array~groupify(dot)
-Groups each "x.y.z. ...." spec in the list.
-
-**Kind**: inner method of [<code>Array</code>](#DEBE.module_Array)  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| dot | <code>string</code> | item seperator |
-
-<a name="DEBE.module_Array..blog"></a>
-
-### Array~blog(keys, ds, cb)
-Blogs each string in the list.
-
-**Kind**: inner method of [<code>Array</code>](#DEBE.module_Array)  
-**See**: totem:blogify  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| keys | <code>List</code> | list of keys to blog |
-| ds | <code>String</code> | Name of dataset being blogged |
-| cb | <code>function</code> | callback(recs) blogified version of records |
 
 <a name="DEBE.module_Array..merge"></a>
 
@@ -227,27 +169,6 @@ Returns a tree = {name,weight,nodes} from records having been sorted on keys=[ke
 | keys | <code>Array</code> | pivot keys |
 | wt | <code>String</code> | key name that contains leaf weight (defaults to "size") |
 
-<a name="DEBE.module_Array..joinify"></a>
-
-### Array~joinify(cb)
-Joins a list with an optional callback cb(head,list) to join the current list 
-with the current head.
-
-**Kind**: inner method of [<code>Array</code>](#DEBE.module_Array)  
-
-| Param | Type |
-| --- | --- |
-| cb | <code>function</code> | 
-
-**Example**  
-```js
-[	a: null,
-		g1: [ b: null, c: null, g2: [ x: null ] ],
-		g3: [ y: null ] ].joinify()
-
-returning a string
-	"a,g1(b,c,g2(x)),g3(y)"
-```
 <a name="DEBE.module_Data"></a>
 
 ## Data
@@ -266,7 +187,7 @@ in accordance with [jsdoc](https://jsdoc.app/).
 	RAS = http://DOMAIN
 	BY = https://DOMAIN
 
-**Requires**: <code>module:[totem](https://github.com/totemstan/totem)</code>, <code>module:[atomic](https://github.com/totemstan/atomic)</code>, <code>module:[geohack](https://github.com/totemstan/geohack)</code>, <code>module:[man](https://github.com/totemstan/man)</code>, <code>module:[randpr](https://github.com/totemstan/randpr)</code>, <code>module:[enums](https://github.com/totemstan/enums)</code>, <code>module:[reader](https://github.com/totemstan/reader)</code>, <code>module:[skin](https://github.com/totemstan/skin)</code>, <code>module:[blog](https://github.com/totemstan/blog)</code>, <code>module:[dogs](https://github.com/totemstan/dogs)</code>, <code>module:[pipe](https://github.com/totemstan/pipe)</code>, <code>module:[crypto](https://nodejs.org/docs/latest/api/)</code>, <code>module:[child\_process](https://nodejs.org/docs/latest/api/)</code>, <code>module:[fs](https://nodejs.org/docs/latest/api/)</code>, <code>module:[stream](https://nodejs.org/docs/latest/api/)</code>, <code>module:[cluster](https://nodejs.org/docs/latest/api/)</code>, <code>module:[repl](https://nodejs.org/docs/latest/api/)</code>, <code>module:[i18n-abide](https://www.npmjs.com/package/i18n-abide)</code>, <code>module:[optimist](https://www.npmjs.com/package/optimist)</code>, <code>module:[tokml](https://www.npmjs.com/package/tokml)</code>, <code>module:[officegen](https://www.npmjs.com/package/officegen)</code>  
+**Requires**: <code>module:[totem](https://github.com/totemstan/totem)</code>, <code>module:[atomic](https://github.com/totemstan/atomic)</code>, <code>module:[man](https://github.com/totemstan/man)</code>, <code>module:[enums](https://github.com/totemstan/enums)</code>, <code>module:[reader](https://github.com/totemstan/reader)</code>, <code>module:[skin](https://github.com/totemstan/skin)</code>, <code>module:[dogs](https://github.com/totemstan/dogs)</code>, <code>module:[crypto](https://nodejs.org/docs/latest/api/)</code>, <code>module:[child\_process](https://nodejs.org/docs/latest/api/)</code>, <code>module:[fs](https://nodejs.org/docs/latest/api/)</code>, <code>module:[stream](https://nodejs.org/docs/latest/api/)</code>, <code>module:[cluster](https://nodejs.org/docs/latest/api/)</code>, <code>module:[repl](https://nodejs.org/docs/latest/api/)</code>, <code>module:[i18n-abide](https://www.npmjs.com/package/i18n-abide)</code>, <code>module:[optimist](https://www.npmjs.com/package/optimist)</code>, <code>module:[tokml](https://www.npmjs.com/package/tokml)</code>, <code>module:[officegen](https://www.npmjs.com/package/officegen)</code>  
 **Author**: [ACMESDS](https://totemstan.github.io)  
 **Example**  
 ```js
@@ -363,16 +284,14 @@ config({
         * [.xxls](#module_DEBE..filters..xxls)
         * [.xpps](#module_DEBE..filters..xpps)
         * [.xppt](#module_DEBE..filters..xppt)
+        * [.data(recs, req, res)](#module_DEBE..filters..data)
+        * [.open(recs, req, res)](#module_DEBE..filters..open)
         * [.dbx(recs, req, res)](#module_DEBE..filters..dbx)
-        * [.db(recs, req, res)](#module_DEBE..filters..db)
         * [.kml(recs, req, res)](#module_DEBE..filters..kml)
         * [.flat(recs, req, res)](#module_DEBE..filters..flat)
-        * [.txt(recs, req, res)](#module_DEBE..filters..txt)
-        * [.html(recs, req, res)](#module_DEBE..filters..html)
         * [.tree(recs, req, res)](#module_DEBE..filters..tree)
         * [.schema(recs, req, res)](#module_DEBE..filters..schema)
     * [~byArea.](#module_DEBE..byArea.)
-        * [.root(req, res)](#module_DEBE..byArea..root)
     * [~byTable.](#module_DEBE..byTable.)
         * [.uploads](#module_DEBE..byTable..uploads)
         * [.stores](#module_DEBE..byTable..stores)
@@ -547,12 +466,11 @@ Filter dataset recs on specifed req-res thread
     * [.xxls](#module_DEBE..filters..xxls)
     * [.xpps](#module_DEBE..filters..xpps)
     * [.xppt](#module_DEBE..filters..xppt)
+    * [.data(recs, req, res)](#module_DEBE..filters..data)
+    * [.open(recs, req, res)](#module_DEBE..filters..open)
     * [.dbx(recs, req, res)](#module_DEBE..filters..dbx)
-    * [.db(recs, req, res)](#module_DEBE..filters..db)
     * [.kml(recs, req, res)](#module_DEBE..filters..kml)
     * [.flat(recs, req, res)](#module_DEBE..filters..flat)
-    * [.txt(recs, req, res)](#module_DEBE..filters..txt)
-    * [.html(recs, req, res)](#module_DEBE..filters..html)
     * [.tree(recs, req, res)](#module_DEBE..filters..tree)
     * [.schema(recs, req, res)](#module_DEBE..filters..schema)
 
@@ -600,9 +518,9 @@ Filter dataset recs on specifed req-res thread
 | req | <code>Object</code> | Totem session request |
 | res | <code>function</code> | Totem session response |
 
-<a name="module_DEBE..filters..dbx"></a>
+<a name="module_DEBE..filters..data"></a>
 
-#### filters..dbx(recs, req, res)
+#### filters..data(recs, req, res)
 **Kind**: static method of [<code>filters.</code>](#module_DEBE..filters.)  
 
 | Param | Type | Description |
@@ -611,9 +529,20 @@ Filter dataset recs on specifed req-res thread
 | req | <code>Object</code> | Totem session request |
 | res | <code>function</code> | Totem session response |
 
-<a name="module_DEBE..filters..db"></a>
+<a name="module_DEBE..filters..open"></a>
 
-#### filters..db(recs, req, res)
+#### filters..open(recs, req, res)
+**Kind**: static method of [<code>filters.</code>](#module_DEBE..filters.)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| recs | <code>Array</code> | Records to filter |
+| req | <code>Object</code> | Totem session request |
+| res | <code>function</code> | Totem session response |
+
+<a name="module_DEBE..filters..dbx"></a>
+
+#### filters..dbx(recs, req, res)
 **Kind**: static method of [<code>filters.</code>](#module_DEBE..filters.)  
 
 | Param | Type | Description |
@@ -636,28 +565,6 @@ Filter dataset recs on specifed req-res thread
 <a name="module_DEBE..filters..flat"></a>
 
 #### filters..flat(recs, req, res)
-**Kind**: static method of [<code>filters.</code>](#module_DEBE..filters.)  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| recs | <code>Array</code> | Records to filter |
-| req | <code>Object</code> | Totem session request |
-| res | <code>function</code> | Totem session response |
-
-<a name="module_DEBE..filters..txt"></a>
-
-#### filters..txt(recs, req, res)
-**Kind**: static method of [<code>filters.</code>](#module_DEBE..filters.)  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| recs | <code>Array</code> | Records to filter |
-| req | <code>Object</code> | Totem session request |
-| res | <code>function</code> | Totem session response |
-
-<a name="module_DEBE..filters..html"></a>
-
-#### filters..html(recs, req, res)
 **Kind**: static method of [<code>filters.</code>](#module_DEBE..filters.)  
 
 | Param | Type | Description |
@@ -694,18 +601,6 @@ Filter dataset recs on specifed req-res thread
 /AREA/FILE-endpoint routers
 
 **Kind**: inner property of [<code>DEBE</code>](#module_DEBE)  
-<a name="module_DEBE..byArea..root"></a>
-
-#### byArea..root(req, res)
-Default area navigator.
-
-**Kind**: static method of [<code>byArea.</code>](#module_DEBE..byArea.)  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| req | <code>Object</code> | Totem session request |
-| res | <code>function</code> | Totem session response |
-
 <a name="module_DEBE..byTable."></a>
 
 ### DEBE~byTable.
