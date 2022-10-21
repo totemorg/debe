@@ -50,7 +50,7 @@ const
 	{ readers, scanner } = READ,
 	{ skinContext, renderSkin, renderJade } = SKIN,
 	{ runTask, queues, byAction,
-		sqlThread, errors, paths, cache, site, byTable, userID, dsThread,
+		sqlThread, errors, paths, cache, site, byNode, userID, dsThread,
 		watchFile, timeIntervals, neoThread, startJob 
 	} = TOTEM,
 	// { JIMP } = $,
@@ -373,11 +373,11 @@ in accordance with [jsdoc]{@link https://jsdoc.app/}.
 @example 
 
 // npm test D2
-// Start challenge-protected server with additional byTable-routed entpoints.
+// Start challenge-protected server with additional byNode-routed entpoints.
 
 config({
 	riddles: 10,
-	"byTable.": {
+	"byNode.": {
 		wfs: function (req,res) {
 			res("here i go again");
 
@@ -646,9 +646,9 @@ License notebook engine code.
 	},
 	
 /**
-Route table to a database according to security requirements.
+Route nodes according to security requirements.
 */
-	"tableRoutes.": {  //< sql table re-routers
+	"nodeRouter.": {  //< sql table re-routers
 		profiles: req => "openv.profiles",
 		sessions: req => "openv.sessions",
 		relays: req => "openv.relays",
@@ -704,7 +704,7 @@ Route table to a database according to security requirements.
 		
 		queues: req => "openv.queues",
 		
-		mods: req => "openv.mods",
+		mods: req => "openv.mods"
 		
 		/*faqs: req => {
 			if ( set = req.set ) {
@@ -714,8 +714,6 @@ Route table to a database according to security requirements.
 			return "openv.faqs";
 		}*/
 	},
-
-	// blogContext: BLOG,		//< blogging / skinning context
 	
 /**
 Default doc for reserved notebook keys
@@ -796,7 +794,6 @@ as described in the [Notebooks api](/api.view). `,
 	
 		Trace("sendmail", opts);
 		
-		//return;
 		if (opts.to) {
 			//opts.from = "totem@noreply.net"; 
 			/*opts.alternatives = [{
@@ -812,21 +809,6 @@ as described in the [Notebooks api](/api.view). `,
 		}
 	},
 
-/*
-Legacy 
-*/
-	onUpdate: function (sql,ds,body) { //< runs when dataset changed
-		//Trace("update", ds, body);
-		if (false)
-		sql.Hawk({Dataset:ds, Field:""});  // journal entry for the record itself
-		
-		if (false)   // journal entry for each record key being changed
-			for (var key in body) { 		
-				sql.Hawk({Dataset:ds, Field:key});
-				sql.Hawk({Dataset:"", Field:key});
-			}
-	},
-
 /**
 Initialize DEBE on startup.
 @param {Object} sql MySQL connector
@@ -834,149 +816,12 @@ Initialize DEBE on startup.
 */
 	initialize: init => {	//< initialize service
 		
-		/*
-		function startNews(sql, engine) {
-			
-			var
-				news = new RSS({					
-					title:          site.nick,
-					description:    site.title,
-					link:           `${paths.HOST}/feed.view`,
-					image:          'http://example.com/image.png',
-					copyright:      'All rights reserved 2013',
-					author: {
-						name:       "tbd",
-						email:      "noreply@garbage.com",
-						link:       "tbd"
-					}
-				});
-			
-			sql.query("SELECT * FROM openv.feeds WHERE NOT ad")
-			.on("result", feature => {
-				news.addItem({
-					title:          feature.feature,
-					link:           `${paths.host}/feed.view`,
-					description:    JSON.stringify(feature),
-					author: [{
-						name:   "tbd", //FLEX.site.title,
-						email:  "tbd@undefined",
-						link:   paths.host
-					}],
-					/ *contributor: [{
-						name:   FLEX.TITLE,
-						email:  site.email.SOURCE,
-						link:   paths.host
-					}],* /
-					date:           feature.found
-					//image:          posts[key].image
-				});
-			});	
-
-			news.render("rss-2.0");  // or "atom-1.0"
-		}
-
-		function startMail(cb) {
-			
-			const
-				[rxHost,rxPort] = (ENV.RXMAIL_HOST || "").split(":"),
-				[rxUser,rxPass] = (ENV.RXMAIL_USER || "").split(":"),
-				[txHost,txPort] = (ENV.TXMAIL_HOST || "").split(":"),
-				[txUser,txPass] = (ENV.TXMAIL_USER || "").split(":"),
-					
-				rxMail = DEBE.rxMail = rxHost
-					? new IMAP({
-						user: rxUser,
-						password: rxPass,
-						host: rxHost,
-						port: parseInt(rxPort),
-						secure: true,
-						//debug: err => { console.warn(ME+">"+err); } ,
-						connTimeout: 10000
-					})
-			
-					: null,
-
-				txmailCon = DEBE.txmailCon = txHost 
-					? MAIL.createTransport({
-						host: txHost,
-						port: parseInt(txPort),
-						auth: txUser
-							? {
-								user: txUser,
-								pass: txPass
-							}
-							: null
-					})
-
-					: {
-						sendMail: (opts, cb) => {
-							Trace(opts);   // -r "${opts.from}" 
-			
-							if ( DEBE.watchMail ) 
-								sqlThread( sql => {
-									sql.query("INSERT INTO openv.email SET ?", {
-										To: opts.to,
-										Body: opts.body,
-										Subject: opts.subject,
-										Send: false,
-										Remove: false
-									});
-								});
-
-							else
-								exec(`echo -e "${opts.body}\n" | mailx -s "${opts.subject}" ${opts.to}`, err => {
-									cb( err );
-									//Trace("MAIL "+ (err || opts.to) );
-								});
-						}
-					}; 
-
-			//txmailCon.sendMail({to:"brian.d.james@comcast.net",text:"greetings!"});
-			
-			if (rxMail)					// Establish server's email inbox	
-				rxMail.connect( err => {  // login cb
-					if (err) Trace(err);
-
-					rxMail.openBox('INBOX', true, (err,mailbox) => {
-
-						if (err) Trace(err);
-
-						rxMail.search([ 'UNSEEN', ['SINCE', 'May 20, 2012'] ], (err, results) => {
-
-							if (err) Trace(err);
-
-							rxMail.Fetch(results, { 
-								headers: ['from', 'to', 'subject', 'date'],
-								cb: fetch => {
-									fetch.on('message', msg => {
-										Trace('Saw message no. ' + msg.seqno);
-										msg.on('headers', hdrs => {
-											Trace('Headers for no. ' + msg.seqno + ': ' + hdrs);
-										});
-										msg.on('end', () => {
-											Trace('Finished message no. ' + msg.seqno);
-										});
-									});
-								}
-							}, err => {
-								if (err) throw err;
-								Trace('Done fetching all messages!');
-								rxMail.logout();
-							});
-						});
-					});
-				});
-				
-			if (cb) cb(null);
-		}
-		*/
-		
 		function initSES(cb) {	// init sessions
 			Trace(`INIT SESSIONS`);
 
 			/*
 			Each( CRUDE, function (n,routes) { // Map engine CRUD to DEBE workers
-				DEBE.byTable[n] = ATOM[n];
+				DEBE.byNode[n] = ATOM[n];
 			});	
 			*/
 			/*
@@ -1070,9 +915,7 @@ Initialize DEBE on startup.
 			if (cb) cb();
 		}
 
-		function initLAB(cb) {
-			// notebooks
-			
+		function initLAB(cb) {	// Initialize notebook lab env
 			const 
 				foci = {},
 				{ $notebooks } = $libs,
@@ -1083,8 +926,10 @@ Initialize DEBE on startup.
 			
 			cb();
 			
+			// config notebook i/f
+				
 			sqlThread( sql => {
-				sql.getTables( "app", books => {	// config notebook i/f
+				sql.getTables( "app", books => {	
 					books.forEach( book => {
 						function logRun(data) {
 							console.log(book+">", data);
@@ -1341,15 +1186,15 @@ Initialize DEBE on startup.
 									sqlThread( sql => {
 										sql.getKeys( $ds, "", ({Field}) => { 
 											console.log(`
-	Usage:
-		${$book}( "USECASE?STORE$KEY" || "USECASE?KEY || "USECASE" || || ...", {SETKEY:NEWVAUE, ...} )
-		${$book}( "USECASE?STORE$KEY" || "USECASE?KEY || "USECASE" || || ...", CTX => { ... } ) 
-		${$book}( "USECASE" || {...}, RESULTS => { ... } ) 
-		${$book}( {keys:[...], cases:[...]} => { ... } )  
+Usage:
+	${$book}( "USECASE?STORE$KEY" || "USECASE?KEY || "USECASE" || || ...", {SETKEY:NEWVAUE, ...} )
+	${$book}( "USECASE?STORE$KEY" || "USECASE?KEY || "USECASE" || || ...", CTX => { ... } ) 
+	${$book}( "USECASE" || {...}, RESULTS => { ... } ) 
+	${$book}( {keys:[...], cases:[...]} => { ... } )  
 
-	Keys:
-		${Field.join(",")}
-	` );
+Keys:
+	${Field.join(",")}
+` );
 										});
 									});
 
@@ -1359,7 +1204,7 @@ Initialize DEBE on startup.
 				});
 			});
 
-			// watchdogs
+			// setup watchdogs
 			
 			Each( dogs, (name,dog) => {
 				$libs["$"+name+"_dog"] = function () { Log("Dogging",name); sqlThread(sql => dog(sql)); } 
@@ -1368,14 +1213,6 @@ Initialize DEBE on startup.
 			site.watchDogs = Object.keys(dogs).map( key => key ).join(", ");			
 		}
 		
-		/*
-		function initIFS(cb) {	// init interfaces
-			["select", "delete", "insert", "update", "execute"].forEach( crud => {
-				DEBE.byAction[crud] = FLEX[crud];
-			});
-
-			if (cb) cb();	
-		} */
 		const 
 			{lookups} = SKIN,
 			{pocs,host} = site;
@@ -1385,32 +1222,41 @@ Initialize DEBE on startup.
 		initSES( () => {  // init sessions
 			
 			if ( isMaster ) {
+				// start news feeds
+				
 				if ( false ) startNews(sql);
 
+				// notify admin service started
+				
 				if (false)
 				startMail( err => {
 					if (false)
-					sendMail({		// notify admin service started
+					sendMail({		
 						to: "brian.d.james@comcast.net", //site.pocs.admin,
 						subject: site.nick + " started", 
 						text: "Just FYI"
 					} );
 				});
 
+				// set custom watchdogs
+				
 				if (false)
 				sql.query( "SELECT File FROM openv.watches WHERE substr(File,1,1) = '/' GROUP BY File", [] )
 				.on("result", link => {
 					ENDPTS.autorun.set( link.File );
 				});
 
-				if ( false ) {	// clear graph database
+				// clear graph database
+				
+				if ( false ) {	
 					sql.query("DELETE FROM openv.nlpactors");
 					sql.query("DELETE FROM openv.nlpedges");
 				}
 				
-				/*	
-				if ( false ) // build endpoint docs					
-					Stream(byTable, {}, (val,skey,cb) => {	// system endpoints
+				// build documentation of endpoints
+				
+				if ( false ) 					
+					Stream(byNode, {}, (val,skey,cb) => {	// system endpoints
 						if ( cb ) // streaming
 							if ( val.name == "sysNav" ) 
 								cb( "Navigator".replace(/\n/mg,"<br>") );
@@ -1445,28 +1291,11 @@ Initialize DEBE on startup.
 									});
 							});
 					});
-				*/
 			}
 
-			//site.mods.forEach( mod => site["$"+mod] = site.$repo+"/"+mod );
-			
-			/*if ( site.sitemap )
-				site.sitemap = site.sitemap.gridify({
-					a:"Site",
-					b:"Usage",
-					c:"Corporate",
-					d:"Follow Us",
-					e:"[Sponsorships](xxx:/likeus)".linkify(),
-					f:"Fork" 
-				}); */
-			
-			// JSDB.config();
-			
 			const 
 				{saveKeys,scripts} = $;
 
-			// console.log(">>>>>>scripts", $);
-			
 			sqlThread( sql => {
 				/*
 				if (saveKeys)
@@ -1582,8 +1411,6 @@ Filter dataset recs on specifed req-res thread
 				res( blog.tag("body").tag("html") );
 			});
 		},
-			
-			
 /**
 @param {Array} recs Records to filter
 @param {Object} req Totem session request
@@ -1624,7 +1451,7 @@ Filter dataset recs on specifed req-res thread
 			res( recs );
 		},
 		
-/**
+/*
 @param {Array} recs Records to filter
 @param {Object} req Totem session request
 @param {Function} res Totem session response
@@ -1648,6 +1475,11 @@ Filter dataset recs on specifed req-res thread
 		},
 		*/
 		
+/*
+@param {Array} recs Records to filter
+@param {Object} req Totem session request
+@param {Function} res Totem session response
+*/
 		/*
 		stat: (recs,req,res) => { // dataset.stat provide info
 			var 
@@ -1680,7 +1512,7 @@ Usage: ${uses.join(", ")}  `);
 			
 		}, */
 		
-/**
+/*
 @param {Array} recs Records to filter
 @param {Object} req Totem session request
 @param {Function} res Totem session response
@@ -1780,9 +1612,9 @@ Usage: ${uses.join(", ")}  `);
 	},
 
 /**
-/TABLE-endpoint routers
+/NODE-endpoint routers
 */
-	"byTable.": {
+	"byNode.": {
 		// nlp
 
 /**
@@ -2828,13 +2660,13 @@ Endpoint to return release information about requested license.
 			});
 		},
 
-/**
+/*
 Endpoint to restart totem if authorized.
 
 @param {Object} req Totem session request
 @param {Function} res Totem session response
 */
-		restart: (req,res) => {
+		/* restart: (req,res) => {
 			const
 				{sql,query,type,client,profile} = req,
 				{ delay, msg } = query;
@@ -2848,7 +2680,7 @@ Endpoint to restart totem if authorized.
 
 				query.msg = msg || `System restarting in ${delay} seconds`;
 
-				byTable.alert(req, msg => Trace( msg ) );
+				byNode.alert(req, msg => Trace( msg ) );
 
 				setTimeout( () => {
 					Trace( "restart*", req );
@@ -2858,9 +2690,9 @@ Endpoint to restart totem if authorized.
 
 			else
 				res( errors.noPermission );
-		},
+		},  */
 
-/**
+/*
 Endpoint to send notice to outsource jobs to agents.
 
 @param {Object} req Totem session request
@@ -2965,12 +2797,13 @@ save = CLIENT.HOST.CASE to save
 
 		}, */
 
-/**
+/*
 Endpoint to send notice to all clients
 
 @param {Object} req Totem session request
 @param {Function} res Totem session response
 */
+		/*
 		alert: (req,res) => {
 			const
 				{sql,query,type,client,prog} = req,
@@ -2990,15 +2823,15 @@ Endpoint to send notice to all clients
 
 			else 
 				res( errors.noPermission );
-		},
+		}, */
 
-/**
+/*
 Endpoint to send emergency message to all clients then halt totem
 
 @param {Object} req Totem session request
 @param {Function} res Totem session response
 */
-		stop: (req,res) => {
+		/* stop: (req,res) => {
 
 			const
 				{type,query} = req,
@@ -3012,7 +2845,7 @@ Endpoint to send emergency message to all clients then halt totem
 
 			res("Server stopped");
 			process.exit();
-		},
+		}, */
 
 /**
 @param {Object} req Totem session request
@@ -3318,7 +3151,7 @@ Respond with system configuration information on requested module mod = NAME or 
 							tables[ name ] = name.link( `/${name}` );
 				});
 				
-				Each( byTable, name => {
+				Each( byNode, name => {
 					xtables[ name ] = name.link( `/${name}` );
 				});
 
@@ -3605,9 +3438,10 @@ ESC remedy interface.
 		
 		// skins
 		proj: renderSkin,
-		//view: renderSkin,
 		calc: renderSkin,
 		note: renderSkin,
+		view: renderSkin,
+		help: renderSkin,		
 		run: renderSkin,
 		//plugin: renderSkin,
 		//site: renderSkin,
@@ -3671,47 +3505,12 @@ ESC remedy interface.
 		mod: modifyPlugin		
 	},
 
-	// private parameters
-		
-	admitRule: { 	//< admitRule all clients by default 	
-	},
-		
-	//primeSkin: { //< legacy site context extenders
-		/*
-		rtp: {  // context keys for swag.view
-			projs: "select * from openv.milestones order by SeqNum,Num",
-			faqs: "select * from openv.faqs where least(?) order by SeqNum"
-		}
-		swag: {  // context keys for swag.view
-			projs: "select * from openv.milestones"
-		},
-		airspace: {
-			projs: "select * from openv.milestones"
-		},
-		plugin: {
-			projs: "select * from openv.milestones"
-		},
-		briefs: {
-			projs: "select * from openv.milestones"
-		},
-		rtpsqd: {
-			apps:"select * from openv.apps",
-			users: "select * from openv.profiles",
-			projs: "select * from openv.milestones",
-			QAs: "select * from app.QAs"
-			//stats:{table:"openv.profiles",group:"client",index:"client,event"}
-		} 
-		*/
-	//},
-		
 /**
 Site skinning context
 */
 	"site.": { 		//< initial site context
-		by: "NGA/R".link( ENV.BY || "http://BY.undefined" ),
+		by: "ACMESDS".link( ENV.BY || "http://BY.undefined" ),
 		
-		//tag: (src,el,tags) => src.tag(el,tags),
-
 		explorer: {
 			Root: "/explore.view?src=/root/", 
 			Earth: "http://${domain}:8083/Apps/totem_index.html", 
@@ -3774,63 +3573,7 @@ Site skinning context
 			e:"[Sponsorships](xxx:/likeus)".linkify(),
 			f:"Fork" }).replace(/xxx:/g, ""),
 		
-		/**
-		Title ti to fileName fn
-		@method hover
-		@memberof Skinning
-		*/
-		hover: (ti,fn) => {
-			if ( ! fn.startsWith("/") ) fn = "/config/shares/hover/"+fn;
-			return ti.tag("p",{class:"sm"}) 
-				+ (
-						 "".tag("img",{src:fn+".jpg"})
-					+ "".tag("iframe",{src:fn+".html"}).tag("div",{class:"ctr"}).tag("div",{class:"mid"})
-				).tag("div",{class:"container"});
-		},
-		tag: (arg,el,at) => arg.tag(el,at),
-		link: (arg,to) => arg.tag("a",{href:to}),
-		get: (recs,idx,ctx) => recs.get(idx,ctx),
-		gridify: (recs,rehead,style) => recs.gridify(rehead,style),
-		invite: d => "Invite".tag("button",{id:"_invite",onclick:"alert(123)"}) + d.users + " AS " + d.roles,
-		embed: (url,w,h) => {
-			const
-				keys = {},
-				[urlPath] = url.parsePath(keys,{},{},{}),
-				urlName = urlPath,
-				W = w||keys.w||400,
-				H = h||keys.h||400,
-				urlType = "",
-				x = urlPath.replace(/(.*)\.(.*)/, (str,L,R) => {
-					urlName = L;
-					urlType = R;
-					return "#";
-				});
-
-			Trace("link", url, urlPath, keys);
-			switch (urlType) { 
-				case "jpg":  
-				case "png":
-					return "".tag("img", { src:`${url}?killcache=${new Date()}`, width:W, height:H });
-					break;
-
-				case "view": 
-				default:
-					return "".tag("iframe", { src: url, width:W, height:H });
-			}
-		},
-		
 		banner: "",	// disabled
-		
-		/*classif: {
-			level: "",
-			purpose: "",
-			banner: ""
-		}, */
-		
-		info: {
-		},
-		
-		mods: ["totem","enums","jsdb","debe","chip","atomic","reader"],
 		
 		JIRA: ENV.JIRA || "JIRA.undefined",
 		RAS: ENV.RAS || "RAS.undefined",
@@ -3841,24 +3584,7 @@ Site skinning context
 			py: "anconda2-2019.7 (iPython 5.1.0 debugger), numpy 1.11.3, scipy 0.18.1, utm 0.4.2, Python 2.7.13",
 			m: "matlab R18, odbc, simulink, stateflow",
 			R: "R-3.6.0, MariaDB, MySQL-connector"
-		},
-		
-		/*
-		match: function (recs,where,get) {
-			return recs.match(where,get);
-		},
-		
-		replace: function (recs,subs) {
-			return recs.replace(subs);
-		}, */
-		
-		/**
-		Jsonize records.
-		@memberof Skinning
-		@param {Array} recs Record source
-		*/
-		json: recs => JSON.stringify(recs)
-
+		}
 	},
 	
 /**
@@ -4022,8 +3748,6 @@ Enable for double-blind testing
 */
 	//blindTesting : false		//< Enable for double-blind testing 
 }, TOTEM, ".");
-
-//DEBE.$libs.$debe = DEBE;
 
 /**
 Process an bySOAP session peer-to-peer request.  Currently customized for Hydra-peer and 
@@ -6221,7 +5945,7 @@ clients, users, system health, etc).`
 	D2: () =>
 		config({
 			"secureLink.challenge.extend": 10,
-			"byTable.": {
+			"byNode.": {
 				wfs: function (req,res) {
 					res("here i go again");
 

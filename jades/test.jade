@@ -63,7 +63,7 @@ append base_body
 					data.forEach( datetime => {
 						const [d,t] = datetime.split(' ');
 						html += `${ioClient} reserved ${d} at ${t} for a ${caltype} lesson`.tag("span");
-						Ajax( {Client: ioClient}, "put", calendar.tag("?",{ Date: datetime}), res => alert(res) );
+						Ajax( {Client: ioClient}, "put", calendar.tag("?",{ Date: datetime, Type: caltype}), res => alert("reserved") );
 					});
 					$('#status').html(html);
 				},

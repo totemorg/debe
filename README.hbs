@@ -1,46 +1,47 @@
 # [DEBE](https://www.npmjs.com/package/@totemorg/debe)
 
-Extends the **TOTEM** web service to provide the following endpoints:
+**DEBETOTEM** defines CRUD (POST, GET, PUT, DELETE) the endpoints
 
 	DATASET.TYPE ? QUERY
 	NOTEBOOK.TYPE ? QUERY
 	AREA/PATH/FILE.TYPE ? QUERY
-	COMMAND.TYPE ? QUERY
+	HOOK.TYPE ? QUERY
 
-to access *DATASET*s, *NOTEBOOK*s, *FILE*s and *COMMAND*s per 
-[Totem's API](http://totem.hopto.org/api.view) and 
-[TOTEM's skinning guide](https://totem.hopto.org/skinguide.view).
+to access *DATASET*s, *NOTEBOOK*s, *FILE*s and *HOOK*s as detailed in **DEBE**'s
+[API](http://totem.hopto.org/api.view) and [skinning guide](https://totem.hopto.org/skinguide.view).
 
-Use *TYPE* to convert a *DATASET*:
+Use *TYPE* to filter *DATASET*s
 
-	db | xml | csv | txt | flat | kml | html | json
+	db | xml | csv | txt | html | json | blog 
+	kml | tree | schema | nav | delta
 
-inspect a *DATASET*:
-
-	tree | schema | nav | delta | view | blog
-
-render a *NOTEBOOK*:
+or to render
  
 	view | run | plugin | pivot | site | spivot | brief | gridbrief | pivbrief | runbrief
 
-probe a *NOTEBOOK*:
+probe
 
 	exe | tou | md | status | suitors | usage | reset | EVENTS
 
-manage a *NOTEBOOK*:
+manage
 
 	import | export | publish | addkey | subkey
 
-license a *NOTEBOOK*:
+or license
 
 	js | py | m | me | jade | ...
 
-**DEBE** also provides the following service *COMMAND*s:
+*NOTEBOOK*s.
 
-	agent | alert | ingest | riddle | task | ping
-	
-to distribute jobs, alert clients, ingest data, validate sessions, spread tasks, and 
-test connections, and provides several *FILE* areas: 
+The following *HOOK*s
+
+	riddle | task | ping | login | agent
+	restart
+
+validate sessions, shard tasks, test connections, establish secure link with clients,
+and interface with in-network task agents.
+
+**DEBE** also provides several *FILE* areas: 
 
 	stores | uploads | shares | west | east | jades
 
@@ -49,6 +50,7 @@ for supervised/unsupervised file sharing.
 ## Manage
 
 	npm install @totemorg/debe		# install
+	npm install @totemorg/totem		# install
 	npm run start [ ? | $ | ...]	# Unit test
 	npm run verminor				# Roll minor version
 	npm run vermajor				# Roll major version
