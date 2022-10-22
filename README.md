@@ -1,6 +1,6 @@
 # [DEBE](https://www.npmjs.com/package/@totemorg/debe)
 
-**DEBETOTEM** defines CRUD (POST, GET, PUT, DELETE) the endpoints
+**DEBE** defines CRUD (POST, GET, PUT, DELETE) the endpoints
 
 	DATASET.TYPE ? QUERY
 	NOTEBOOK.TYPE ? QUERY

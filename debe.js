@@ -3509,23 +3509,23 @@ ESC remedy interface.
 Site skinning context
 */
 	"site.": { 		//< initial site context
-		by: "ACMESDS".link( ENV.BY || "http://BY.undefined" ),
+		by: ENV.BY || "ACMESDS",
 		
 		explorer: {
-			Root: "/explore.view?src=/root/", 
-			Earth: "http://${domain}:8083/Apps/totem_index.html", 
-			Graph: "http://${domain}:7474/neo4j", 
-			Streets: "http://${domain}:3000/", 
-			Process: "http://${domain}:1880/", 
+			Root: "/root/", 
+			Earth: `${ENV.URL_CESIUM}/Apps/earth.html`, 
+			Graph: `${ENV.URL_NEO4J}/neo4j`, 
+			Streets: `${ENV.URL_OSM}/`, 
+			Process: `${ENV.URL_NODERED}/`, 
 			Totem: "/brief.view?_project=totem",  
 			Notebooks: "/notebooks.html", 
 			API: "/api.view", 
 			SkinGuide: "/skinguide.view", 
-			JIRA: ENV.JIRA || "JIRA.undefined", 
-			RAS: ENV.RAS || "RAS.undefined",
-			Repo: ENV.REPO || "REPO.undefined",
+			//JIRA: ENV.JIRA || "JIRA.undefined", 
+			//RAS: ENV.RAS || "RAS.undefined",
+			Repo: `${ENV.URL_REPO}/`,
 			Survey: "/survey.view",
-			Calendar: "/test.view"
+			Calendar: "/calendar.view"
 		},
 		
 		sitemap: [
