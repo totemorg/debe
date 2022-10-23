@@ -49,8 +49,10 @@ for supervised/unsupervised file sharing.
 
 ## Manage
 
-	npm install @totemorg/debe		# install
-	npm install @totemorg/totem		# install
+	npm install @totemorg/debe		# install extended service
+	npm install @totemorg/totem		# install base service
+	npm install @totemorg/dbs		# install database schema
+
 	npm run start [ ? | $ | ...]	# Unit test
 	npm run verminor				# Roll minor version
 	npm run vermajor				# Roll major version
@@ -95,7 +97,7 @@ where configuration keys follow [ENUMS deep copy conventions](https://www.npmjs.
 <dt><a href="#DEBE.module_Data">Data</a></dt>
 <dd></dd>
 <dt><a href="#module_DEBE">DEBE</a></dt>
-<dd><p>Provides UI interfaces to the <a href="https://github.com/totemstan/totem">barebone TOTEM web service</a> 
+<dd><p>Provides UI interfaces to the <a href="https://github.com/totemorg/totem">barebone TOTEM web service</a> 
 to support notebooks and other entities.  This module documented 
 in accordance with <a href="https://jsdoc.app/">jsdoc</a>.</p>
 <h3 id="env-dependencies">Env Dependencies</h3>
@@ -177,7 +179,7 @@ Returns a tree = {name,weight,nodes} from records having been sorted on keys=[ke
 <a name="module_DEBE"></a>
 
 ## DEBE
-Provides UI interfaces to the [barebone TOTEM web service](https://github.com/totemstan/totem) 
+Provides UI interfaces to the [barebone TOTEM web service](https://github.com/totemorg/totem) 
 to support notebooks and other entities.  This module documented 
 in accordance with [jsdoc](https://jsdoc.app/).
 
@@ -189,8 +191,8 @@ in accordance with [jsdoc](https://jsdoc.app/).
 	RAS = http://DOMAIN
 	BY = https://DOMAIN
 
-**Requires**: <code>module:[totem](https://github.com/totemstan/totem)</code>, <code>module:[atomic](https://github.com/totemstan/atomic)</code>, <code>module:[man](https://github.com/totemstan/man)</code>, <code>module:[enums](https://github.com/totemstan/enums)</code>, <code>module:[reader](https://github.com/totemstan/reader)</code>, <code>module:[skin](https://github.com/totemstan/skin)</code>, <code>module:[dogs](https://github.com/totemstan/dogs)</code>, <code>module:[crypto](https://nodejs.org/docs/latest/api/)</code>, <code>module:[child\_process](https://nodejs.org/docs/latest/api/)</code>, <code>module:[fs](https://nodejs.org/docs/latest/api/)</code>, <code>module:[stream](https://nodejs.org/docs/latest/api/)</code>, <code>module:[cluster](https://nodejs.org/docs/latest/api/)</code>, <code>module:[repl](https://nodejs.org/docs/latest/api/)</code>, <code>module:[i18n-abide](https://www.npmjs.com/package/i18n-abide)</code>, <code>module:[optimist](https://www.npmjs.com/package/optimist)</code>, <code>module:[tokml](https://www.npmjs.com/package/tokml)</code>, <code>module:[officegen](https://www.npmjs.com/package/officegen)</code>  
-**Author**: [ACMESDS](https://totemstan.github.io)  
+**Requires**: <code>module:[totem](https://github.com/totemorg/totem)</code>, <code>module:[atomic](https://github.com/totemorg/atomic)</code>, <code>module:[man](https://github.com/totemorg/man)</code>, <code>module:[enums](https://github.com/totemorg/enums)</code>, <code>module:[reader](https://github.com/totemorg/reader)</code>, <code>module:[skin](https://github.com/totemorg/skin)</code>, <code>module:[dogs](https://github.com/totemorg/dogs)</code>, <code>module:[crypto](https://nodejs.org/docs/latest/api/)</code>, <code>module:[child\_process](https://nodejs.org/docs/latest/api/)</code>, <code>module:[fs](https://nodejs.org/docs/latest/api/)</code>, <code>module:[stream](https://nodejs.org/docs/latest/api/)</code>, <code>module:[cluster](https://nodejs.org/docs/latest/api/)</code>, <code>module:[repl](https://nodejs.org/docs/latest/api/)</code>, <code>module:[i18n-abide](https://www.npmjs.com/package/i18n-abide)</code>, <code>module:[optimist](https://www.npmjs.com/package/optimist)</code>, <code>module:[tokml](https://www.npmjs.com/package/tokml)</code>, <code>module:[officegen](https://www.npmjs.com/package/officegen)</code>  
+**Author**: [ACMESDS](https://totemorg.github.io)  
 **Example**  
 ```js
 // npm test D2
@@ -312,7 +314,6 @@ config({
         * [.ingest(req, res)](#module_DEBE..byNode..ingest)
         * [.decode(req, res)](#module_DEBE..byNode..decode)
         * [.devstatus(req, res)](#module_DEBE..byNode..devstatus)
-        * [.milestones(req, res)](#module_DEBE..byNode..milestones)
         * [.config(req, res)](#module_DEBE..byNode..config)
         * [.info(req, res)](#module_DEBE..byNode..info)
         * [.DG(req, res)](#module_DEBE..byNode..DG)
@@ -386,43 +387,43 @@ config({
 <a name="module_DEBE..$libs.$"></a>
 
 #### $libs.$
-See [man](https://github.com/totemstan/man/)
+See [man](https://github.com/totemorg/man/)
 
 **Kind**: static property of [<code>$libs</code>](#module_DEBE..$libs)  
 <a name="module_DEBE..$libs.$log"></a>
 
 #### $libs.$log
-See [debe](https://github.com/totemstan/debe/)
+See [debe](https://github.com/totemorg/debe/)
 
 **Kind**: static property of [<code>$libs</code>](#module_DEBE..$libs)  
 <a name="module_DEBE..$libs.$task"></a>
 
 #### $libs.$task
-See [debe](https://github.com/totemstan/debe/)
+See [debe](https://github.com/totemorg/debe/)
 
 **Kind**: static property of [<code>$libs</code>](#module_DEBE..$libs)  
 <a name="module_DEBE..$libs.$sql"></a>
 
 #### $libs.$sql
-See [jsdb](https://github.com/totemstan/jsdb/)
+See [jsdb](https://github.com/totemorg/jsdb/)
 
 **Kind**: static property of [<code>$libs</code>](#module_DEBE..$libs)  
 <a name="module_DEBE..$libs.$neo"></a>
 
 #### $libs.$neo
-See [jsdb](https://github.com/totemstan/jsdb/)
+See [jsdb](https://github.com/totemorg/jsdb/)
 
 **Kind**: static property of [<code>$libs</code>](#module_DEBE..$libs)  
 <a name="module_DEBE..$libs.$copy"></a>
 
 #### $libs.$copy
-See [enums](https://github.com/totemstan/enums/)
+See [enums](https://github.com/totemorg/enums/)
 
 **Kind**: static property of [<code>$libs</code>](#module_DEBE..$libs)  
 <a name="module_DEBE..$libs.$each"></a>
 
 #### $libs.$each
-See [enums](https://github.com/totemstan/enums/)
+See [enums](https://github.com/totemorg/enums/)
 
 **Kind**: static property of [<code>$libs</code>](#module_DEBE..$libs)  
 <a name="module_DEBE..$libs.$fetch"></a>
@@ -625,7 +626,6 @@ Filter dataset recs on specifed req-res thread
     * [.ingest(req, res)](#module_DEBE..byNode..ingest)
     * [.decode(req, res)](#module_DEBE..byNode..decode)
     * [.devstatus(req, res)](#module_DEBE..byNode..devstatus)
-    * [.milestones(req, res)](#module_DEBE..byNode..milestones)
     * [.config(req, res)](#module_DEBE..byNode..config)
     * [.info(req, res)](#module_DEBE..byNode..info)
     * [.DG(req, res)](#module_DEBE..byNode..DG)
@@ -831,16 +831,6 @@ Endpoint to return release information about requested license.
 <a name="module_DEBE..byNode..devstatus"></a>
 
 #### byNode..devstatus(req, res)
-**Kind**: static method of [<code>byNode.</code>](#module_DEBE..byNode.)  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| req | <code>Object</code> | Totem session request |
-| res | <code>function</code> | Totem session response |
-
-<a name="module_DEBE..byNode..milestones"></a>
-
-#### byNode..milestones(req, res)
 **Kind**: static method of [<code>byNode.</code>](#module_DEBE..byNode.)  
 
 | Param | Type | Description |

@@ -9,8 +9,8 @@
     "setoper": "source ./maint.sh config oper",
     "setprot": "source ./maint.sh config prot",
     "setprod": "source ./maint.sh config prod",
-    "verminor": "npm version minor -f",
-    "vermajor": "npm version major -f",
+    "verminor": "npm version minor",
+    "vermajor": "npm version major",
     "start": "node debe.js ",
     "redoc": "jsdoc2md --template README.hbs --files debe.js >README.md; git commit -am 'redoc'; git  push agent master",
     "genio": "node debe.js blog http://localhost:8080/totemblog.view ./stash/index.html; cd stash; git commit -am 'reblog'; git push agent master",
@@ -18,15 +18,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@git.geointapps.org:acme/debe.org"
+    "url": "git@git.geointapps.org:totemorg/debe.org"
   },
-  "author": "ACME Software Disposal Service",
+  "author": "totemorg Software Disposal Service",
   "license": "ISC",
   "dependencies": {
-    "@totemorg/atomic": "^2.0.0",
-    "@totemorg/dogs": "^1.3.0",
-    "@totemorg/man": "^1.16.0",
-    "@totemorg/reader": "^2.0.0",
+    "@totemorg/atomic": "^2.1.0",
+    "@totemorg/dogs": "^1.4.0",
+    "@totemorg/man": "^1.17.0",
+    "@totemorg/mathjx": "^1.8.0",
+    "@totemorg/reader": "^2.2.0",
     "ajv": "^6.10.2",
     "archiver": "^3.1.1",
     "feed": "^4.1.0",

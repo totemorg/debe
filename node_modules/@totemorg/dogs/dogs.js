@@ -15,7 +15,7 @@ documented in accordance with [jsdoc]{@link https://jsdoc.app/}.
 @requires [enums](https://github.com/totemorg/enums)
 */
 const
-	{Copy,Each,Fetch,Log,Start} = require("./enums");
+	{Copy,Each,Fetch,Log,Start} = require("@totemorg/enums");
 
 const
 	DOGS = module.exports = {	// watchdogs

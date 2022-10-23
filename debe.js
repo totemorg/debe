@@ -1,7 +1,7 @@
 ﻿// UNCLASSIFIED 
 
 const
-	READ = require("./reader");		// partial config of NLP (avoids string prototype collision)
+	{ readers, scanner } = READ = {}; //require("@totemorg/reader");		// partial config of NLP (avoids string prototype collision)
 
 // NodeJS modules
 const 									
@@ -31,14 +31,14 @@ const
 	// include modules
 	//EAT = require("./ingesters"),	
 	TOTEM = require("./totem"),
-	ENUMS = require("./totem/enums"),
-	SKIN = require("./totem/skin"),
-	ATOM = require("./atomic"), 
-	$ = require("./man"),
+	ENUMS = require("./enums"),
+	SKIN = require("./skin"),
+	ATOM = require("@totemorg/atomic"), 
+	$ = require("@totemorg/man"),
 	//RAN = require("./randpr"),
 	//PIPE = require("./pipe"),
 	//BLOG = require("./blog"),
-	DOGS = require("./dogs");
+	DOGS = require("@totemorg/dogs");
 
 const 
 	{ exec } = CP,
@@ -47,7 +47,6 @@ const
 	 getList, getURL,
 	 txmailCon, rxmailCon,
 	} = ENUMS,
-	{ readers, scanner } = READ,
 	{ skinContext, renderSkin, renderJade } = SKIN,
 	{ runTask, queues, byAction,
 		sqlThread, errors, paths, cache, site, byNode, userID, dsThread,
@@ -335,7 +334,7 @@ Copy({  // date prototypes
 }, Date.prototype);
 
 /**
-Provides UI interfaces to the [barebone TOTEM web service](https://github.com/totemstan/totem) 
+Provides UI interfaces to the [barebone TOTEM web service](https://github.com/totemorg/totem) 
 to support notebooks and other entities.  This module documented 
 in accordance with [jsdoc]{@link https://jsdoc.app/}.
 
@@ -348,15 +347,15 @@ in accordance with [jsdoc]{@link https://jsdoc.app/}.
 	BY = https://DOMAIN
 
 @module DEBE
-@author [ACMESDS](https://totemstan.github.io)
+@author [ACMESDS](https://totemorg.github.io)
 
-@requires [totem](https://github.com/totemstan/totem)
-@requires [atomic](https://github.com/totemstan/atomic)
-@requires [man](https://github.com/totemstan/man)
-@requires [enums](https://github.com/totemstan/enums)
-@requires [reader](https://github.com/totemstan/reader)
-@requires [skin](https://github.com/totemstan/skin)
-@requires [dogs](https://github.com/totemstan/dogs)
+@requires [totem](https://github.com/totemorg/totem)
+@requires [atomic](https://github.com/totemorg/atomic)
+@requires [man](https://github.com/totemorg/man)
+@requires [enums](https://github.com/totemorg/enums)
+@requires [reader](https://github.com/totemorg/reader)
+@requires [skin](https://github.com/totemorg/skin)
+@requires [dogs](https://github.com/totemorg/dogs)
 
 @requires [crypto](https://nodejs.org/docs/latest/api/)
 @requires [child_process](https://nodejs.org/docs/latest/api/)
@@ -469,10 +468,14 @@ Inspect doc - kludge i/f to support nlp project
 		const
 			[x,Doc,Topic] = doc.match( /(.*)#(.*)/ ) || ["",doc,""];
 		
-		scanner(Doc, Topic||"default", 0.1, score => {
-			Trace(doc,score);
-			cb(score);
-		});
+		if ( scanner )
+			scanner(Doc, Topic||"default", 0.1, score => {
+				Trace(doc,score);
+				cb(score);
+			});
+		
+		else
+			cb( null );
 			
 	},
 	
@@ -518,20 +521,20 @@ Usage:
 		},
 		
 /**
-See [man]{@link https://github.com/totemstan/man/}
+See [man]{@link https://github.com/totemorg/man/}
 */
 		$: $,
 /**
-See [debe]{@link https://github.com/totemstan/debe/}
+See [debe]{@link https://github.com/totemorg/debe/}
 */
 		$log: console.log,
 /**
-See [debe]{@link https://github.com/totemstan/debe/}
+See [debe]{@link https://github.com/totemorg/debe/}
 */
 		$task: runTask,
 		// $jimp: JIMP,
 /**
-See [jsdb]{@link https://github.com/totemstan/jsdb/}
+See [jsdb]{@link https://github.com/totemorg/jsdb/}
 */
 		$sql: sqlThread,
 		
@@ -557,15 +560,15 @@ See [jsdb]{@link https://github.com/totemstan/jsdb/}
 		}, req => byAction.delete(req, cb||$log) ),
 		
 /**
-See [jsdb]{@link https://github.com/totemstan/jsdb/}
+See [jsdb]{@link https://github.com/totemorg/jsdb/}
 */
 		$neo: neoThread,
 /**
-See [enums]{@link https://github.com/totemstan/enums/}
+See [enums]{@link https://github.com/totemorg/enums/}
 */
 		$copy: Copy,
 /**
-See [enums]{@link https://github.com/totemstan/enums/}
+See [enums]{@link https://github.com/totemorg/enums/}
 */
 		$each: Each,
 /**
@@ -919,7 +922,7 @@ Initialize DEBE on startup.
 			const 
 				foci = {},
 				{ $notebooks } = $libs,
-				repo = ENV.REPO, //"https://github.com/totemstan",
+				repo = ENV.REPO, //"https://github.com/totemorg",
 				toggle = {
 					chain: false
 				};
@@ -1820,14 +1823,15 @@ Search of multiple files
 						break;
 
 					default:
-						if ( reader = readers[Type] ) 
-							reader( path, txt => {
-								//FS.writeFile(save,txt,"utf-8",err => {});
-								res(txt);
-							});	
+						if ( readers )
+							if ( reader = readers[Type] ) 
+								reader( path, txt => {
+									//FS.writeFile(save,txt,"utf-8",err => {});
+									res(txt);
+								});	
 
-						else
-							res( new Error("no reader for specified file") );
+							else
+								res( new Error("no reader for specified file") );
 				}
 
 			else
@@ -2937,15 +2941,16 @@ Endpoint to send emergency message to all clients then halt totem
 			statRepo(sql);	
 		},
 
-/**
+/*
 @param {Object} req Totem session request
 @param {Function} res Totem session response
 */
+		/*
 		milestones: (req, res) => {
 			const 
 				{sql,log,query,type} = req,
 				map = {SeqNum:1,Num:1,Hours:1,Complete:1,Task:1},
-				{xlsx} = readers;
+				{xlsx} = readers || {};
 
 			if (type == "help")
 			return res("Provide milestone status information");
@@ -2961,7 +2966,7 @@ Endpoint to send emergency message to all clients then halt totem
 			});
 
 			res(SUBMITTED);
-		},	
+		},	*/
 
 /**
 Configure DEBE/TOTEM.
@@ -3534,23 +3539,23 @@ Site skinning context
 			 c: "[Employee Portal](xxx:/portal.view)",
 			 d: "[Facebook](https://facebook.com/?goto=totem)",
 			 e: "[Leaders](xxx:/sponsors?level=leader)",
-			 f: "[Federated Repo](http://github.com/totemstan/dockify)"
+			 f: "[Federated Repo](http://github.com/totemorg/dockify)"
 			},
 			{a: "[Privacy](xxx:/privacy.new)",	
 			 b: "[API](xxx:/api.view)",
 			 c: "[Contact Us](xxx:/contact.view)",
 			 d: "[Twitter](https://twitter.com/?goto=totem)",
 			 e: "[Corporate](xxx:/sponsors?level=corporate)",
-			 f: "[DEBE Repo](https://github.com/totemstan/debe)"
+			 f: "[DEBE Repo](https://github.com/totemorg/debe)"
 			},
 			{a: "[News](xxx:/news.view)",
 			 b: "[Skinning](xxx:/skinguide.view)",
 			 c: "[Career Opportunities](xxx:/contact.view)",
 			 d: "[Instagram](http://instagram.com?goto=totem)",
 			 e: "[Platinum](http://xxx:/sponsors?level=platinum)",
-			 f: "[TOTEM Repo](https://github.com/totemstan/totem)"
+			 f: "[TOTEM Repo](https://github.com/totemorg/totem)"
 			},
-			{a: "[Community](http://totemstan.github.io)",
+			{a: "[Community](http://totemorg.github.io)",
 			 b: "[Status](xxx:/status.view)",
 			 c: "[History](http://intellipedia/swag)",
 			 d: "[Telegram](https://telegram.com?goto=totem)",
@@ -5192,7 +5197,7 @@ function publishPlugin(req,res) {
 	function genArtifacts( name, uid ) {
 		const 
 			remote = "164.187.33.219",
-			gitsite = "git@github.com:totemstan/artifacts",
+			gitsite = "git@github.com:totemorg/artifacts",
 				//"https://sc.appdev.proj.coe/acmesds",
 			short = {
 				pub: "publish",
@@ -5798,7 +5803,7 @@ To connect to ${site.Nick} from Windows:
 
 }
 
-Start("debe", {			// start unit test
+Start("debe", Copy({			// start unit test
 	"??": () => 
 		Trace("$", {
 			siteContext: site
@@ -6043,6 +6048,6 @@ clients, users, system health, etc).`
 					DEBE.stop( () => process.exit() );
 				});
 		})
-});
+}, (cmd,ctx) => $(cmd,ctx) ));
 
 // UNCLASSIFIED
